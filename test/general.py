@@ -84,7 +84,7 @@ class FbVMWareTestcase(unittest.TestCase):
         appname = os.path.basename(sys.argv[0]).replace('.py', '')
         self._appname = appname
 
-        super(FbVMWaresTestcase, self).__init__(methodName)
+        super(FbVMWareTestcase, self).__init__(methodName)
 
     # -------------------------------------------------------------------------
     @property

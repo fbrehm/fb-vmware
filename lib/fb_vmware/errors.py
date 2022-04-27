@@ -17,6 +17,8 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
+__version__ = '0.1.0'
+
 _ = XLATOR.gettext
 
 

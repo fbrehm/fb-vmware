@@ -14,8 +14,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
 parts/
 sdist/
 var/
@@ -53,7 +51,6 @@ coverage.xml
 
 # Translations
 *.mo
-*.pot
 
 # Django stuff:
 *.log
@@ -127,3 +124,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other stuff, loke editors a.s.o.
+*.swp
+*.old
+*.bak
+tmp/
+etc/*.ini
+rpmdir/*
+.rpm-version*
+

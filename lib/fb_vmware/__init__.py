@@ -21,6 +21,8 @@ from .base import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
 from .base import DEFAULT_DC, DEFAULT_CLUSTER, DEFAULT_TZ_NAME
 from .base import DEFAULT_MAX_SEARCH_DEPTH
 
+from .obj import VsphereObject
+
 __version__ = '0.2.1'
 
 LOG = logging.getLogger(__name__)

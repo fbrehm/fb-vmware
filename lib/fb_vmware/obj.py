@@ -22,10 +22,12 @@ from .xlate import XLATOR
 
 from .errors import VSphereNameError
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
+DEFAULT_OBJ_STATUS = 'gray'
 
 
 # =============================================================================
@@ -40,8 +42,9 @@ class VsphereObject(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, name=None, obj_type=None, name_prefix="unknown", status='gray', config_status='gray',
-            appname=None, verbose=0, version=__version__, base_dir=None, initialized=None):
+        self, name=None, obj_type=None, name_prefix="unknown", status=DEFAULT_OBJ_STATUS,
+            config_status=DEFAULT_OBJ_STATUS, appname=None, verbose=0, version=__version__,
+            base_dir=None, initialized=None):
 
         self._name = None
         self._obj_type = None

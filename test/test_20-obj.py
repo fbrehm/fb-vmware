@@ -43,6 +43,34 @@ class TestVMWareObject(FbVMWareTestcase):
 
         LOG.debug("Version of fb_vmware.obj: {!r}.".format(fb_vmware.obj.__version__))
 
+    # -------------------------------------------------------------------------
+    def test_init_object(self):
+
+        if self.verbose >= 1:
+            print()
+        LOG.info("Testing init of a VsphereObject object ...")
+
+        from fb_vmware import VsphereObject, DEFAULT_OBJ_STATUS
+        obj_type = 'testobject'
+        obj_name = 'Test-Object'
+
+        gen_obj = VsphereObject(
+            name=obj_name,
+            obj_type=obj_type,
+            appname=self.appname,
+            verbose=1,
+        )
+
+        LOG.debug("VsphereObject %r: {!r}".format(gen_obj))
+        LOG.debug("VsphereObject %s:\n{}".format(gen_obj))
+
+        self.assertIsInstance(gen_obj, VsphereObject)
+        self.assertEqual(gen_obj.verbose, 1)
+        self.assertEqual(gen_obj.name, obj_name)
+        self.assertEqual(gen_obj.obj_type, obj_type)
+        self.assertEqual(gen_obj.config_status, DEFAULT_OBJ_STATUS)
+        self.assertEqual(gen_obj.status, DEFAULT_OBJ_STATUS)
+
 
 # =============================================================================
 if __name__ == '__main__':
@@ -57,6 +85,7 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     suite.addTest(TestVMWareObject('test_import', verbose))
+    suite.addTest(TestVMWareObject('test_init_object', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

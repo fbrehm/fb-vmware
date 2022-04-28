@@ -17,7 +17,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 _ = XLATOR.gettext
 
@@ -168,13 +168,11 @@ class VSphereCannotConnectError(VSphereExpectedError):
 class TimeoutCreateVmError(VSphereExpectedError):
 
     # -------------------------------------------------------------------------
-    def __init__(self, vm, timeout):
+    def __init__(self, vm, timeout=None):
 
         t_o = None
-        try:
+        if timeout is not None:
             t_o = float(timeout)
-        except ValueError:
-            pass
         self.timeout = t_o
 
         self.vm = vm
@@ -182,8 +180,11 @@ class TimeoutCreateVmError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
 
-        msg = _("Timeout on creating VM {vm!r} after {to:0.1f} seconds.").format(
-            vm=self.vm, to=self.timeout)
+        if self.timeout is not None:
+            msg = _("Timeout on creating VM {vm!r} after {to:0.1f} seconds.").format(
+                vm=self.vm, to=self.timeout)
+        else:
+            msg = _("Timeout on creating VM {!r}.").format(self.vm)
         return msg
 
 

@@ -35,7 +35,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def test_import(self):
 
-        if self.verbose == 1:
+        if self.verbose >= 1:
             print()
         LOG.info("Testing import of fb_vmware.errors ...")
         import fb_vmware.errors
@@ -46,7 +46,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def test_vsphere_error(self):
 
-        if self.verbose == 1:
+        if self.verbose >= 1:
             print()
         LOG.info("Test raising a VSphereHandlerError exception ...")
 
@@ -69,7 +69,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def test_nodatastore_error(self):
 
-        if self.verbose == 1:
+        if self.verbose >= 1:
             print()
         LOG.info("Test raising a VSphereNoDatastoresFoundError exception ...")
 
@@ -90,7 +90,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def test_name_error(self):
 
-        if self.verbose == 1:
+        if self.verbose >= 1:
             print()
         LOG.info("Test raising a VSphereNameError exception ...")
 
@@ -113,7 +113,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def test_notfound_error(self):
 
-        if self.verbose == 1:
+        if self.verbose >= 1:
             print()
 
         from fb_vmware.errors import VSphereHandlerError
@@ -131,6 +131,109 @@ class TestVMWareErrors(FbVMWareTestcase):
             raise VSphereDatacenterNotFoundError('my-dc')
         e = cm.exception
         LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        self.assertIsInstance(e, VSphereDatacenterNotFoundError)
+
+        LOG.info("Test raising a VSphereVmNotFoundError exception ...")
+
+        from fb_vmware.errors import VSphereVmNotFoundError
+
+        with self.assertRaises(TypeError) as cm:
+            raise VSphereVmNotFoundError()
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        with self.assertRaises(VSphereHandlerError) as cm:
+            raise VSphereVmNotFoundError('my-VM')
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        self.assertIsInstance(e, VSphereVmNotFoundError)
+
+        LOG.info("Test raising a VSphereNoDatastoreFoundError exception ...")
+
+        from fb_vmware.errors import VSphereNoDatastoreFoundError
+
+        with self.assertRaises(TypeError) as cm:
+            raise VSphereNoDatastoreFoundError()
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        with self.assertRaises(ValueError) as cm:
+            raise VSphereNoDatastoreFoundError('my-datastore')
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        with self.assertRaises(VSphereHandlerError) as cm:
+            raise VSphereNoDatastoreFoundError(20 * 1024 * 1024 * 1024)
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        self.assertIsInstance(e, VSphereNoDatastoreFoundError)
+
+        LOG.info("Test raising a VSphereNetworkNotExistingError exception ...")
+
+        from fb_vmware.errors import VSphereNetworkNotExistingError
+
+        with self.assertRaises(TypeError) as cm:
+            raise VSphereNetworkNotExistingError()
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        with self.assertRaises(VSphereHandlerError) as cm:
+            raise VSphereNetworkNotExistingError('my-network')
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        self.assertIsInstance(e, VSphereNetworkNotExistingError)
+
+    # -------------------------------------------------------------------------
+    def test_misc_errors(self):
+
+        if self.verbose >= 1:
+            print()
+
+        from fb_vmware.errors import VSphereHandlerError
+
+        LOG.info("Test raising a VSphereCannotConnectError exception ...")
+
+        from fb_vmware.errors import VSphereCannotConnectError
+
+        wrong_params_list = (
+            [], ['test-vca.nowhere.net'], ['test-vca.nowhere.net', 9100],
+            ['test-vca.nowhere.net', 9100, 'admin', 'blub'],
+        )
+
+        for wrong_params in wrong_params_list:
+            with self.assertRaises(TypeError) as cm:
+                raise VSphereCannotConnectError(*wrong_params)
+            e = cm.exception
+            LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        good_params = ['test-vca.nowhere.net', 9100, 'admin']
+        with self.assertRaises(VSphereHandlerError) as cm:
+            raise VSphereCannotConnectError(*good_params)
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        self.assertIsInstance(e, VSphereCannotConnectError)
+
+        LOG.info("Test raising a TimeoutCreateVmError exception ...")
+
+        from fb_vmware.errors import TimeoutCreateVmError
+
+        wrong_params_list = ([], ['my-VM', 3600, 'blub'], ['my-VM', 'uhu'])
+
+        for wrong_params in wrong_params_list:
+            with self.assertRaises((TypeError, ValueError)) as cm:
+                raise TimeoutCreateVmError(*wrong_params)
+            e = cm.exception
+            LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        good_params_list = (['my-VM', 3600], ['my-VM'], ['my-VM', None])
+
+        for good_params in good_params_list:
+
+            with self.assertRaises(VSphereHandlerError) as cm:
+                raise TimeoutCreateVmError(*good_params)
+            e = cm.exception
+            LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+            self.assertIsInstance(e, TimeoutCreateVmError)
 
 
 # =============================================================================
@@ -150,6 +253,7 @@ if __name__ == '__main__':
     suite.addTest(TestVMWareErrors('test_nodatastore_error', verbose))
     suite.addTest(TestVMWareErrors('test_name_error', verbose))
     suite.addTest(TestVMWareErrors('test_notfound_error', verbose))
+    suite.addTest(TestVMWareErrors('test_misc_errors', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

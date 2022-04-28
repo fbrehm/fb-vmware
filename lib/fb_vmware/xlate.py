@@ -20,12 +20,12 @@ try:
 except ImportError:
     from pathlib2 import Path
 
-from distutils.version import LooseVersion
-
 # Third party modules
 import babel
 import babel.lists
 from babel.support import Translations
+
+from packaging.version import Version
 
 DOMAIN = 'fb_vmware'
 
@@ -58,8 +58,8 @@ if __mo_file__:
 else:
     XLATOR = gettext.NullTranslations()
 
-CUR_BABEL_VERSION = LooseVersion(babel.__version__)
-NEWER_BABEL_VERSION = LooseVersion('2.6.0')
+CUR_BABEL_VERSION = Version(babel.__version__)
+NEWER_BABEL_VERSION = Version('2.6.0')
 
 SUPPORTED_LANGS = (
     'de_DE',

@@ -19,8 +19,9 @@ from .xlate import XLATOR
 from .base import BaseVsphereHandler
 from .base import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
 from .base import DEFAULT_DC, DEFAULT_CLUSTER, DEFAULT_TZ_NAME
+from .base import DEFAULT_MAX_SEARCH_DEPTH
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 LOG = logging.getLogger(__name__)
 

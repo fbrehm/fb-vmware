@@ -12,7 +12,7 @@ from __future__ import absolute_import
 import logging
 import ssl
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 # Third party modules
 from six import add_metaclass
@@ -29,7 +29,7 @@ from .xlate import XLATOR
 
 from .errors import VSphereCannotConnectError
 
-__version__ = '0.1.0'
+__version__ = '0.1.2'
 
 LOG = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ DEFAULT_USER = 'Administrator@vsphere.local'
 DEFAULT_DC = 'vmcc'
 DEFAULT_CLUSTER = 'vmcc-l105-01'
 DEFAULT_TZ_NAME = 'Europe/Berlin'
+DEFAULT_MAX_SEARCH_DEPTH = 10
 
 
 # =============================================================================
@@ -51,7 +52,7 @@ class BaseVsphereHandler(HandlingObject):
     May not be instantiated.
     """
 
-    max_search_depth = 10
+    max_search_depth = DEFAULT_MAX_SEARCH_DEPTH
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -156,6 +157,29 @@ class BaseVsphereHandler(HandlingObject):
             self._tz = value
         else:
             self._tz = pytz.timezone(value)
+
+    # -------------------------------------------------------------------------
+    @abstractmethod
+    def __repr__(self):
+        """Typecasting into a string for reproduction."""
+
+        out = "<%s()>" % (self.__class__.__name__)
+        return out
+
+    # -------------------------------------------------------------------------
+    def _repr(self):
+
+        out = "<%s(" % (self.__class__.__name__)
+
+        fields = []
+        fields.append("host={!r}".format(self.host))
+        fields.append("port={!r}".format(self.port))
+        fields.append("user={!r}".format(self.user))
+        fields.append("dc={!r}".format(self.dc))
+        fields.append("cluster={!r}".format(self.cluster))
+
+        out += ", ".join(fields) + ")>"
+        return out
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

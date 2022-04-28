@@ -16,20 +16,15 @@ import logging
 # Own modules
 from .xlate import XLATOR
 
-from base import BaseVsphereHandler
+from .base import BaseVsphereHandler
+from .base import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
+from .base import DEFAULT_DC, DEFAULT_CLUSTER, DEFAULT_TZ_NAME
 
 __version__ = '0.2.0'
 
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
-
-DEFAULT_HOST = 'vcs01.ppbrln.internal'
-DEFAULT_PORT = 443
-DEFAULT_USER = 'Administrator@vsphere.local'
-DEFAULT_DC = 'vmcc'
-DEFAULT_CLUSTER = 'vmcc-l105-01'
-DEFAULT_TZ_NAME = 'Europe/Berlin'
 
 
 # =============================================================================

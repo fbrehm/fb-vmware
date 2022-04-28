@@ -29,14 +29,18 @@ from .xlate import XLATOR
 
 from .errors import VSphereCannotConnectError
 
-from . import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, DEFAULT_DC
-from . import DEFAULT_CLUSTER, DEFAULT_TZ_NAME
-
 __version__ = '0.1.0'
 
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
+DEFAULT_HOST = 'vcs01.ppbrln.internal'
+DEFAULT_PORT = 443
+DEFAULT_USER = 'Administrator@vsphere.local'
+DEFAULT_DC = 'vmcc'
+DEFAULT_CLUSTER = 'vmcc-l105-01'
+DEFAULT_TZ_NAME = 'Europe/Berlin'
 
 
 # =============================================================================

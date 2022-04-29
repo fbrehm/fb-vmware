@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware 0.2.2\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-04-29 13:59+0200\n"
+"POT-Creation-Date: 2022-04-29 16:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,23 +85,23 @@ msgstr ""
 msgid "Invalid name prefix {p!r} for a {o}."
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:97
-msgid "Module directory: {!r}"
-msgstr ""
-
 #: lib/fb_vmware/xlate.py:98
-msgid "Base directory: {!r}"
+msgid "Module directory:"
 msgstr ""
 
 #: lib/fb_vmware/xlate.py:99
-msgid "Locale directory: {!r}"
+msgid "Base directory:"
 msgstr ""
 
 #: lib/fb_vmware/xlate.py:100
-msgid "Locale domain: {!r}"
+msgid "Locale directory:"
 msgstr ""
 
 #: lib/fb_vmware/xlate.py:101
-msgid "Found .mo-file: {!r}"
+msgid "Locale domain:"
+msgstr ""
+
+#: lib/fb_vmware/xlate.py:102
+msgid "Found .mo-file:"
 msgstr ""
 

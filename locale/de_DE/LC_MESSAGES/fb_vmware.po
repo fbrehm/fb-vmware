@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware 0.2.2\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-04-29 13:59+0200\n"
-"PO-Revision-Date: 2022-04-29 13:59+0200\n"
+"POT-Creation-Date: 2022-04-29 16:21+0200\n"
+"PO-Revision-Date: 2022-04-29 16:25+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -20,7 +20,9 @@ msgstr ""
 
 #: lib/fb_vmware/base.py:106
 msgid "Invalid port number {!r} for the VSphere server, must be 0 < PORT <= 65536."
-msgstr "Ungültige Portnummer {!r} für den vSphere-Server, diese muss größer als Null und kleiner oder gleich 65536 sein."
+msgstr ""
+"Ungültige Portnummer {!r} für den vSphere-Server, diese muss größer als Null und kleiner oder "
+"gleich 65536 sein."
 
 #: lib/fb_vmware/base.py:221
 msgid "Connecting to vSphere host {h}:{p} as {u!r} ..."
@@ -52,7 +54,9 @@ msgstr "Die VSphere-VM {!r} wurde nicht gefunden."
 
 #: lib/fb_vmware/errors.py:125
 msgid "No SAN based datastore found with at least {m:0.0f} MiB == {g:0.1f} GiB available space found."
-msgstr "Kein SAN-basierter Datastore mit wenigstens {m:0.0f} MiB == {g:0.1f} GiB verfügbarem Platz gefunden."
+msgstr ""
+"Kein SAN-basierter Datastore mit wenigstens {m:0.0f} MiB == {g:0.1f} GiB verfügbarem Platz "
+"gefunden."
 
 #: lib/fb_vmware/errors.py:143
 msgid "The network {!r} is not existing."
@@ -86,23 +90,23 @@ msgstr "Der Namenspräfix eines {} darf nicht None sein."
 msgid "Invalid name prefix {p!r} for a {o}."
 msgstr "Ungültiger Namenspräfix {p!r} für ein {o}."
 
-#: lib/fb_vmware/xlate.py:97
-msgid "Module directory: {!r}"
-msgstr "Modul-Verzeichnis: {!r}"
-
 #: lib/fb_vmware/xlate.py:98
-msgid "Base directory: {!r}"
-msgstr "Basis-Verzeichnis: {!r}"
+msgid "Module directory:"
+msgstr "Modul-Verzeichnis:"
 
 #: lib/fb_vmware/xlate.py:99
-msgid "Locale directory: {!r}"
-msgstr "Verzeichnis für Locales: {!r}"
+msgid "Base directory:"
+msgstr "Basis-Verzeichnis:"
 
 #: lib/fb_vmware/xlate.py:100
-msgid "Locale domain: {!r}"
-msgstr "Locale-Domäne: {!r}"
+msgid "Locale directory:"
+msgstr "Verzeichnis für Locales:"
 
 #: lib/fb_vmware/xlate.py:101
-msgid "Found .mo-file: {!r}"
-msgstr "Gefundene .mo-Datei: {!r}"
+msgid "Locale domain:"
+msgstr "Locale-Domäne:"
+
+#: lib/fb_vmware/xlate.py:102
+msgid "Found .mo-file:"
+msgstr "Gefundene .mo-Datei:"
 

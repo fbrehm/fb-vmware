@@ -269,7 +269,7 @@ class VsphereAboutInfo(FbBaseObject):
 
         if test_mode:
 
-            necessary_fields = set(
+            necessary_fields = (
                 'apiType', 'apiVersion', 'name', 'fullName', 'vendor', 'version',
                 'osType', 'instanceUuid', 'licenseProductName', 'licenseProductVersion')
             failing_fields = []

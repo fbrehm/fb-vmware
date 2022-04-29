@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.2\n"
+"Project-Id-Version: fb_vmware 0.2.3\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-04-29 16:21+0200\n"
+"POT-Creation-Date: 2022-04-29 18:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,22 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
+
+#: lib/fb_vmware/about.py:281
+msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
+msgstr ""
+
+#: lib/fb_vmware/about.py:289
+msgid "Parameter {t!r} must be a {e}, {v!r} was given."
+msgstr ""
+
+#: lib/fb_vmware/about.py:301
+msgid "Creating {} object from:"
+msgstr ""
+
+#: lib/fb_vmware/about.py:337
+msgid "Created {} object:"
+msgstr ""
 
 #: lib/fb_vmware/base.py:106
 msgid "Invalid port number {!r} for the VSphere server, must be 0 < PORT <= 65536."

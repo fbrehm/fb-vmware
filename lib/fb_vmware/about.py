@@ -18,11 +18,12 @@ from pyVmomi import vim
 
 from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
+from fb_tools.xlate import format_list
 
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -264,12 +265,30 @@ class VsphereAboutInfo(FbBaseObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None):
+    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
 
-        if not isinstance(data, vim.AboutInfo):
-            msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
-                t='data', e='vim.AboutInfo', v=data)
-            raise TypeError(msg)
+        if test_mode:
+
+            necessary_fields = set(
+                'apiType', 'apiVersion', 'name', 'fullName', 'vendor', 'version',
+                'osType', 'instanceUuid', 'licenseProductName', 'licenseProductVersion')
+            failing_fields = []
+
+            for field in necessary_fields:
+                if not hasattr(data, field):
+                    failing_fields.append(field)
+            if len(failing_fields):
+                msg = _(
+                    "The given parameter {p!r} on calling method {m}() has failing "
+                    "attributes").format(p='data', m='from_summary')
+                msg += ': ' + format_list(failing_fields, do_repr=True)
+                raise AssertionError(msg)
+
+        else:
+            if not isinstance(data, vim.AboutInfo):
+                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                    t='data', e='vim.AboutInfo', v=data)
+                raise TypeError(msg)
 
         params = {
             'appname': appname,
@@ -305,7 +324,7 @@ class VsphereAboutInfo(FbBaseObject):
         info.api_version = data.apiVersion
         info.name = data.name
         info.full_name = data.fullName
-        info.vendor = data.fullName
+        info.vendor = data.vendor
         info.os_version = data.version
         info.os_type = data.osType
         info.instance_uuid = data.instanceUuid

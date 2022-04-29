@@ -23,7 +23,9 @@ from .base import DEFAULT_MAX_SEARCH_DEPTH
 
 from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
-__version__ = '0.2.2'
+from .about import VsphereAboutInfo
+
+__version__ = '0.2.3'
 
 LOG = logging.getLogger(__name__)
 

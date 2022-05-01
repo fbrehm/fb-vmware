@@ -108,6 +108,14 @@ class FbVMWareTestcase(unittest.TestCase):
 
 
 # =============================================================================
+class SimpleTestObject(object):
+    """A helper class for defining an object, where some particular attributes
+        could be defined, which can be used e.g. for testing calling from_summary()
+        of some classes."""
+    pass
+
+
+# =============================================================================
 if __name__ == '__main__':
 
     pass

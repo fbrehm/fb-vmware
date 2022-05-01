@@ -21,6 +21,7 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
+from general import SimpleTestObject
 
 LOG = logging.getLogger('test-aboutinfo')
 
@@ -71,9 +72,6 @@ class TestVMAboutInfo(FbVMWareTestcase):
 
         from fb_vmware import VsphereAboutInfo
 
-        class TestClass(object):
-            pass
-
         api_type = 'VirtualCenter'
         api_version = '6.5'
         full_name = 'VMware vCenter Server 6.5.0 build-8024368'
@@ -85,7 +83,7 @@ class TestVMAboutInfo(FbVMWareTestcase):
         os_type = 'linux-x64'
         vendor = 'VMware, Inc.'
 
-        data = TestClass()
+        data = SimpleTestObject()
         data.apiType = api_type
         data.apiVersion = api_version
         data.fullName = full_name

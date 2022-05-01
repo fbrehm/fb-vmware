@@ -62,6 +62,8 @@ class TestVMAboutInfo(FbVMWareTestcase):
         LOG.debug("VsphereAboutInfo %s:\n{}".format(about_info))
 
         self.assertIsInstance(about_info, VsphereAboutInfo)
+        self.assertEqual(about_info.appname, self.appname)
+        self.assertEqual(about_info.verbose, 1)
 
     # -------------------------------------------------------------------------
     def test_init_from_summary(self):

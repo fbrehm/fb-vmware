@@ -4,7 +4,7 @@
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere about info object.
+@summary: The module for capsulating a VSphere about info object.
 """
 from __future__ import absolute_import
 
@@ -277,6 +277,7 @@ class VsphereAboutInfo(FbBaseObject):
             for field in necessary_fields:
                 if not hasattr(data, field):
                     failing_fields.append(field)
+
             if len(failing_fields):
                 msg = _(
                     "The given parameter {p!r} on calling method {m}() has failing "

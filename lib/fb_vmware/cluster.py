@@ -22,7 +22,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 LOG = logging.getLogger(__name__)
 
 
@@ -321,8 +321,9 @@ class VsphereCluster(VsphereObject):
 
         else:
             if not isinstance(data, (vim.ClusterComputeResource, vim.ComputeResource)):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
-                    t='data', e='vim.[Cluster]ComputeResource', v=data)
+                msg = _(
+                    "Parameter {t!r} must be a {e} object, a {v} object was given "
+                    "instead.").format( t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {

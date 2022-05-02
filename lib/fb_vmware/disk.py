@@ -29,7 +29,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -394,8 +394,6 @@ class VsphereDisk(FbBaseObject):
         else:
 
             if not isinstance(data, vim.vm.device.VirtualDisk):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
-                    t='data', e='vim.vm.device.VirtualDisk', v=data, vt=data.__class__.__name__)
                 msg = _(
                     "Parameter {t!r} must be a {e} object, a {v} object was given "
                     "instead.").format(

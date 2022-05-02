@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.4\n"
+"Project-Id-Version: fb_vmware 0.2.5\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-02 09:46+0200\n"
+"POT-Creation-Date: 2022-05-02 13:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:160
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:161
+#: lib/fb_vmware/disk.py:388
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr ""
 
-#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:324 lib/fb_vmware/dc.py:168
+#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:324 lib/fb_vmware/dc.py:169
+#: lib/fb_vmware/disk.py:397
 msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr ""
 
-#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:188
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:189
+#: lib/fb_vmware/disk.py:419
 msgid "Creating {} object from:"
 msgstr ""
 
-#: lib/fb_vmware/about.py:339
+#: lib/fb_vmware/about.py:339 lib/fb_vmware/disk.py:424
 msgid "Created {} object:"
 msgstr ""
 
@@ -45,7 +48,7 @@ msgstr ""
 msgid "Disconnecting from vSphere host {}."
 msgstr ""
 
-#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:126
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:127 lib/fb_vmware/disk.py:274
 msgid "Comparing {} objects ..."
 msgstr ""
 
@@ -59,6 +62,18 @@ msgstr ""
 
 #: lib/fb_vmware/cluster.py:364
 msgid "Cluster {c!r} has datastore {d!r}."
+msgstr ""
+
+#: lib/fb_vmware/disk.py:435
+msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
+msgstr ""
+
+#: lib/fb_vmware/disk.py:503
+msgid "{m} takes at most {max} arguments ({n} given)."
+msgstr ""
+
+#: lib/fb_vmware/disk.py:543
+msgid "Disk is not in disk list."
 msgstr ""
 
 #: lib/fb_vmware/errors.py:38

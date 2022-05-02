@@ -78,6 +78,72 @@ class TestVMCluster(FbVMWareTestcase):
         self.assertEqual(cluster.verbose, 1)
         self.assertEqual(cluster.name, cluster_name)
 
+    # -------------------------------------------------------------------------
+    def test_init_from_summary(self):
+
+        if self.verbose >= 1:
+            print()
+        LOG.info("Testing init by calling VsphereCluster.from_summary() ...")
+
+        from fb_vmware import VsphereCluster
+
+        cluster_name = 'my-cluster'
+
+        data = SimpleTestObject()
+
+        ds1 = SimpleTestObject()
+        ds2 = SimpleTestObject()
+
+        data.name = cluster_name
+        data.summary = SimpleTestObject()
+        data.configStatus = 'gray'
+        data.datastore = []
+        data.datastore.append(ds1)
+        data.datastore.append(ds2)
+        data.resourcePool = None
+
+        data.summary.numCpuCores = 144
+        data.summary.numCpuThreads = 288
+        data.summary.numHosts = 9
+        data.summary.numEffectiveHosts = 8
+
+        mem_host = 256 * 1024 * 1024 * 1024
+        data.summary.totalMemory = 9 * mem_host
+
+        ds1.name = 'Datastore-0101'
+        ds2.name = 'Datastore-0102'
+
+        with self.assertRaises(TypeError)  as cm:
+
+            about_info = VsphereCluster.from_summary(
+                data, appname=self.appname, verbose=self.verbose)
+            LOG.debug("VsphereCluster %s:\n{}".format(about_info))
+
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        with self.assertRaises(AssertionError)  as cm:
+
+            cluster = VsphereCluster.from_summary(
+                data, appname=self.appname, verbose=self.verbose, test_mode=True)
+            LOG.debug("VsphereCluster %s:\n{}".format(cluster))
+
+        e = cm.exception
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+
+        data.overallStatus = 'gray'
+        data.summary.effectiveMemory = 8 * mem_host
+
+        nw1 = SimpleTestObject()
+        nw1.name = 'Network-01'
+
+        data.network = []
+        data.network.append(nw1)
+
+        cluster = VsphereCluster.from_summary(
+            data, appname=self.appname, verbose=self.verbose, test_mode=True)
+        LOG.debug("VsphereCluster %s:\n{}".format(cluster))
+
 
 # =============================================================================
 if __name__ == '__main__':
@@ -93,7 +159,7 @@ if __name__ == '__main__':
 
     suite.addTest(TestVMCluster('test_import', verbose))
     suite.addTest(TestVMCluster('test_init_object', verbose))
-    # suite.addTest(TestVMCluster('test_init_from_summary', verbose))
+    suite.addTest(TestVMCluster('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

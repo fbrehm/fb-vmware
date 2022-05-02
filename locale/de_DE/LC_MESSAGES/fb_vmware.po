@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.3\n"
+"Project-Id-Version: fb_vmware 0.2.4\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-04-29 18:23+0200\n"
-"PO-Revision-Date: 2022-04-29 18:25+0200\n"
+"POT-Creation-Date: 2022-05-02 09:46+0200\n"
+"PO-Revision-Date: 2022-05-02 09:50+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:281
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:160
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr "Dem übergebenen Parameter {p!r} beim Aufruf der Methode {m}() fehlen Attribute"
 
-#: lib/fb_vmware/about.py:289
-msgid "Parameter {t!r} must be a {e}, {v!r} was given."
-msgstr "Der Parameter {t!r} muss ein {e} sein, {v!r} wurde übergeben."
+#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:324 lib/fb_vmware/dc.py:168
+msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
+msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
 
-#: lib/fb_vmware/about.py:301
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:188
 msgid "Creating {} object from:"
 msgstr "Erstelle ein {}-Objekt aus:"
 
-#: lib/fb_vmware/about.py:337
+#: lib/fb_vmware/about.py:339
 msgid "Created {} object:"
 msgstr "Erstelltes {}-Objekt:"
 
@@ -47,6 +47,23 @@ msgstr "Verbinde mich mit vSphere-Host {h}:{p} als {u!r} …"
 #: lib/fb_vmware/base.py:239
 msgid "Disconnecting from vSphere host {}."
 msgstr "Trenne Verbindung zu vSphere-Host {}."
+
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:126
+msgid "Comparing {} objects ..."
+msgstr "Vergleiche {}-Objekte …"
+
+#: lib/fb_vmware/cluster.py:299 lib/fb_vmware/cluster.py:306
+#, fuzzy
+msgid "The given parameter {p!r} on calling method {m}() is not a sequence type."
+msgstr "Der übergebene Parameter {p!r} beim Aufruf der Methode {m}() ist kein Sequenz-Typ."
+
+#: lib/fb_vmware/cluster.py:357
+msgid "Cluster {c!r} has network {n!r}."
+msgstr "Das Cluster {c!r} besitzt das Netzwerk {n!r}."
+
+#: lib/fb_vmware/cluster.py:364
+msgid "Cluster {c!r} has datastore {d!r}."
+msgstr "as Cluster {c!r} besitzt den Datastore {d!r}."
 
 #: lib/fb_vmware/errors.py:38
 msgid "No VSphere datastores found."

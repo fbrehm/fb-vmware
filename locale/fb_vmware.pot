@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.3\n"
+"Project-Id-Version: fb_vmware 0.2.4\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-04-29 18:23+0200\n"
+"POT-Creation-Date: 2022-05-02 09:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,19 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:281
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:160
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr ""
 
-#: lib/fb_vmware/about.py:289
-msgid "Parameter {t!r} must be a {e}, {v!r} was given."
+#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:324 lib/fb_vmware/dc.py:168
+msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr ""
 
-#: lib/fb_vmware/about.py:301
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:188
 msgid "Creating {} object from:"
 msgstr ""
 
-#: lib/fb_vmware/about.py:337
+#: lib/fb_vmware/about.py:339
 msgid "Created {} object:"
 msgstr ""
 
@@ -43,6 +43,22 @@ msgstr ""
 
 #: lib/fb_vmware/base.py:239
 msgid "Disconnecting from vSphere host {}."
+msgstr ""
+
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:126
+msgid "Comparing {} objects ..."
+msgstr ""
+
+#: lib/fb_vmware/cluster.py:299 lib/fb_vmware/cluster.py:306
+msgid "The given parameter {p!r} on calling method {m}() is not a sequence type."
+msgstr ""
+
+#: lib/fb_vmware/cluster.py:357
+msgid "Cluster {c!r} has network {n!r}."
+msgstr ""
+
+#: lib/fb_vmware/cluster.py:364
+msgid "Cluster {c!r} has datastore {d!r}."
 msgstr ""
 
 #: lib/fb_vmware/errors.py:38

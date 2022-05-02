@@ -15,13 +15,14 @@ import logging
 from pyVmomi import vim
 
 from fb_tools.common import pp
+from fb_tools.xlate import format_list
 
 # Own modules
 from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = 'host'

@@ -107,17 +107,17 @@ class TestVMCluster(FbVMWareTestcase):
         data.summary.numHosts = 9
         data.summary.numEffectiveHosts = 8
 
-        mem_host = 256 * 1024 * 1024 * 1024
-        data.summary.totalMemory = 9 * mem_host
+        mem_host = 256 * 1024
+        data.summary.totalMemory = 9 * mem_host * 1024 * 1024
 
         ds1.name = 'Datastore-0101'
         ds2.name = 'Datastore-0102'
 
         with self.assertRaises(TypeError)  as cm:
 
-            about_info = VsphereCluster.from_summary(
+            cluster = VsphereCluster.from_summary(
                 data, appname=self.appname, verbose=self.verbose)
-            LOG.debug("VsphereCluster %s:\n{}".format(about_info))
+            LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
         e = cm.exception
         LOG.debug("%s raised: %s", e.__class__.__qualname__, e)

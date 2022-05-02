@@ -30,7 +30,9 @@ from .cluster import VsphereCluster
 from .dc import VsphereDatacenter
 from .dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER, DEFAULT_DS_FOLDER, DEFAULT_NETWORK_FOLDER
 
-__version__ = '0.2.5'
+from .disk import VsphereDisk, VsphereDiskList
+
+__version__ = '0.2.6'
 
 LOG = logging.getLogger(__name__)
 

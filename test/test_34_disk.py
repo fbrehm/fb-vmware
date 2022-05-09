@@ -45,6 +45,31 @@ class TestVdisk(FbVMWareTestcase):
 
         LOG.debug("Version of fb_vmware.disk: {!r}.".format(fb_vmware.disk.__version__))
 
+    # -------------------------------------------------------------------------
+    def test_init_object(self):
+
+        if self.verbose >= 1:
+            print()
+        LOG.info("Testing init of a VsphereDisk object ...")
+
+        from fb_vmware import VsphereDisk
+
+        capacity = int(50 * 1024 * 1024 * 1024)
+
+        disk = VsphereDisk(
+            appname=self.appname,
+            verbose=1,
+            size=capacity,
+        )
+
+        LOG.debug("VsphereDisk %r: {!r}".format(disk))
+        LOG.debug("VsphereDisk %s:\n{}".format(disk))
+
+        self.assertIsInstance(disk, VsphereDisk)
+        self.assertEqual(disk.appname, self.appname)
+        self.assertEqual(disk.verbose, 1)
+        self.assertEqual(disk.size, capacity)
+
 
 # =============================================================================
 if __name__ == '__main__':
@@ -59,7 +84,7 @@ if __name__ == '__main__':
     suite = unittest.TestSuite()
 
     suite.addTest(TestVdisk('test_import', verbose))
-    # suite.addTest(TestVdisk('test_init_object', verbose))
+    suite.addTest(TestVdisk('test_init_object', verbose))
     # suite.addTest(TestVdisk('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

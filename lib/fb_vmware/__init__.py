@@ -27,12 +27,14 @@ from .about import VsphereAboutInfo
 
 from .cluster import VsphereCluster
 
+from .datastore import VsphereDatastore, VsphereDatastoreDict
+
 from .dc import VsphereDatacenter
 from .dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER, DEFAULT_DS_FOLDER, DEFAULT_NETWORK_FOLDER
 
 from .disk import VsphereDisk, VsphereDiskList
 
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 
 LOG = logging.getLogger(__name__)
 

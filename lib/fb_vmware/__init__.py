@@ -38,7 +38,9 @@ from .disk import VsphereDisk, VsphereDiskList
 
 from .ether import VsphereEthernetcard, VsphereEthernetcardList
 
-__version__ = '0.2.10'
+from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
+
+__version__ = '0.3.0'
 
 LOG = logging.getLogger(__name__)
 

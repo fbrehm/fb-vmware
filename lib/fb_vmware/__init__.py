@@ -36,7 +36,9 @@ from .dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER, DEFAULT_DS_FOLDER, DEFAU
 
 from .disk import VsphereDisk, VsphereDiskList
 
-__version__ = '0.2.9'
+from .ether import VsphereEthernetcard, VsphereEthernetcardList
+
+__version__ = '0.2.10'
 
 LOG = logging.getLogger(__name__)
 

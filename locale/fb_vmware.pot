@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.9\n"
+"Project-Id-Version: fb_vmware 0.3.0\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-12 07:38+0200\n"
+"POT-Creation-Date: 2022-05-12 08:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,7 @@ msgstr ""
 
 #: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/datastore.py:222
 #: lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388 lib/fb_vmware/ds_cluster.py:126
+#: lib/fb_vmware/ether.py:435
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr ""
 
@@ -29,10 +30,12 @@ msgstr ""
 
 #: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/datastore.py:262
 #: lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419 lib/fb_vmware/ds_cluster.py:152
+#: lib/fb_vmware/ether.py:495 lib/fb_vmware/host_port_group.py:204
 msgid "Creating {} object from:"
 msgstr ""
 
-#: lib/fb_vmware/about.py:339 lib/fb_vmware/disk.py:424
+#: lib/fb_vmware/about.py:339 lib/fb_vmware/disk.py:424 lib/fb_vmware/ether.py:500
+#: lib/fb_vmware/host_port_group.py:209
 msgid "Created {} object:"
 msgstr ""
 
@@ -49,7 +52,8 @@ msgid "Disconnecting from vSphere host {}."
 msgstr ""
 
 #: lib/fb_vmware/cluster.py:263 lib/fb_vmware/datastore.py:349 lib/fb_vmware/dc.py:127
-#: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191
+#: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191 lib/fb_vmware/ether.py:305
+#: lib/fb_vmware/host_port_group.py:161
 msgid "Comparing {} objects ..."
 msgstr ""
 
@@ -101,11 +105,11 @@ msgstr ""
 msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
 msgstr ""
 
-#: lib/fb_vmware/disk.py:435
+#: lib/fb_vmware/disk.py:435 lib/fb_vmware/ether.py:511 lib/fb_vmware/host_port_group.py:220
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr ""
 
-#: lib/fb_vmware/disk.py:503
+#: lib/fb_vmware/disk.py:503 lib/fb_vmware/ether.py:579 lib/fb_vmware/host_port_group.py:309
 msgid "{m} takes at most {max} arguments ({n} given)."
 msgstr ""
 
@@ -155,6 +159,22 @@ msgstr ""
 
 #: lib/fb_vmware/errors.py:187
 msgid "Timeout on creating VM {!r}."
+msgstr ""
+
+#: lib/fb_vmware/ether.py:444 lib/fb_vmware/host_port_group.py:188
+msgid "Parameter {t!r} must be a {e}, {v!r} ({vt}) was given."
+msgstr ""
+
+#: lib/fb_vmware/ether.py:472
+msgid "Checking class of ethernet card: {!r}"
+msgstr ""
+
+#: lib/fb_vmware/ether.py:618
+msgid "card is not in card list."
+msgstr ""
+
+#: lib/fb_vmware/host_port_group.py:348
+msgid "group is not in group list."
 msgstr ""
 
 #: lib/fb_vmware/obj.py:77

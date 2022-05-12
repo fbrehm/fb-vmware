@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.5\n"
+"Project-Id-Version: fb_vmware 0.2.9\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-02 13:01+0200\n"
+"POT-Creation-Date: 2022-05-12 07:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:161
-#: lib/fb_vmware/disk.py:388
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/datastore.py:222
+#: lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388 lib/fb_vmware/ds_cluster.py:126
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr ""
 
@@ -27,8 +27,8 @@ msgstr ""
 msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr ""
 
-#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:189
-#: lib/fb_vmware/disk.py:419
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/datastore.py:262
+#: lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419 lib/fb_vmware/ds_cluster.py:152
 msgid "Creating {} object from:"
 msgstr ""
 
@@ -48,7 +48,8 @@ msgstr ""
 msgid "Disconnecting from vSphere host {}."
 msgstr ""
 
-#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:127 lib/fb_vmware/disk.py:274
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/datastore.py:349 lib/fb_vmware/dc.py:127
+#: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191
 msgid "Comparing {} objects ..."
 msgstr ""
 
@@ -64,6 +65,42 @@ msgstr ""
 msgid "Cluster {c!r} has datastore {d!r}."
 msgstr ""
 
+#: lib/fb_vmware/datastore.py:231 lib/fb_vmware/ds_cluster.py:135
+msgid "Parameter {t!r} must be a {e}, {v!r} was given."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:367 lib/fb_vmware/ds_cluster.py:209
+msgid "Invalid item type {{!r}} to set, only {} allowed."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:369
+msgid "The key {k!r} must be equal to the datastore name {n!r}."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:370 lib/fb_vmware/ds_cluster.py:212
+msgid "None type as key is not allowed."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:371 lib/fb_vmware/ds_cluster.py:213
+msgid "Empty key {!r} is not allowed."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:372 lib/fb_vmware/ds_cluster.py:214
+msgid "Object {{!r}} is not a {} object."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:604
+msgid "Could not handle datastore type {!r}."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:611
+msgid "Could not found a datastore for {c:0.1f} GiB of type {t!r}."
+msgstr ""
+
+#: lib/fb_vmware/datastore.py:618
+msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
+msgstr ""
+
 #: lib/fb_vmware/disk.py:435
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr ""
@@ -74,6 +111,10 @@ msgstr ""
 
 #: lib/fb_vmware/disk.py:543
 msgid "Disk is not in disk list."
+msgstr ""
+
+#: lib/fb_vmware/ds_cluster.py:211
+msgid "The key {k!r} must be equal to the datastore cluster name {n!r}."
 msgstr ""
 
 #: lib/fb_vmware/errors.py:38

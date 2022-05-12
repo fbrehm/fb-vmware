@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.2.5\n"
+"Project-Id-Version: fb_vmware 0.2.9\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-02 13:01+0200\n"
-"PO-Revision-Date: 2022-05-02 13:00+0200\n"
+"POT-Creation-Date: 2022-05-12 07:38+0200\n"
+"PO-Revision-Date: 2022-05-12 08:40+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -18,8 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/dc.py:161
-#: lib/fb_vmware/disk.py:388
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/datastore.py:222
+#: lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388 lib/fb_vmware/ds_cluster.py:126
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr "Dem übergebenen Parameter {p!r} beim Aufruf der Methode {m}() fehlen Attribute"
 
@@ -28,8 +28,8 @@ msgstr "Dem übergebenen Parameter {p!r} beim Aufruf der Methode {m}() fehlen At
 msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
 
-#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/dc.py:189
-#: lib/fb_vmware/disk.py:419
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/datastore.py:262
+#: lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419 lib/fb_vmware/ds_cluster.py:152
 msgid "Creating {} object from:"
 msgstr "Erstelle ein {}-Objekt aus:"
 
@@ -51,7 +51,8 @@ msgstr "Verbinde mich mit vSphere-Host {h}:{p} als {u!r} …"
 msgid "Disconnecting from vSphere host {}."
 msgstr "Trenne Verbindung zu vSphere-Host {}."
 
-#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/dc.py:127 lib/fb_vmware/disk.py:274
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/datastore.py:349 lib/fb_vmware/dc.py:127
+#: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191
 msgid "Comparing {} objects ..."
 msgstr "Vergleiche {}-Objekte …"
 
@@ -67,6 +68,42 @@ msgstr "Das Cluster {c!r} besitzt das Netzwerk {n!r}."
 msgid "Cluster {c!r} has datastore {d!r}."
 msgstr "as Cluster {c!r} besitzt den Datastore {d!r}."
 
+#: lib/fb_vmware/datastore.py:231 lib/fb_vmware/ds_cluster.py:135
+msgid "Parameter {t!r} must be a {e}, {v!r} was given."
+msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
+
+#: lib/fb_vmware/datastore.py:367 lib/fb_vmware/ds_cluster.py:209
+msgid "Invalid item type {{!r}} to set, only {} allowed."
+msgstr "Ungültiger Elementen-Typ {{!r}} beim Setzen, nur {} ist erlaubt."
+
+#: lib/fb_vmware/datastore.py:369
+msgid "The key {k!r} must be equal to the datastore name {n!r}."
+msgstr "Der Schlüssel {k!r} muss identisch mit dem Namen des Datastores {n!r} sein."
+
+#: lib/fb_vmware/datastore.py:370 lib/fb_vmware/ds_cluster.py:212
+msgid "None type as key is not allowed."
+msgstr "Ein None-Typ ist als Schlüssel nicht erlaubt."
+
+#: lib/fb_vmware/datastore.py:371 lib/fb_vmware/ds_cluster.py:213
+msgid "Empty key {!r} is not allowed."
+msgstr "Ein leere Schlüssel {!r} ist nicht erlaubt."
+
+#: lib/fb_vmware/datastore.py:372 lib/fb_vmware/ds_cluster.py:214
+msgid "Object {{!r}} is not a {} object."
+msgstr "Das Objekt {{!r}} ist kein {}-Objekt."
+
+#: lib/fb_vmware/datastore.py:604
+msgid "Could not handle datastore type {!r}."
+msgstr "Kann den Datastore-Typ {!r} nicht behandeln."
+
+#: lib/fb_vmware/datastore.py:611
+msgid "Could not found a datastore for {c:0.1f} GiB of type {t!r}."
+msgstr "Konnte keinen Datastore für {c:0.1f} GiB vom Typ {t!r} finden."
+
+#: lib/fb_vmware/datastore.py:618
+msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
+msgstr "Suche Datastore für {c:0.1f} GiB vom Typ {t!r}."
+
 #: lib/fb_vmware/disk.py:435
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr "Ungültiger Typ {t!r} als ein Eintrag von {c}, ausschließlich {o}-Objekte sind erlaubt."
@@ -78,6 +115,10 @@ msgstr "{m} akzeptiert höchstens {max} Argumente ({n} wurden gegeben)."
 #: lib/fb_vmware/disk.py:543
 msgid "Disk is not in disk list."
 msgstr "Die Platte ist nicht in der Liste der Disks."
+
+#: lib/fb_vmware/ds_cluster.py:211
+msgid "The key {k!r} must be equal to the datastore cluster name {n!r}."
+msgstr "Der Schlüssel {k!r} muss gleich dem Namen des Datastore-Clusters {n!r} sein."
 
 #: lib/fb_vmware/errors.py:38
 msgid "No VSphere datastores found."

@@ -43,7 +43,7 @@ class TestVDataStore(FbVMWareTestcase):
         from fb_vmware import VsphereDatastore                       # noqa
         from fb_vmware import VsphereDatastoreDict                   # noqa
 
-        LOG.debug("Version of fb_vmware.disk: {!r}.".format(fb_vmware.disk.__version__))
+        LOG.debug("Version of fb_vmware.datastore: {!r}.".format(fb_vmware.datastore.__version__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

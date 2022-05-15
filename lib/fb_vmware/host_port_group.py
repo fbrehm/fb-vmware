@@ -28,7 +28,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -182,12 +182,30 @@ class VsphereHostPortgroup(FbBaseObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, hostname=None, appname=None, verbose=0, base_dir=None):
+    def from_summary(
+            cls, data, hostname=None, appname=None, verbose=0, base_dir=None, test_mode=False):
 
-        if not isinstance(data, vim.host.PortGroup):
-            msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
-                t='data', e='vim.host.PortGroup', v=data, vt=data.__class__.__name__)
-            raise TypeError(msg)
+        if test_mode:
+
+            failing_fields = []
+            if not hasattr(data, 'spec'):
+                failing_fields.append('spec')
+            else:
+                for field in ('name', 'vlanId'. 'vswitchName'):
+                    failing_fields.append('spec.' + field)
+
+            if len(failing_fields):
+                msg = _(
+                    "The given parameter {p!r} on calling method {m}() has failing "
+                    "attributes").format(p='data', m='from_summary')
+                msg += ': ' + format_list(failing_fields, do_repr=True)
+                raise AssertionError(msg)
+
+        else:
+            if not isinstance(data, vim.host.PortGroup):
+                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                    t='data', e='vim.host.PortGroup', v=data, vt=data.__class__.__name__)
+                raise TypeError(msg)
 
         params = {
             'appname': appname,

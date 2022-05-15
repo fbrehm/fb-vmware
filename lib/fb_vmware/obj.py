@@ -22,12 +22,13 @@ from .xlate import XLATOR
 
 from .errors import VSphereNameError
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 
 DEFAULT_OBJ_STATUS = 'gray'
+OBJ_STATUS_GREEN = 'green'
 
 
 # =============================================================================

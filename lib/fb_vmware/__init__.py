@@ -40,7 +40,9 @@ from .ether import VsphereEthernetcard, VsphereEthernetcardList
 
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
-__version__ = '0.3.0'
+from .host import VsphereHostBiosInfo, VsphereHost
+
+__version__ = '0.3.1'
 
 LOG = logging.getLogger(__name__)
 

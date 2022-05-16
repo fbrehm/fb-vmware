@@ -28,7 +28,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -191,7 +191,7 @@ class VsphereHostPortgroup(FbBaseObject):
             if not hasattr(data, 'spec'):
                 failing_fields.append('spec')
             else:
-                for field in ('name', 'vlanId'. 'vswitchName'):
+                for field in ('name', 'vlanId', 'vswitchName'):
                     failing_fields.append('spec.' + field)
 
             if len(failing_fields):

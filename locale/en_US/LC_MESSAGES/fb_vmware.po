@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.3.0\n"
+"Project-Id-Version: fb_vmware 0.3.1\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-12 08:39+0200\n"
+"POT-Creation-Date: 2022-05-16 07:43+0200\n"
 "PO-Revision-Date: 2022-05-02 09:45+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -20,7 +20,8 @@ msgstr ""
 
 #: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/datastore.py:222
 #: lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388 lib/fb_vmware/ds_cluster.py:126
-#: lib/fb_vmware/ether.py:435
+#: lib/fb_vmware/ether.py:435 lib/fb_vmware/host.py:242 lib/fb_vmware/host.py:586
+#: lib/fb_vmware/host_port_group.py:198
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr ""
 
@@ -31,12 +32,13 @@ msgstr ""
 
 #: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/datastore.py:262
 #: lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419 lib/fb_vmware/ds_cluster.py:152
-#: lib/fb_vmware/ether.py:495 lib/fb_vmware/host_port_group.py:204
+#: lib/fb_vmware/ether.py:495 lib/fb_vmware/host.py:274 lib/fb_vmware/host.py:613
+#: lib/fb_vmware/host_port_group.py:222
 msgid "Creating {} object from:"
 msgstr ""
 
 #: lib/fb_vmware/about.py:339 lib/fb_vmware/disk.py:424 lib/fb_vmware/ether.py:500
-#: lib/fb_vmware/host_port_group.py:209
+#: lib/fb_vmware/host_port_group.py:227
 msgid "Created {} object:"
 msgstr ""
 
@@ -54,7 +56,7 @@ msgstr ""
 
 #: lib/fb_vmware/cluster.py:263 lib/fb_vmware/datastore.py:349 lib/fb_vmware/dc.py:127
 #: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191 lib/fb_vmware/ether.py:305
-#: lib/fb_vmware/host_port_group.py:161
+#: lib/fb_vmware/host.py:517 lib/fb_vmware/host_port_group.py:161
 msgid "Comparing {} objects ..."
 msgstr "Comparing {} objects …"
 
@@ -106,11 +108,11 @@ msgstr ""
 msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
 msgstr ""
 
-#: lib/fb_vmware/disk.py:435 lib/fb_vmware/ether.py:511 lib/fb_vmware/host_port_group.py:220
+#: lib/fb_vmware/disk.py:435 lib/fb_vmware/ether.py:511 lib/fb_vmware/host_port_group.py:238
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr ""
 
-#: lib/fb_vmware/disk.py:503 lib/fb_vmware/ether.py:579 lib/fb_vmware/host_port_group.py:309
+#: lib/fb_vmware/disk.py:503 lib/fb_vmware/ether.py:579 lib/fb_vmware/host_port_group.py:327
 msgid "{m} takes at most {max} arguments ({n} given)."
 msgstr ""
 
@@ -162,7 +164,8 @@ msgstr ""
 msgid "Timeout on creating VM {!r}."
 msgstr ""
 
-#: lib/fb_vmware/ether.py:444 lib/fb_vmware/host_port_group.py:188
+#: lib/fb_vmware/ether.py:444 lib/fb_vmware/host.py:250 lib/fb_vmware/host.py:594
+#: lib/fb_vmware/host_port_group.py:206
 msgid "Parameter {t!r} must be a {e}, {v!r} ({vt}) was given."
 msgstr ""
 
@@ -174,23 +177,27 @@ msgstr ""
 msgid "card is not in card list."
 msgstr ""
 
-#: lib/fb_vmware/host_port_group.py:348
+#: lib/fb_vmware/host.py:599
+msgid "Host {!r} seems to be offline!"
+msgstr ""
+
+#: lib/fb_vmware/host_port_group.py:366
 msgid "group is not in group list."
 msgstr ""
 
-#: lib/fb_vmware/obj.py:77
+#: lib/fb_vmware/obj.py:78
 msgid "The type of a {} may not be None."
 msgstr ""
 
-#: lib/fb_vmware/obj.py:82 lib/fb_vmware/obj.py:105 lib/fb_vmware/obj.py:128
+#: lib/fb_vmware/obj.py:83 lib/fb_vmware/obj.py:106 lib/fb_vmware/obj.py:129
 msgid "Invalid {w}.{p} {v!r}."
 msgstr ""
 
-#: lib/fb_vmware/obj.py:144
+#: lib/fb_vmware/obj.py:145
 msgid "The name prefix of a {} may not be None."
 msgstr ""
 
-#: lib/fb_vmware/obj.py:148
+#: lib/fb_vmware/obj.py:149
 msgid "Invalid name prefix {p!r} for a {o}."
 msgstr ""
 

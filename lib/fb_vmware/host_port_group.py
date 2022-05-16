@@ -28,7 +28,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -370,7 +370,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     def __contains__(self, group):
 
         if not isinstance(group, VsphereHostPortgroup):
-            raise TypeError(self.msg_no_ether_card.format(
+            raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
 
         if not self._list:
@@ -386,7 +386,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     def count(self, group):
 
         if not isinstance(group, VsphereHostPortgroup):
-            raise TypeError(self.msg_no_ether_card.format(
+            raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
 
         if not self._list:
@@ -423,7 +423,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     def __setitem__(self, key, group):
 
         if not isinstance(group, VsphereHostPortgroup):
-            raise TypeError(self.msg_no_ether_card.format(
+            raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
 
         self._list.__setitem__(key, group)
@@ -437,7 +437,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     def append(self, group):
 
         if not isinstance(group, VsphereHostPortgroup):
-            raise TypeError(self.msg_no_ether_card.format(
+            raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
 
         self._list.append(group)
@@ -446,7 +446,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     def insert(self, index, group):
 
         if not isinstance(group, VsphereHostPortgroup):
-            raise TypeError(self.msg_no_ether_card.format(
+            raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
 
         self._list.insert(index, group)

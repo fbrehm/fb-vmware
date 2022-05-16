@@ -15,6 +15,11 @@ import uuid
 import ipaddress
 import copy
 
+try:
+    from collections.abc import MutableSequence
+except ImportError:
+    from collections import MutableSequence
+
 # Third party modules
 from pyVmomi import vim
 
@@ -31,7 +36,7 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .xlate import XLATOR
 
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -658,6 +663,229 @@ class VsphereHost(VsphereObject):
                     host.portgroups.append(pgroup)
 
         return host
+
+
+# =============================================================================
+class VsphereHostList(FbBaseObject, MutableSequence):
+    """
+    A list containing VsphereHost objects.
+    """
+
+    msg_no_host = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+
+    # -------------------------------------------------------------------------
+    def __init__(
+        self, appname=None, verbose=0, version=__version__, base_dir=None,
+            initialized=None, *hosts):
+
+        self._list = []
+
+        super(VsphereHostList, self).__init__(
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
+            initialized=False)
+
+        for host in hosts:
+            self.append(host)
+
+        if initialized is not None:
+            self.initialized = initialized
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True, bare=False):
+        """
+        Transforms the elements of the object into a dict
+
+        @param short: don't include local properties in resulting dict.
+        @type short: bool
+        @param bare: don't include generic fields in returning dict
+        @type bare: bool
+
+        @return: structure as dict or list
+        @rtype:  dict or list
+        """
+
+        if bare:
+            res = []
+            for host in self:
+                res.append(host.as_dict(short=True))
+            return res
+
+        res = super(VsphereHostList, self).as_dict(short=short)
+        res['_list'] = []
+
+        for host in self:
+            res['_list'].append(host.as_dict(short=short))
+
+        return res
+
+    # -------------------------------------------------------------------------
+    def __copy__(self):
+
+        new_list = self.__class__(
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
+            initialized=False)
+
+        for host in self:
+            new_list.append(copy.copy(host))
+
+        new_list.initialized = self.initialized
+        return new_list
+
+    # -------------------------------------------------------------------------
+    def index(self, host, *args):
+
+        i = None
+        j = None
+
+        if len(args) > 0:
+            if len(args) > 2:
+                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                    m='index()', max=3, n=len(args) + 1))
+            i = int(args[0])
+            if len(args) > 1:
+                j = int(args[1])
+
+        index = 0
+        start = 0
+        if i is not None:
+            start = i
+            if i < 0:
+                start = len(self._list) + i
+
+        wrap = False
+        end = len(self._list)
+        if j is not None:
+            if j < 0:
+                end = len(self._list) + j
+                if end < index:
+                    wrap = True
+            else:
+                end = j
+        for index in list(range(len(self._list))):
+            item = self._list[index]
+            if index < start:
+                continue
+            if index >= end and not wrap:
+                break
+            if item == host:
+                return index
+
+        if wrap:
+            for index in list(range(len(self._list))):
+                item = self._list[index]
+                if index >= end:
+                    break
+            if item == host:
+                return index
+
+        msg = _("host is not in host list.")
+        raise ValueError(msg)
+
+    # -------------------------------------------------------------------------
+    def __contains__(self, host):
+
+        if not isinstance(host, VsphereHost):
+            raise TypeError(self.msg_no_host.format(
+                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+
+        if not self._list:
+            return False
+
+        for item in self._list:
+            if item == host:
+                return True
+
+        return False
+
+    # -------------------------------------------------------------------------
+    def count(self, host):
+
+        if not isinstance(host, VsphereHost):
+            raise TypeError(self.msg_no_host.format(
+                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+
+        if not self._list:
+            return 0
+
+        num = 0
+        for item in self._list:
+            if item == host:
+                num += 1
+        return num
+
+    # -------------------------------------------------------------------------
+    def __len__(self):
+        return len(self._list)
+
+    # -------------------------------------------------------------------------
+    def __getitem__(self, key):
+        return self._list.__getitem__(key)
+
+    # -------------------------------------------------------------------------
+    def __reversed__(self):
+
+        new_list = self.__class__(
+            appname=self.appname, verbose=self.verbose,
+            base_dir=self.base_dir, initialized=False)
+
+        for host in reversed(self._list):
+            new_list.append(copy.copy(host))
+
+        new_list.initialized = self.initialized
+        return new_list
+
+    # -------------------------------------------------------------------------
+    def __setitem__(self, key, host):
+
+        if not isinstance(host, VsphereHost):
+            raise TypeError(self.msg_no_host.format(
+                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+
+        self._list.__setitem__(key, host)
+
+    # -------------------------------------------------------------------------
+    def __delitem__(self, key):
+
+        del self._list[key]
+
+    # -------------------------------------------------------------------------
+    def append(self, host):
+
+        if not isinstance(host, VsphereHost):
+            raise TypeError(self.msg_no_host.format(
+                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+
+        self._list.append(host)
+
+    # -------------------------------------------------------------------------
+    def insert(self, index, host):
+
+        if not isinstance(host, VsphereHost):
+            raise TypeError(self.msg_no_host.format(
+                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+
+        self._list.insert(index, host)
+
+    # -------------------------------------------------------------------------
+    def clear(self):
+        "Remove all items from the VsphereHostList."
+
+        self._list = []
+
+    # -------------------------------------------------------------------------
+    def __iter__(self):
+
+        for host in self._list:
+            yield host
+
+    # -------------------------------------------------------------------------
+    def ordered(self):
+
+        try:
+            for host in sorted(self._list, key=lambda x: x.name.lower()):
+                yield host
+        except StopIteration:
+            pass
 
 
 # =============================================================================

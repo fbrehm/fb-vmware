@@ -40,7 +40,7 @@ from .ether import VsphereEthernetcard, VsphereEthernetcardList
 
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
-from .host import VsphereHostBiosInfo, VsphereHost
+from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList
 
 __version__ = '0.3.1'
 

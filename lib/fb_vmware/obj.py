@@ -171,6 +171,20 @@ class VsphereObject(FbBaseObject):
 
     # -----------------------------------------------------------
     @property
+    def qual_name(self):
+        """The qualified name of the object, including object_type and name."""
+
+        if self.obj_type is None:
+            if self.name is None:
+                return ''
+            else:
+                return self.name.lower()
+        if self.name is None:
+            return self.obj_type.lower() + '.'
+        return self.obj_type.lower() + '.' + self.name.lower()
+
+    # -----------------------------------------------------------
+    @property
     def tf_name(self):
         """The name of the bject how used in terraform."""
         if self.name is None:
@@ -197,6 +211,7 @@ class VsphereObject(FbBaseObject):
 
         res = super(VsphereObject, self).as_dict(short=short)
         res['name'] = self.name
+        res['qual_name'] = self.qual_name
         res['obj_type'] = self.obj_type
         res['name_prefix'] = self.name_prefix
         res['tf_name'] = self.tf_name
@@ -232,6 +247,59 @@ class VsphereObject(FbBaseObject):
 
         out += ", ".join(fields) + ")>"
         return out
+
+    # -------------------------------------------------------------------------
+    def __lt__(self, other):
+
+        if not isinstance(other, VsphereObject):
+            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            raise TypeError(msg.format(other))
+
+        return self.qual_name < other.qual_name
+
+    # -------------------------------------------------------------------------
+    def __gt__(self, other):
+
+        if not isinstance(other, VsphereObject):
+            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            raise TypeError(msg.format(other))
+
+        return self.qual_name > other.qual_name
+
+    # -------------------------------------------------------------------------
+    def __eq__(self, other):
+
+        if self.verbose > 4:
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+
+        if not isinstance(other, VsphereObject):
+            return False
+
+        return self.qual_name == other.qual_name
+
+    # -------------------------------------------------------------------------
+    def __le__(self, other):
+
+        if not isinstance(other, VsphereObject):
+            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            raise TypeError(msg.format(other))
+
+        if self == other:
+            return True
+
+        return self.qual_name < other.qual_name
+
+    # -------------------------------------------------------------------------
+    def __ge__(self, other):
+
+        if not isinstance(other, VsphereObject):
+            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            raise TypeError(msg.format(other))
+
+        if self == other:
+            return True
+
+        return self.qual_name > other.qual_name
 
 
 # =============================================================================

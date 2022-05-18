@@ -36,7 +36,7 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .xlate import XLATOR
 
-__version__ = '0.7.0'
+__version__ = '0.7.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -671,7 +671,9 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     A list containing VsphereHost objects.
     """
 
-    msg_no_host = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_host = _(
+        "Invalid type {{t!r}} as an item of a {{c}}, only {} objects are allowed.").format(
+            'VsphereHost')
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -786,7 +788,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if not isinstance(host, VsphereHost):
             raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+                t=host.__class__.__name__, c=self.__class__.__name__))
 
         if not self._list:
             return False
@@ -802,7 +804,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if not isinstance(host, VsphereHost):
             raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+                t=host.__class__.__name__, c=self.__class__.__name__))
 
         if not self._list:
             return 0
@@ -839,7 +841,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if not isinstance(host, VsphereHost):
             raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+                t=host.__class__.__name__, c=self.__class__.__name__))
 
         self._list.__setitem__(key, host)
 
@@ -853,7 +855,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if not isinstance(host, VsphereHost):
             raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+                t=host.__class__.__name__, c=self.__class__.__name__))
 
         self._list.append(host)
 
@@ -862,7 +864,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if not isinstance(host, VsphereHost):
             raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__, o='VsphereHost'))
+                t=host.__class__.__name__, c=self.__class__.__name__))
 
         self._list.insert(index, host)
 

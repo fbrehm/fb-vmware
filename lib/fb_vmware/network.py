@@ -29,7 +29,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -118,12 +118,34 @@ class VsphereNetwork(VsphereObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None):
+    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
 
-        if not isinstance(data, vim.Network):
-            msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
-                t='data', e='vim.Network', v=data)
-            raise TypeError(msg)
+        if test_mode:
+
+            necessary_fields = ('summary', 'overallStatus', 'configStatus')
+
+            failing_fields = []
+
+            for field in necessary_fields:
+                if not hasattr(data, field):
+                    failing_fields.append(field)
+
+            if hasattr(data, 'summary'):
+                if not hasattr(data.summary, 'name'):
+                    failing_fields.append('summary.name')
+
+            if len(failing_fields):
+                msg = _(
+                    "The given parameter {p!r} on calling method {m}() has failing "
+                    "attributes").format(p='data', m='from_summary')
+                msg += ': ' + format_list(failing_fields, do_repr=True)
+                raise AssertionError(msg)
+
+        else:
+            if not isinstance(data, vim.Network):
+                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                    t='data', e='vim.Network', v=data)
+                raise TypeError(msg)
 
         params = {
             'appname': appname,

@@ -38,11 +38,13 @@ from .disk import VsphereDisk, VsphereDiskList
 
 from .ether import VsphereEthernetcard, VsphereEthernetcardList
 
+from .network import VsphereNetwork, VsphereNetworkDict
+
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 LOG = logging.getLogger(__name__)
 

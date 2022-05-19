@@ -34,6 +34,8 @@ from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict
 from .dc import VsphereDatacenter
 from .dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER, DEFAULT_DS_FOLDER, DEFAULT_NETWORK_FOLDER
 
+from .controller import VsphereDiskController, VsphereDiskControllerList
+
 from .disk import VsphereDisk, VsphereDiskList
 
 from .ether import VsphereEthernetcard, VsphereEthernetcardList
@@ -44,7 +46,9 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList
 
-__version__ = '0.3.2'
+# from .vm import VsphereVm, VsphereVmList
+
+__version__ = '0.3.3'
 
 LOG = logging.getLogger(__name__)
 

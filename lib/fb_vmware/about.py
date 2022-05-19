@@ -23,7 +23,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -289,7 +289,7 @@ class VsphereAboutInfo(FbBaseObject):
             if not isinstance(data, vim.AboutInfo):
                 msg = _(
                     "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format( t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    "instead.").format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {

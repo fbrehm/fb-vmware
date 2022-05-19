@@ -27,7 +27,7 @@ from .xlate import XLATOR
 
 from .obj import VsphereObject
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -111,6 +111,8 @@ class VsphereDsCluster(VsphereObject):
 
             necessary_fields = ('summary', 'overallStatus', 'configStatus')
             summary_fields = ('capacity', 'freeSpace', 'name')
+
+            failing_fields = []
 
             for field in necessary_fields:
                 if not hasattr(data, field):

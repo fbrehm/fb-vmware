@@ -27,7 +27,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -409,37 +409,8 @@ class VsphereEthernetcard(FbBaseObject):
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
 
         if test_mode:
-
-            necessary_fields = (
-                'unitNumber', 'key', 'addressType', 'externalId', 'macAddress', 'wakeOnLanEnabled'
-                'backing', 'connectable')
-            connectable_fields = (
-                'connected', 'status', 'startConnected', 'allowGuestControl')
-
-            failing_fields = []
-
-            for field in necessary_fields:
-                if not hasattr(data, field):
-                    failing_fields.append(field)
-
-            if hasattr(data, 'backing') and not hasattr(data.backing, 'deviceName'):
-                failing_fields.append('backing.deviceName')
-
-            if hasattr(data, 'connectable'):
-                connectable = data.connectable
-                for field in connectable_fields:
-                    if not hasattr(connectable, field):
-                        failing_fields.append('connectable.' + field)
-
-            if len(failing_fields):
-                msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
-                raise AssertionError(msg)
-
+            cls._check_summary_data(data)
         else:
-
             if not isinstance(data, vim.vm.device.VirtualEthernetCard):
                 msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
                     t='data', e='vim.vm.device.VirtualEthernetCard',
@@ -500,6 +471,38 @@ class VsphereEthernetcard(FbBaseObject):
             LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(card.as_dict()))
 
         return card
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_summary_data(cls, data):
+
+        necessary_fields = (
+            'unitNumber', 'key', 'addressType', 'externalId', 'macAddress', 'wakeOnLanEnabled'
+            'backing', 'connectable')
+        connectable_fields = (
+            'connected', 'status', 'startConnected', 'allowGuestControl')
+
+        failing_fields = []
+
+        for field in necessary_fields:
+            if not hasattr(data, field):
+                failing_fields.append(field)
+
+        if hasattr(data, 'backing') and not hasattr(data.backing, 'deviceName'):
+            failing_fields.append('backing.deviceName')
+
+        if hasattr(data, 'connectable'):
+            connectable = data.connectable
+            for field in connectable_fields:
+                if not hasattr(connectable, field):
+                    failing_fields.append('connectable.' + field)
+
+        if len(failing_fields):
+            msg = _(
+                "The given parameter {p!r} on calling method {m}() has failing "
+                "attributes").format(p='data', m='from_summary')
+            msg += ': ' + format_list(failing_fields, do_repr=True)
+            raise AssertionError(msg)
 
 
 # =============================================================================

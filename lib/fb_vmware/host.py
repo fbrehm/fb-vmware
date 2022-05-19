@@ -38,7 +38,7 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .xlate import XLATOR
 
-__version__ = '0.7.2'
+__version__ = '0.7.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -565,65 +565,7 @@ class VsphereHost(VsphereObject):
             cluster_name=None, test_mode=False):
 
         if test_mode:
-
-            necessary_fields = ('summary', 'hardware', 'runtime', 'config')
-            hardware_fields = ('biosInfo', 'cpuInfo', 'memorySize', 'systemInfo')
-            cpu_fields = ('hz', 'numCpuCores', 'numCpuPackages', 'numCpuThreads')
-            runtime_fields = (
-                'bootTime', 'connectionState', 'powerState',
-                'standbyMode', 'inMaintenanceMode', 'inQuarantineMode')
-            summary_fields = ('managementServerIp', 'rebootRequired')
-
-            failing_fields = []
-
-            for field in necessary_fields:
-                if not hasattr(data, field):
-                    failing_fields.append(field)
-
-            if hasattr(data, 'hardware'):
-                hardware = data.hardware
-                for field in hardware_fields:
-                    if not hasattr(hardware, field):
-                        failing_fields.append("hardware." + field)
-
-                if hasattr(hardware, 'cpuInfo'):
-                    for field in cpu_fields:
-                        if not hasattr(hardware.cpuInfo, field):
-                            failing_fields.append("hardware.cpuInfo." + field)
-
-                if hasattr(hardware, 'systemInfo'):
-                    if not hasattr(hardware.systemInfo, 'model'):
-                        failing_fields.append("hardware.systemInfo.model")
-                    if not hasattr(hardware.systemInfo, 'vendor'):
-                        failing_fields.append("hardware.systemInfo.vendor")
-
-            if hasattr(data, 'runtime'):
-                for field in runtime_fields:
-                    if not hasattr(data.runtime, field):
-                        failing_fields.append("runtime." + field)
-
-            if hasattr(data, 'summary'):
-                for field in summary_fields:
-                    if not hasattr(data.summary, field):
-                        failing_fields.append("summary." + field)
-
-            if hasattr(data, 'config') and data.config:
-                if not hasattr(data.config, 'product'):
-                    failing_fields.append("config.product")
-                if not hasattr(data.config, 'network'):
-                    failing_fields.append("config.network")
-                elif data.config.network:
-                    for field in ('ipV6Enabled', 'atBootIpV6Enabled', 'portgroup'):
-                        if not hasattr(data.config.network, field):
-                            failing_fields.append("config.network." + field)
-
-            if len(failing_fields):
-                msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
-                raise AssertionError(msg)
-
+            cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.HostSystem):
                 msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
@@ -694,6 +636,87 @@ class VsphereHost(VsphereObject):
                     host.portgroups.append(pgroup)
 
         return host
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_summary_data(cls, data):
+
+        necessary_fields = ('summary', 'hardware', 'runtime', 'config')
+        runtime_fields = (
+            'bootTime', 'connectionState', 'powerState',
+            'standbyMode', 'inMaintenanceMode', 'inQuarantineMode')
+        summary_fields = ('managementServerIp', 'rebootRequired')
+
+        failing_fields = []
+
+        for field in necessary_fields:
+            if not hasattr(data, field):
+                failing_fields.append(field)
+
+        if hasattr(data, 'hardware'):
+            failing_fields += cls._check_hardware_data(data.hardware)
+
+        if hasattr(data, 'runtime'):
+            for field in runtime_fields:
+                if not hasattr(data.runtime, field):
+                    failing_fields.append("runtime." + field)
+
+        if hasattr(data, 'summary'):
+            for field in summary_fields:
+                if not hasattr(data.summary, field):
+                    failing_fields.append("summary." + field)
+
+        if hasattr(data, 'config') and data.config:
+            failing_fields += cls._check_config_data(data.config)
+
+        if len(failing_fields):
+            msg = _(
+                "The given parameter {p!r} on calling method {m}() has failing "
+                "attributes").format(p='data', m='from_summary')
+            msg += ': ' + format_list(failing_fields, do_repr=True)
+            raise AssertionError(msg)
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_hardware_data(cls, hardware):
+
+        hardware_fields = ('biosInfo', 'cpuInfo', 'memorySize', 'systemInfo')
+        cpu_fields = ('hz', 'numCpuCores', 'numCpuPackages', 'numCpuThreads')
+        failing_fields = []
+
+        for field in hardware_fields:
+            if not hasattr(hardware, field):
+                failing_fields.append("hardware." + field)
+
+        if hasattr(hardware, 'cpuInfo'):
+            for field in cpu_fields:
+                if not hasattr(hardware.cpuInfo, field):
+                    failing_fields.append("hardware.cpuInfo." + field)
+
+        if hasattr(hardware, 'systemInfo'):
+            if not hasattr(hardware.systemInfo, 'model'):
+                failing_fields.append("hardware.systemInfo.model")
+            if not hasattr(hardware.systemInfo, 'vendor'):
+                failing_fields.append("hardware.systemInfo.vendor")
+
+        return failing_fields
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_config_data(cls, config):
+
+        failing_fields = []
+
+        if not hasattr(config, 'product'):
+            failing_fields.append("config.product")
+        if not hasattr(config, 'network'):
+            failing_fields.append("config.network")
+        elif config.network:
+            for field in ('ipV6Enabled', 'atBootIpV6Enabled', 'portgroup'):
+                if not hasattr(config.network, field):
+                    failing_fields.append("config.network." + field)
+
+        return failing_fields
 
 
 # =============================================================================
@@ -910,12 +933,6 @@ class VsphereHostList(FbBaseObject, MutableSequence):
         "Remove all items from the VsphereHostList."
 
         self._list = []
-
-    # -------------------------------------------------------------------------
-    def __iter__(self):
-
-        for host in self._list:
-            yield host
 
     # -------------------------------------------------------------------------
     def ordered(self):

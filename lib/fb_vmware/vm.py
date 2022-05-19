@@ -37,7 +37,7 @@ from .controller import VsphereDiskController, VsphereDiskControllerList
 
 from .xlate import XLATOR
 
-__version__ = '0.6.0'
+__version__ = '0.6.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -488,57 +488,8 @@ class VsphereVm(VsphereObject):
             base_dir=None, test_mode=False):
 
         if test_mode:
-
-            necessary_fields = ('summary', 'resourcePool', 'runtime', 'config', 'guest')
-            summary_cfg_fields = (
-                'template', 'memorySizeMB', 'numCpu', 'numEthernetCards', 'numVirtualDisks',
-                'guestFullName', 'guestId', 'uuid', 'instanceUuid', 'powerState',
-                'vmPathName')
-
-            failing_fields = []
-
-            for field in necessary_fields:
-                if not hasattr(data, field):
-                    failing_fields.append(field)
-
-            if hasattr(data, 'resourcePool') and data.resourcePool:
-                if hasattr(data.resourcePool, 'owner'):
-                    if not hasattr(data.resourcePool.owner, 'name'):
-                        failing_fields.append('resourcePool.owner.name')
-                else:
-                    failing_fields.append('resourcePool.owner')
-
-            if hasattr(data, 'runtime'):
-                if not hasattr(data.runtime, 'host'):
-                    failing_fields.append('runtime.host')
-
-            if hasattr(data, 'summary'):
-                if hasattr(data.summary, 'config'):
-                    for field in summary_cfg_fields:
-                        if not hasattr(data.summary.config, field):
-                            failing_fields.append('summary.config.' + field)
-                else:
-                    failing_fields.append('summary.config')
-
-            if hasattr(data, 'config') and data.config:
-                if not hasattr(data.config, 'version'):
-                    failing_fields.append('config.version')
-                if hasattr(data.config, 'hardware'):
-                    if data.config.hardware:
-                        if not hasattr(data.config.hardware, 'device'):
-                            failing_fields.append('config.hardware.device')
-                else:
-                    failing_fields.append('config.hardware')
-
-            if len(failing_fields):
-                msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
-                raise AssertionError(msg)
-
+            cls._check_summary_data(data)
         else:
-
             if not isinstance(data, vim.VirtualMachine):
                 msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
                     t='data', e='vim.VirtualMachine', v=data, vt=data.__class__.__name__)
@@ -630,6 +581,59 @@ class VsphereVm(VsphereObject):
             LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(vm.as_dict()))
 
         return vm
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_summary_data(cls, data):
+
+        necessary_fields = ('summary', 'resourcePool', 'runtime', 'config', 'guest')
+        summary_cfg_fields = (
+            'template', 'memorySizeMB', 'numCpu', 'numEthernetCards', 'numVirtualDisks',
+            'guestFullName', 'guestId', 'uuid', 'instanceUuid', 'powerState',
+            'vmPathName')
+
+        failing_fields = []
+
+        for field in necessary_fields:
+            if not hasattr(data, field):
+                failing_fields.append(field)
+
+        if hasattr(data, 'resourcePool') and data.resourcePool:
+            if hasattr(data.resourcePool, 'owner'):
+                if not hasattr(data.resourcePool.owner, 'name'):
+                    failing_fields.append('resourcePool.owner.name')
+            else:
+                failing_fields.append('resourcePool.owner')
+
+        if hasattr(data, 'runtime'):
+            if not hasattr(data.runtime, 'host'):
+                failing_fields.append('runtime.host')
+
+        if hasattr(data, 'summary'):
+            if hasattr(data.summary, 'config'):
+                for field in summary_cfg_fields:
+                    if not hasattr(data.summary.config, field):
+                        failing_fields.append('summary.config.' + field)
+            else:
+                failing_fields.append('summary.config')
+
+        if hasattr(data, 'config') and data.config:
+            if not hasattr(data.config, 'version'):
+                failing_fields.append('config.version')
+            if hasattr(data.config, 'hardware'):
+                if data.config.hardware:
+                    if not hasattr(data.config.hardware, 'device'):
+                        failing_fields.append('config.hardware.device')
+            else:
+                failing_fields.append('config.hardware')
+
+        if len(failing_fields):
+            msg = _(
+                "The given parameter {p!r} on calling method {m}() has failing "
+                "attributes").format(p='data', m='from_summary')
+            msg += ': ' + format_list(failing_fields, do_repr=True)
+            raise AssertionError(msg)
+
 
 # =============================================================================
 class VsphereVmList(FbBaseObject, MutableSequence):

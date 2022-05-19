@@ -27,7 +27,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -64,7 +64,8 @@ class VsphereDiskController(FbBaseObject):
         'lsi_logic': _('Virtual LSI SCSI controller'),
         'lsi_logic_sas': _('Virtual LSI Logic SAS SCSI controller'),
         'scsi': _('Virtual SCSI controller'),
-        'sio': _('Virtual Super IO Controller for floppy drives, parallel ports, and serial ports'),
+        'sio': _(
+            'Virtual Super IO Controller for floppy drives, parallel ports, and serial ports'),
         'usb': _('Virtual USB controller (USB 1.1 and 2.0)'),
         'usb_xhci': _('Virtual USB Extensible Host Controller Interface (USB 3.0)'),
         'unknown': _('Unknown virtual controller'),

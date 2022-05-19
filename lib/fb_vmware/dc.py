@@ -22,7 +22,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = 'host'
@@ -168,7 +168,7 @@ class VsphereDatacenter(VsphereObject):
             if not isinstance(data, vim.Datacenter):
                 msg = _(
                     "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format( t='data', e='vim.Datacenter', v=data.__class__.__qualname__)
+                    "instead.").format(t='data', e='vim.Datacenter', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {

@@ -22,7 +22,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 LOG = logging.getLogger(__name__)
 
 
@@ -275,55 +275,12 @@ class VsphereCluster(VsphereObject):
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
 
         if test_mode:
-
-            necessary_fields = (
-                'datastore', 'name', 'network', 'overallStatus', 'configStatus',
-                'summary', 'resourcePool')
-            summary_fields = (
-                'numCpuCores', 'numCpuThreads', 'numEffectiveHosts', 'numHosts',
-                'effectiveMemory', 'totalMemory')
-            failing_fields = []
-
-            for field in necessary_fields:
-                if not hasattr(data, field):
-                    failing_fields.append(field)
-
-            if hasattr(data, 'summary'):
-                summary = data.summary
-                for field in summary_fields:
-                    if not hasattr(summary, field):
-                        failing_fields.append("summary.{}".format(field))
-
-            if hasattr(data, 'datastore'):
-                if not is_sequence(data.datastore):
-                    msg = _(
-                        "The given parameter {p!r} on calling method {m}() is not a sequence "
-                        "type.").format(p='data.datastore', m='from_summary')
-                    raise AssertionError(msg)
-
-            if hasattr(data, 'network'):
-                if not is_sequence(data.network):
-                    msg = _(
-                        "The given parameter {p!r} on calling method {m}() is not a sequence "
-                        "type.").format(p='data.network', m='from_summary')
-                    raise AssertionError(msg)
-
-            if hasattr(data, 'resourcePool') and data.resourcePool:
-                if not hasattr(data.resourcePool, 'summary'):
-                    failing_fields.append("data.resourcePool.summary")
-
-            if len(failing_fields):
-                msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
-                raise AssertionError(msg)
-
+            cls._check_summary_data(data)
         else:
             if not isinstance(data, (vim.ClusterComputeResource, vim.ComputeResource)):
                 msg = _(
                     "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format( t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    "instead.").format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
@@ -368,6 +325,53 @@ class VsphereCluster(VsphereObject):
         cluster.resource_pool = data.resourcePool
 
         return cluster
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _check_summary_data(cls, data):
+
+        necessary_fields = (
+            'datastore', 'name', 'network', 'overallStatus', 'configStatus',
+            'summary', 'resourcePool')
+        summary_fields = (
+            'numCpuCores', 'numCpuThreads', 'numEffectiveHosts', 'numHosts',
+            'effectiveMemory', 'totalMemory')
+        failing_fields = []
+
+        for field in necessary_fields:
+            if not hasattr(data, field):
+                failing_fields.append(field)
+
+        if hasattr(data, 'summary'):
+            summary = data.summary
+            for field in summary_fields:
+                if not hasattr(summary, field):
+                    failing_fields.append("summary.{}".format(field))
+
+        if hasattr(data, 'datastore'):
+            if not is_sequence(data.datastore):
+                msg = _(
+                    "The given parameter {p!r} on calling method {m}() is not a sequence "
+                    "type.").format(p='data.datastore', m='from_summary')
+                raise AssertionError(msg)
+
+        if hasattr(data, 'network'):
+            if not is_sequence(data.network):
+                msg = _(
+                    "The given parameter {p!r} on calling method {m}() is not a sequence "
+                    "type.").format(p='data.network', m='from_summary')
+                raise AssertionError(msg)
+
+        if hasattr(data, 'resourcePool') and data.resourcePool:
+            if not hasattr(data.resourcePool, 'summary'):
+                failing_fields.append("data.resourcePool.summary")
+
+        if len(failing_fields):
+            msg = _(
+                "The given parameter {p!r} on calling method {m}() has failing "
+                "attributes").format(p='data', m='from_summary')
+            msg += ': ' + format_list(failing_fields, do_repr=True)
+            raise AssertionError(msg)
 
 
 # =============================================================================

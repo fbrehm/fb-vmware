@@ -29,7 +29,7 @@ from .xlate import XLATOR
 
 from .obj import VsphereObject
 
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -207,6 +207,8 @@ class VsphereDatastore(VsphereObject):
 
             necessary_fields = ('summary', 'overallStatus', 'configStatus')
             summary_fields = ('capacity', 'freeSpace', 'name', 'type', 'url')
+
+            failing_fields = []
 
             for field in necessary_fields:
                 if not hasattr(data, field):

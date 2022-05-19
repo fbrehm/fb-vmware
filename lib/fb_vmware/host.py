@@ -28,6 +28,8 @@ from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
 # Own modules
+from .errors import VSphereHandlerError
+
 from .obj import VsphereObject, DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 
 from .about import VsphereAboutInfo
@@ -36,7 +38,7 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .xlate import XLATOR
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -289,10 +291,11 @@ class VsphereHost(VsphereObject):
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, cluster_name=None, status=DEFAULT_OBJ_STATUS,
+            name=None, cluster_name=None, vsphere=None, status=DEFAULT_OBJ_STATUS,
             config_status=DEFAULT_OBJ_STATUS):
 
-        self.repr_fields = ('name', )
+        self.repr_fields = ('name', 'vsphere')
+        self._vsphere = None
         self._cluster_name = None
         self.bios = None
         self.cpu_speed = None
@@ -322,7 +325,30 @@ class VsphereHost(VsphereObject):
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
+        if vsphere is not None:
+            self.vsphere = vsphere
+
         self.cluster_name = cluster_name
+
+    # -----------------------------------------------------------
+    @property
+    def vsphere(self):
+        """The name of the VSPhere from configuration, in which
+            the host should be existing."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == '':
+            msg = _("The name of the vsphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
 
     # -----------------------------------------------------------
     @property
@@ -451,6 +477,7 @@ class VsphereHost(VsphereObject):
         """
 
         res = super(VsphereHost, self).as_dict(short=short)
+        res['vsphere'] = self.vsphere
         res['cluster_name'] = self.cluster_name
         res['memory_mb'] = self.memory_mb
         res['memory_gb'] = self.memory_gb
@@ -489,7 +516,7 @@ class VsphereHost(VsphereObject):
 
         host = VsphereHost(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, name=self.name, status=self.status,
+            initialized=self.initialized, vsphere=self.vsphere, name=self.name, status=self.status,
             config_status=self.config_status, cluster_name=self.cluster_name)
 
         if self.bios:
@@ -524,6 +551,8 @@ class VsphereHost(VsphereObject):
         if not isinstance(other, VsphereHost):
             return False
 
+        if self.vsphere != other.vsphere:
+            return False
         if self.name != other.name:
             return False
 
@@ -532,7 +561,8 @@ class VsphereHost(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(
-            cls, data, appname=None, verbose=0, base_dir=None, cluster_name=None, test_mode=False):
+            cls, data, vsphere=None, appname=None, verbose=0, base_dir=None,
+            cluster_name=None, test_mode=False):
 
         if test_mode:
 
@@ -604,6 +634,7 @@ class VsphereHost(VsphereObject):
             LOG.error(_("Host {!r} seems to be offline!").format(data.summary.config.name))
 
         params = {
+            'vsphere': vsphere,
             'appname': appname,
             'verbose': verbose,
             'base_dir': base_dir,
@@ -818,6 +849,12 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def __len__(self):
         return len(self._list)
+
+    # -------------------------------------------------------------------------
+    def __iter__(self):
+
+        for item in self._list:
+            yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):

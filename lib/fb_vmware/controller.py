@@ -67,7 +67,7 @@ class VsphereDiskController(FbBaseObject):
         'sio': _('Virtual Super IO Controller for floppy drives, parallel ports, and serial ports'),
         'usb': _('Virtual USB controller (USB 1.1 and 2.0)'),
         'usb_xhci': _('Virtual USB Extensible Host Controller Interface (USB 3.0)'),
-        'unknown': '_(Unknown virtual controller'),
+        'unknown': _('Unknown virtual controller'),
     }
 
     # -------------------------------------------------------------------------
@@ -227,6 +227,7 @@ class VsphereDiskController(FbBaseObject):
 
         res = super(VsphereDiskController, self).as_dict(short=short)
         res['ctrl_type'] = self.ctrl_type
+        res['ctrl_type_name'] = self.ctrl_type_name
         res['bus_nr'] = self.bus_nr
         res['hot_add_remove'] = self.hot_add_remove
         res['scsi_ctrl_nr'] = self.scsi_ctrl_nr

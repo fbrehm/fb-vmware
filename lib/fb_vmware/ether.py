@@ -27,7 +27,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -653,6 +653,12 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def __len__(self):
         return len(self._list)
+
+    # -------------------------------------------------------------------------
+    def __iter__(self):
+
+        for item in self._list:
+            yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):

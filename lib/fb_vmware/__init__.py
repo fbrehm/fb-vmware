@@ -46,9 +46,9 @@ from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 
 from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList
 
-# from .vm import VsphereVm, VsphereVmList
+from .vm import VsphereVm, VsphereVmList
 
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 
 LOG = logging.getLogger(__name__)
 

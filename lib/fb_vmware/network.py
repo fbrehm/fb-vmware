@@ -23,6 +23,7 @@ except ImportError:
 from pyVmomi import vim
 
 from fb_tools.common import pp
+from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
 # Own modules
@@ -30,7 +31,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -219,7 +220,7 @@ class VsphereNetwork(VsphereObject):
 
 
 # =============================================================================
-class VsphereNetworkDict(MutableMapping):
+class VsphereNetworkDict(MutableMapping, FbGenericBaseObject):
     """
     A dictionary containing VsphereNetwork objects.
     It works like a dict.

@@ -20,6 +20,7 @@ except ImportError:
 from pyVmomi import vim
 
 from fb_tools.common import pp
+from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
 # Own modules
@@ -27,7 +28,7 @@ from .xlate import XLATOR
 
 from .obj import VsphereObject
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -202,7 +203,7 @@ class VsphereDsCluster(VsphereObject):
 
 
 # =============================================================================
-class VsphereDsClusterDict(MutableMapping):
+class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     """
     A dictionary containing VsphereDsCluster objects.
     It works like a dict.

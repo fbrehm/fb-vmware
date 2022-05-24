@@ -22,6 +22,7 @@ except ImportError:
 from pyVmomi import vim
 
 from fb_tools.common import pp, to_bool
+from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
 # Own modules
@@ -29,7 +30,7 @@ from .xlate import XLATOR
 
 from .obj import VsphereObject
 
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -360,7 +361,7 @@ class VsphereDatastore(VsphereObject):
 
 
 # =============================================================================
-class VsphereDatastoreDict(MutableMapping):
+class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     """
     A dictionary containing VsphereDatastore objects.
     It works like a dict.

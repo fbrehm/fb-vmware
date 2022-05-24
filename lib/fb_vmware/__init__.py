@@ -41,6 +41,8 @@ from .disk import VsphereDisk, VsphereDiskList                                  
 
 from .ether import VsphereEthernetcard, VsphereEthernetcardList                 # noqa
 
+from .iface import VsphereVmInterface                                           # noqa
+
 from .network import VsphereNetwork, VsphereNetworkDict                         # noqa
 
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList     # noqa

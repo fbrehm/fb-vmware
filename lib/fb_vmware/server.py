@@ -42,7 +42,7 @@ from .dc import VsphereDatacenter
 
 from .cluster import VsphereCluster
 
-from .ds import VsphereDatastore, VsphereDatastoreDict
+from .datastore import VsphereDatastore, VsphereDatastoreDict
 
 from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict
 
@@ -59,7 +59,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux7_64Guest'
@@ -113,6 +113,12 @@ class VsphereServer(BaseVsphereHandler):
         )
 
         self.initialized = initialized
+
+    # -------------------------------------------------------------------------
+    def __repr__(self):
+        """Typecasting into a string for reproduction."""
+
+        return self._repr()
 
     # -------------------------------------------------------------------------
     def get_about(self, disconnect=False):

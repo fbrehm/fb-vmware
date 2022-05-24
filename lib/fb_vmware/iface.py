@@ -24,7 +24,7 @@ from .errors import VSphereNameError
 from .xlate import XLATOR
 
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -78,12 +78,14 @@ class VsphereVmInterface(FbBaseObject):
     @name.setter
     def name(self, value):
 
+        oname = self.obj_type + '.name'
+
         if value is None:
-            raise VSphereNameError(value, self.obj_type)
+            raise VSphereNameError(value, oname)
 
         val = value.strip()
         if val == '':
-            raise VSphereNameError(value, self.obj_type)
+            raise VSphereNameError(value, oname)
 
         self._name = val
 
@@ -95,11 +97,13 @@ class VsphereVmInterface(FbBaseObject):
 
     @network_name.setter
     def network_name(self, value):
+        oname = self.obj_type + '.network_name'
+
         if value is None:
-            raise VSphereNameError(value, self.obj_type)
+            raise VSphereNameError(value, oname)
         val = value.strip()
         if val == '':
-            raise VSphereNameError(value, self.obj_type)
+            raise VSphereNameError(value, oname)
 
         self._network_name = val
 

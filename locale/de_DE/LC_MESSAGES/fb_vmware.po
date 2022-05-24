@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.3.1\n"
+"Project-Id-Version: fb_vmware 0.3.5\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-16 07:43+0200\n"
-"PO-Revision-Date: 2022-05-16 07:45+0200\n"
+"POT-Creation-Date: 2022-05-20 14:44+0200\n"
+"PO-Revision-Date: 2022-05-24 15:30+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -18,27 +18,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.1\n"
 
-#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:316 lib/fb_vmware/datastore.py:222
-#: lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388 lib/fb_vmware/ds_cluster.py:126
-#: lib/fb_vmware/ether.py:435 lib/fb_vmware/host.py:242 lib/fb_vmware/host.py:586
-#: lib/fb_vmware/host_port_group.py:198
+#: lib/fb_vmware/about.py:282 lib/fb_vmware/cluster.py:370 lib/fb_vmware/controller.py:266
+#: lib/fb_vmware/datastore.py:224 lib/fb_vmware/dc.py:161 lib/fb_vmware/disk.py:388
+#: lib/fb_vmware/ds_cluster.py:128 lib/fb_vmware/ether.py:501 lib/fb_vmware/host.py:249
+#: lib/fb_vmware/host.py:673 lib/fb_vmware/host_port_group.py:198 lib/fb_vmware/network.py:139
+#: lib/fb_vmware/vm.py:631
 msgid "The given parameter {p!r} on calling method {m}() has failing attributes"
 msgstr "Dem übergebenen Parameter {p!r} beim Aufruf der Methode {m}() fehlen Attribute"
 
-#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:324 lib/fb_vmware/dc.py:169
+#: lib/fb_vmware/about.py:290 lib/fb_vmware/cluster.py:281 lib/fb_vmware/dc.py:169
 #: lib/fb_vmware/disk.py:397
 msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
 
-#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:349 lib/fb_vmware/datastore.py:262
-#: lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419 lib/fb_vmware/ds_cluster.py:152
-#: lib/fb_vmware/ether.py:495 lib/fb_vmware/host.py:274 lib/fb_vmware/host.py:613
-#: lib/fb_vmware/host_port_group.py:222
+#: lib/fb_vmware/about.py:303 lib/fb_vmware/cluster.py:306 lib/fb_vmware/controller.py:308
+#: lib/fb_vmware/datastore.py:264 lib/fb_vmware/dc.py:189 lib/fb_vmware/disk.py:419
+#: lib/fb_vmware/ds_cluster.py:154 lib/fb_vmware/ether.py:466 lib/fb_vmware/host.py:281
+#: lib/fb_vmware/host.py:591 lib/fb_vmware/host_port_group.py:222 lib/fb_vmware/network.py:171
+#: lib/fb_vmware/vm.py:510
 msgid "Creating {} object from:"
 msgstr "Erstelle ein {}-Objekt aus:"
 
-#: lib/fb_vmware/about.py:339 lib/fb_vmware/disk.py:424 lib/fb_vmware/ether.py:500
-#: lib/fb_vmware/host_port_group.py:227
+#: lib/fb_vmware/about.py:339 lib/fb_vmware/controller.py:313 lib/fb_vmware/disk.py:424
+#: lib/fb_vmware/ether.py:471 lib/fb_vmware/host_port_group.py:227 lib/fb_vmware/vm.py:581
 msgid "Created {} object:"
 msgstr "Erstelltes {}-Objekt:"
 
@@ -56,73 +58,150 @@ msgstr "Verbinde mich mit vSphere-Host {h}:{p} als {u!r} …"
 msgid "Disconnecting from vSphere host {}."
 msgstr "Trenne Verbindung zu vSphere-Host {}."
 
-#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/datastore.py:349 lib/fb_vmware/dc.py:127
-#: lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:191 lib/fb_vmware/ether.py:305
-#: lib/fb_vmware/host.py:517 lib/fb_vmware/host_port_group.py:161
+#: lib/fb_vmware/cluster.py:263 lib/fb_vmware/controller.py:187 lib/fb_vmware/datastore.py:351
+#: lib/fb_vmware/dc.py:127 lib/fb_vmware/disk.py:274 lib/fb_vmware/ds_cluster.py:193
+#: lib/fb_vmware/ether.py:305 lib/fb_vmware/host.py:549 lib/fb_vmware/host_port_group.py:161
+#: lib/fb_vmware/network.py:210 lib/fb_vmware/obj.py:273 lib/fb_vmware/vm.py:470
 msgid "Comparing {} objects ..."
 msgstr "Vergleiche {}-Objekte …"
 
-#: lib/fb_vmware/cluster.py:299 lib/fb_vmware/cluster.py:306
-msgid "The given parameter {p!r} on calling method {m}() is not a sequence type."
-msgstr "Der übergebene Parameter {p!r} beim Aufruf der Methode {m}() ist kein sequenzieller Typ."
-
-#: lib/fb_vmware/cluster.py:357
+#: lib/fb_vmware/cluster.py:314
 msgid "Cluster {c!r} has network {n!r}."
 msgstr "Das Cluster {c!r} besitzt das Netzwerk {n!r}."
 
-#: lib/fb_vmware/cluster.py:364
+#: lib/fb_vmware/cluster.py:321
 msgid "Cluster {c!r} has datastore {d!r}."
 msgstr "as Cluster {c!r} besitzt den Datastore {d!r}."
 
-#: lib/fb_vmware/datastore.py:231 lib/fb_vmware/ds_cluster.py:135
-msgid "Parameter {t!r} must be a {e}, {v!r} was given."
-msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
+#: lib/fb_vmware/cluster.py:353 lib/fb_vmware/cluster.py:360
+msgid "The given parameter {p!r} on calling method {m}() is not a sequence type."
+msgstr "Der übergebene Parameter {p!r} beim Aufruf der Methode {m}() ist kein sequenzieller Typ."
 
-#: lib/fb_vmware/datastore.py:367 lib/fb_vmware/ds_cluster.py:209
-msgid "Invalid item type {{!r}} to set, only {} allowed."
-msgstr "Ungültiger Elementen-Typ {{!r}} beim Setzen, nur {} ist erlaubt."
+#: lib/fb_vmware/controller.py:56
+msgid "Virtual IDE controller"
+msgstr "Virtueller IDE-Kontroller"
 
-#: lib/fb_vmware/datastore.py:369
-msgid "The key {k!r} must be equal to the datastore name {n!r}."
-msgstr "Der Schlüssel {k!r} muss identisch mit dem Namen des Datastores {n!r} sein."
+#: lib/fb_vmware/controller.py:57
+msgid "Virtual VNME controller"
+msgstr "Virtueller VNME-Kontroller"
 
-#: lib/fb_vmware/datastore.py:370 lib/fb_vmware/ds_cluster.py:212
-msgid "None type as key is not allowed."
-msgstr "Ein None-Typ ist als Schlüssel nicht erlaubt."
+#: lib/fb_vmware/controller.py:58
+msgid "Virtual PCI controller"
+msgstr "Virtueller PCO-Kontroller"
 
-#: lib/fb_vmware/datastore.py:371 lib/fb_vmware/ds_cluster.py:213
-msgid "Empty key {!r} is not allowed."
-msgstr "Ein leere Schlüssel {!r} ist nicht erlaubt."
+#: lib/fb_vmware/controller.py:59
+msgid "Virtual controller for keyboards and mice"
+msgstr "Virtueller Kontroller für Tastaturen und Mäuse"
 
-#: lib/fb_vmware/datastore.py:372 lib/fb_vmware/ds_cluster.py:214
-msgid "Object {{!r}} is not a {} object."
-msgstr "Das Objekt {{!r}} ist kein {}-Objekt."
+#: lib/fb_vmware/controller.py:60
+msgid "Virtual AHCI SATA controller"
+msgstr "Virtueller AHCI-SATA-Kontroller"
 
-#: lib/fb_vmware/datastore.py:604
-msgid "Could not handle datastore type {!r}."
-msgstr "Kann den Datastore-Typ {!r} nicht behandeln."
+#: lib/fb_vmware/controller.py:61
+msgid "Virtual SATA controller"
+msgstr "Virtueller SATA-Kontroller"
 
-#: lib/fb_vmware/datastore.py:611
-msgid "Could not found a datastore for {c:0.1f} GiB of type {t!r}."
-msgstr "Konnte keinen Datastore für {c:0.1f} GiB vom Typ {t!r} finden."
+#: lib/fb_vmware/controller.py:62
+msgid "Virtual paravirtualized SCSI controller"
+msgstr "Virtueller paravirtualisierter SCSI-Kontroller"
 
-#: lib/fb_vmware/datastore.py:618
-msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
-msgstr "Suche Datastore für {c:0.1f} GiB vom Typ {t!r}."
+#: lib/fb_vmware/controller.py:63
+msgid "Virtual BusLogic SCSI controller"
+msgstr "Virtueller BusLogic SCSI-Kontroller"
 
-#: lib/fb_vmware/disk.py:435 lib/fb_vmware/ether.py:511 lib/fb_vmware/host_port_group.py:238
+#: lib/fb_vmware/controller.py:64
+msgid "Virtual LSI SCSI controller"
+msgstr "Virtueller LSI SCSI-Kontroller"
+
+#: lib/fb_vmware/controller.py:65
+msgid "Virtual LSI Logic SAS SCSI controller"
+msgstr "Virtueller LSI Logic Logic SCSI-Kontroller"
+
+#: lib/fb_vmware/controller.py:66
+msgid "Virtual SCSI controller"
+msgstr "Virtueller SCSI-Kontroller"
+
+#: lib/fb_vmware/controller.py:67
+msgid "Virtual Super IO Controller for floppy drives, parallel ports, and serial ports"
+msgstr "Virtueller Super-IO-Kontroller für Diskettenlaufwerke, Parallel- und serielle Ports"
+
+#: lib/fb_vmware/controller.py:69
+msgid "Virtual USB controller (USB 1.1 and 2.0)"
+msgstr "Virtueller USB-Kontroller (USB 1.1 and 2.0)"
+
+#: lib/fb_vmware/controller.py:70
+msgid "Virtual USB Extensible Host Controller Interface (USB 3.0)"
+msgstr "Virtueller USB Extensible Host Kontroller Interface (USB 3.0)"
+
+#: lib/fb_vmware/controller.py:71
+msgid "Unknown virtual controller"
+msgstr "Unbekannter virtueller Kontroller"
+
+#: lib/fb_vmware/controller.py:275 lib/fb_vmware/ether.py:415 lib/fb_vmware/host.py:257
+#: lib/fb_vmware/host.py:571 lib/fb_vmware/host_port_group.py:206 lib/fb_vmware/vm.py:494
+msgid "Parameter {t!r} must be a {e}, {v!r} ({vt}) was given."
+msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde {v!r} ({vt}) übergeben."
+
+#: lib/fb_vmware/controller.py:297
+msgid "Checking class of controller: {!r}"
+msgstr "Überprüfe die Klasse des Kontrollers: {!r}"
+
+#: lib/fb_vmware/controller.py:324 lib/fb_vmware/disk.py:435 lib/fb_vmware/ether.py:514
+#: lib/fb_vmware/host_port_group.py:238 lib/fb_vmware/vm.py:644
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr "Ungültiger Typ {t!r} als ein Eintrag von {c}, ausschließlich {o}-Objekte sind erlaubt."
 
-#: lib/fb_vmware/disk.py:503 lib/fb_vmware/ether.py:579 lib/fb_vmware/host_port_group.py:327
+#: lib/fb_vmware/controller.py:392 lib/fb_vmware/disk.py:503 lib/fb_vmware/ether.py:582
+#: lib/fb_vmware/host.py:798 lib/fb_vmware/host_port_group.py:327 lib/fb_vmware/vm.py:712
 msgid "{m} takes at most {max} arguments ({n} given)."
 msgstr "{m} akzeptiert höchstens {max} Argumente ({n} wurden gegeben)."
+
+#: lib/fb_vmware/controller.py:431
+msgid "Controller is not in controller list."
+msgstr "Der Kontroller ist nicht in der Liste der Kontroller."
+
+#: lib/fb_vmware/datastore.py:233 lib/fb_vmware/ds_cluster.py:137 lib/fb_vmware/network.py:147
+msgid "Parameter {t!r} must be a {e}, {v!r} was given."
+msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
+
+#: lib/fb_vmware/datastore.py:369 lib/fb_vmware/ds_cluster.py:211 lib/fb_vmware/network.py:228
+msgid "Invalid item type {{!r}} to set, only {} allowed."
+msgstr "Ungültiger Elementen-Typ {{!r}} beim Setzen, nur {} ist erlaubt."
+
+#: lib/fb_vmware/datastore.py:371
+msgid "The key {k!r} must be equal to the datastore name {n!r}."
+msgstr "Der Schlüssel {k!r} muss identisch mit dem Namen des Datastores {n!r} sein."
+
+#: lib/fb_vmware/datastore.py:372 lib/fb_vmware/ds_cluster.py:214 lib/fb_vmware/network.py:231
+msgid "None type as key is not allowed."
+msgstr "Ein None-Typ ist als Schlüssel nicht erlaubt."
+
+#: lib/fb_vmware/datastore.py:373 lib/fb_vmware/ds_cluster.py:215 lib/fb_vmware/network.py:232
+msgid "Empty key {!r} is not allowed."
+msgstr "Ein leere Schlüssel {!r} ist nicht erlaubt."
+
+#: lib/fb_vmware/datastore.py:374 lib/fb_vmware/ds_cluster.py:216 lib/fb_vmware/network.py:233
+#: lib/fb_vmware/obj.py:255 lib/fb_vmware/obj.py:264 lib/fb_vmware/obj.py:284 lib/fb_vmware/obj.py:296
+msgid "Object {{!r}} is not a {} object."
+msgstr "Das Objekt {{!r}} ist kein {}-Objekt."
+
+#: lib/fb_vmware/datastore.py:606
+msgid "Could not handle datastore type {!r}."
+msgstr "Kann den Datastore-Typ {!r} nicht behandeln."
+
+#: lib/fb_vmware/datastore.py:613
+msgid "Could not found a datastore for {c:0.1f} GiB of type {t!r}."
+msgstr "Konnte keinen Datastore für {c:0.1f} GiB vom Typ {t!r} finden."
+
+#: lib/fb_vmware/datastore.py:620
+msgid "Searching datastore for {c:0.1f} GiB of type {t!r}."
+msgstr "Suche Datastore für {c:0.1f} GiB vom Typ {t!r}."
 
 #: lib/fb_vmware/disk.py:543
 msgid "Disk is not in disk list."
 msgstr "Die Platte ist nicht in der Liste der Disks."
 
-#: lib/fb_vmware/ds_cluster.py:211
+#: lib/fb_vmware/ds_cluster.py:213
 msgid "The key {k!r} must be equal to the datastore cluster name {n!r}."
 msgstr "Der Schlüssel {k!r} muss gleich dem Namen des Datastore-Clusters {n!r} sein."
 
@@ -168,26 +247,69 @@ msgstr "Zeitüberschreitung bei der Erstellung der VM {vm!r} nach {to:0.1f} Seku
 msgid "Timeout on creating VM {!r}."
 msgstr "Zeitüberschreitung bei der Erstellung der VM {!r}."
 
-#: lib/fb_vmware/ether.py:444 lib/fb_vmware/host.py:250 lib/fb_vmware/host.py:594
-#: lib/fb_vmware/host_port_group.py:206
-msgid "Parameter {t!r} must be a {e}, {v!r} ({vt}) was given."
-msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde {v!r} ({vt}) übergeben."
-
-#: lib/fb_vmware/ether.py:472
+#: lib/fb_vmware/ether.py:443
 msgid "Checking class of ethernet card: {!r}"
 msgstr "Überprüfe die Klasse der Ethernet-Karte: {!r}"
 
-#: lib/fb_vmware/ether.py:618
+#: lib/fb_vmware/ether.py:621
 msgid "card is not in card list."
 msgstr "Die Karte ist nicht in der Liste der Ethernet-Karten."
 
-#: lib/fb_vmware/host.py:599
+#: lib/fb_vmware/host.py:348 lib/fb_vmware/vm.py:110
+msgid "The name of the vsphere may not be empty."
+msgstr "Der Name des VSPhere darf nicht leer sein."
+
+#: lib/fb_vmware/host.py:576
 msgid "Host {!r} seems to be offline!"
 msgstr "Der Host {!r} scheint offline zu sein!"
 
+#: lib/fb_vmware/host.py:728
+msgid "Invalid type {{t!r}} as an item of a {{c}}, only {} objects are allowed."
+msgstr "Ungültiger Typ {{t!r}} als ein Eintrag von {{c}}, ausschließlich {}-Objekte sind erlaubt."
+
+#: lib/fb_vmware/host.py:837
+msgid "host is not in host list."
+msgstr "der Host ist nicht in der Liste der Hosts."
+
 #: lib/fb_vmware/host_port_group.py:366
 msgid "group is not in group list."
-msgstr "Gruppe ist nich in der Gruppenliste."
+msgstr "Gruppe ist nicht in der Gruppenliste."
+
+#: lib/fb_vmware/network.py:70
+msgid "Trying to get IPv4 network {n!r} -> {i!r}."
+msgstr "Versuche ein IPv6-Netzwerk {n!r} -> {i!r} zu bekommen."
+
+#: lib/fb_vmware/network.py:77
+msgid "Could not get IP network from network name {!r}."
+msgstr "Konnte kein IP-Netzwerk aus dem Netzwerk-Namen {!r} ermitteln."
+
+#: lib/fb_vmware/network.py:80
+msgid "Network {!r} has no IP network assigned."
+msgstr "Dem Netzwerk {!r} wurde kein IP-Netzwerk zugeordnet."
+
+#: lib/fb_vmware/network.py:86
+msgid "Initialized network object:"
+msgstr "Initialisiertes Netzwerk-Objekt:"
+
+#: lib/fb_vmware/network.py:230
+msgid "The key {k!r} must be equal to the network name {n!r}."
+msgstr "Der Schlüssel {k!r} muss identisch mit dem Namen des Netzwerkes {n!r} sein."
+
+#: lib/fb_vmware/network.py:478
+msgid "Searching VSphere network for address {} ..."
+msgstr "Suche VSphere-Netzwerk für Adresse {} …"
+
+#: lib/fb_vmware/network.py:484
+msgid "Found network {n!r} for IP {i}."
+msgstr "Fand Netzwerk {n!r} für IP {i}."
+
+#: lib/fb_vmware/network.py:488
+msgid "Could not find VSphere network for IP {}."
+msgstr "Konnte kein VSphere-Netzwerk für die IP {} finden."
+
+#: lib/fb_vmware/network.py:491
+msgid "Could not find VSphere network for IP addresses {}."
+msgstr "Konnte kein VSphere-Netzwerk für die IP-Adressen {} finden."
 
 #: lib/fb_vmware/obj.py:78
 msgid "The type of a {} may not be None."
@@ -204,6 +326,18 @@ msgstr "Der Namenspräfix eines {} darf nicht None sein."
 #: lib/fb_vmware/obj.py:149
 msgid "Invalid name prefix {p!r} for a {o}."
 msgstr "Ungültiger Namenspräfix {p!r} für ein {o}."
+
+#: lib/fb_vmware/vm.py:573
+msgid "Unknown hardware device of type {}."
+msgstr "Unbekanntes Hardware-Gerät vom Typ {}."
+
+#: lib/fb_vmware/vm.py:576
+msgid "There is something wrong wit VM {n!r} in cluster {c!r} and path {p!r} ..."
+msgstr "Da ist irgendwas falsch mit der VM {n!r} in Cluster {c!r} und Pfad {p!r} …"
+
+#: lib/fb_vmware/vm.py:751
+msgid "VM is not in VM list."
+msgstr "Die VM ist nicht in der Liste der Virtuellen Maschinen."
 
 #: lib/fb_vmware/xlate.py:98
 msgid "Module directory:"

@@ -51,7 +51,9 @@ from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList             
 
 from .vm import VsphereVm, VsphereVmList                                        # noqa
 
-__version__ = '0.3.5'
+from .server import VsphereServer, DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION   # noqa
+
+__version__ = '0.3.6'
 
 LOG = logging.getLogger(__name__)
 

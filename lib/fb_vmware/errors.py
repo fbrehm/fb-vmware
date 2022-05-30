@@ -17,7 +17,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.1.1'
+__version__ = '0.2.0'
 
 _ = XLATOR.gettext
 
@@ -185,6 +185,50 @@ class TimeoutCreateVmError(VSphereExpectedError):
                 vm=self.vm, to=self.timeout)
         else:
             msg = _("Timeout on creating VM {!r}.").format(self.vm)
+        return msg
+
+
+# =============================================================================
+class WrongPortTypeError(VSphereHandlerError, TypeError):
+
+    # -------------------------------------------------------------------------
+    def __init__(self, port, emesg=None):
+
+        self.port = port
+        self.emesg = emesg
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _("Invalid type of {!r} for a port of a VSPhere server").format(self.port)
+        if self.emesg:
+            msg += ': ' + self.emesg
+        else:
+            msg += '.'
+
+        return msg
+
+# =============================================================================
+class WrongPortValueError(VSphereHandlerError, ValueError):
+
+    default_max_port = (2 ** 16) - 1
+
+    # -------------------------------------------------------------------------
+    def __init__(self, port, max_port=None):
+
+        self.port = port
+        self.max_port = max_port
+        if self.max_port is None:
+            self.max_port = self.default_max_port
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _(
+            "Invalid port number {port!r} for the VSphere server, "
+            "PORT must be greater than zero and less or equal to {max}.").format(
+            port=self.port, max=self.max_port)
+
         return msg
 
 

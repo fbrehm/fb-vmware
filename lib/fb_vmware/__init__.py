@@ -14,6 +14,7 @@ import logging
 # Third party modules
 
 # Own modules
+
 from .xlate import XLATOR
 
 from .base import BaseVsphereHandler                                            # noqa
@@ -55,7 +56,7 @@ from .server import VsphereServer, DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION   
 
 from .base_config import VmwareConfigError, VmwareConfiguration                 # noqa
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 LOG = logging.getLogger(__name__)
 

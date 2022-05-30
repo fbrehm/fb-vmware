@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.3.6\n"
+"Project-Id-Version: fb_vmware 0.4.1\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2022-05-30 10:37+0200\n"
+"POT-Creation-Date: 2022-05-30 12:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank@brehm-online.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,18 +43,36 @@ msgstr ""
 msgid "Created {} object:"
 msgstr ""
 
-#: lib/fb_vmware/base.py:106
-msgid ""
-"Invalid port number {!r} for the VSphere server, PORT must be greater than zero and less or "
-"equal to 65536."
-msgstr ""
-
-#: lib/fb_vmware/base.py:221
+#: lib/fb_vmware/base.py:223
 msgid "Connecting to vSphere host {h}:{p} as {u!r} ..."
 msgstr ""
 
-#: lib/fb_vmware/base.py:239
+#: lib/fb_vmware/base.py:241
 msgid "Disconnecting from vSphere host {}."
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:157
+msgid "An empty name for a VSPhere datacenter is not allowed."
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:171
+msgid "An empty user name for connecting to a VSPhere datacenter is not allowed."
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:263
+msgid "Unknown key {k!r} with value {v!r} for VSphere {vs!r} in section {sec!r} found."
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:269
+msgid "{e} in section {sn!r} for VSphere {vs!r}:"
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:275
+msgid "There must be given at least the VSPhere hostname in section {sn!r} for VSphere {vs!r}."
+msgstr ""
+
+#: lib/fb_vmware/base_config.py:407
+msgid "Empty VSphere name found."
 msgstr ""
 
 #: lib/fb_vmware/cluster.py:263 lib/fb_vmware/controller.py:187 lib/fb_vmware/datastore.py:352
@@ -243,6 +261,16 @@ msgstr ""
 
 #: lib/fb_vmware/errors.py:187
 msgid "Timeout on creating VM {!r}."
+msgstr ""
+
+#: lib/fb_vmware/errors.py:203
+msgid "Invalid type of {!r} for a port of a VSPhere server"
+msgstr ""
+
+#: lib/fb_vmware/errors.py:227
+msgid ""
+"Invalid port number {port!r} for the VSphere server, PORT must be greater than zero and less or "
+"equal to {max}."
 msgstr ""
 
 #: lib/fb_vmware/ether.py:443

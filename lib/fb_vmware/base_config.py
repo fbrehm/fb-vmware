@@ -273,7 +273,7 @@ class VSPhereConfigInfo(FbBaseObject):
 
         if not info.host:
             msg = _(
-                "There must ne given at least the VSPhere hostname in section {sn!r} "
+                "There must be given at least the VSPhere hostname in section {sn!r} "
                 "for VSphere {vs!r}.").format(vs=vsphere_name, sec=section_name)
             raise VmwareConfigError(msg)
 

@@ -29,7 +29,7 @@ from .xlate import XLATOR
 
 from .errors import VSphereCannotConnectError
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 LOG = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class BaseVsphereHandler(HandlingObject):
         if val <= 0 or val > 65536:
             err_msg = _(
                 "Invalid port number {!r} for the VSphere server, "
-                "must be 0 < PORT <= 65536.")
+                "PORT must be greater than zero and less or equal to 65536.")
             msg = err_msg.format(value)
             raise ValueError(msg)
         self._port = val

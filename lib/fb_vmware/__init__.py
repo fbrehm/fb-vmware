@@ -53,7 +53,9 @@ from .vm import VsphereVm, VsphereVmList                                        
 
 from .server import VsphereServer, DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION   # noqa
 
-__version__ = '0.3.6'
+from .base_config import VmwareConfigError, VmwareConfiguration                 # noqa
+
+__version__ = '0.4.0'
 
 LOG = logging.getLogger(__name__)
 

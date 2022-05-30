@@ -28,8 +28,9 @@ from fb_tools.handling_obj import HandlingObject
 from .xlate import XLATOR
 
 from .errors import VSphereCannotConnectError
+from .errors import WrongPortTypeError, WrongPortValueError
 
-__version__ = '0.1.4'
+__version__ = '0.1.5'
 
 LOG = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ DEFAULT_CLUSTER = 'vmcc-l105-01'
 DEFAULT_TZ_NAME = 'Europe/Berlin'
 DEFAULT_MAX_SEARCH_DEPTH = 10
 
+MAX_PORT_NUMBER = (2 ** 16) - 1
 
 # =============================================================================
 @add_metaclass(ABCMeta)
@@ -101,13 +103,13 @@ class BaseVsphereHandler(HandlingObject):
         if value is None:
             self._port = self.default_port
             return
-        val = int(value)
-        if val <= 0 or val > 65536:
-            err_msg = _(
-                "Invalid port number {!r} for the VSphere server, "
-                "PORT must be greater than zero and less or equal to 65536.")
-            msg = err_msg.format(value)
-            raise ValueError(msg)
+        try:
+            val = int(value)
+            if val <= 0 or val > MAX_PORT_NUMBER:
+                raise WrongPortValueError(val, MAX_PORT_NUMBER)
+        except TypeError as e:
+            raise WrongPortTypeError(val, stra(e))
+
         self._port = val
 
     # -----------------------------------------------------------

@@ -23,22 +23,24 @@ from fb_tools.obj import FbGenericBaseObject, FbBaseObject
 
 from ..errors import WrongPortTypeError, WrongPortValueError
 
-from ..base import MAX_PORT_NUMBER
-
 from ..xlate import XLATOR
 
-__version__ = '0.5.2'
+__version__ = '0.5.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 
 DEFAULT_CONFIG_DIR = 'pixelpark'
+
 DEFAULT_VSPHERE_PORT = 443
 DEFAULT_VSPHERE_USER = 'Administrator@vsphere.local'
 DEFAULT_VSPHERE_DC = 'vmcc'
+DEFAULT_VSPHERE_CLUSTER = 'vmcc-l105-01'
 
 DEFAULT_PORT_HTTP = 80
 DEFAULT_PORT_HTTPS = 443
+
+MAX_PORT_NUMBER = (2 ** 16) - 1
 
 
 # =============================================================================
@@ -292,12 +294,29 @@ class VSPhereConfigInfo(FbBaseObject):
         fields.append("host={!r}".format(self.host))
         fields.append("use_https={!r}".format(self.use_https))
         fields.append("port={!r}".format(self.port))
-        fields.append("dx={!r}".format(self.dx))
+        fields.append("dc={!r}".format(self.dc))
         fields.append("user={!r}".format(self.user))
         fields.append("password={!r}".format(self.password))
         fields.append("verbose={!r}".format(self.verbose))
         fields.append("base_dir={!r}".format(self.base_dir))
         fields.append("initialized={!r}".format(self.initialized))
+
+        out += ", ".join(fields) + ")>"
+        return out
+
+    # -------------------------------------------------------------------------
+    def _repr(self):
+        """A typecasting into a string for reproduction only with relevant information."""
+
+        out = "<%s(" % (self.__class__.__name__)
+
+        fields = []
+        fields.append("host={!r}".format(self.host))
+        fields.append("use_https={!r}".format(self.use_https))
+        fields.append("port={!r}".format(self.port))
+        fields.append("dc={!r}".format(self.dc))
+        fields.append("user={!r}".format(self.user))
+        fields.append("password={!r}".format(self.show_password))
 
         out += ", ".join(fields) + ")>"
         return out

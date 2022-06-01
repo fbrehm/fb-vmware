@@ -34,7 +34,8 @@ from fb_tools.xlate import format_list
 
 # Own modules
 from .base import BaseVsphereHandler, DEFAULT_TZ_NAME
-from .base import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER, DEFAULT_DC, DEFAULT_CLUSTER
+
+from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
 
 from .about import VsphereAboutInfo
 
@@ -59,7 +60,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.7.1'
+__version__ = '1.8.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux7_64Guest'
@@ -87,9 +88,8 @@ class VsphereServer(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            host=DEFAULT_HOST, port=DEFAULT_PORT, user=DEFAULT_USER, password=None,
-            dc=DEFAULT_DC, cluster=DEFAULT_CLUSTER, auto_close=True, simulate=None,
+        self, connect_info, appname=None, verbose=0, version=__version__, base_dir=None,
+            cluster=DEFAULT_VSPHERE_CLUSTER, auto_close=True, simulate=None,
             force=None, terminal_has_colors=False, tz=DEFAULT_TZ_NAME, initialized=False):
 
         self.datastores = VsphereDatastoreDict()
@@ -106,10 +106,10 @@ class VsphereServer(BaseVsphereHandler):
         self.hosts = {}
 
         super(VsphereServer, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            host=host, port=port, user=user, password=password, dc=dc, cluster=cluster,
-            simulate=simulate, force=force, auto_close=auto_close,
-            terminal_has_colors=terminal_has_colors, tz=tz, initialized=False,
+            connect_info=connect_info, appname=appname, verbose=verbose, version=version,
+            base_dir=base_dir, dc=dc, cluster=cluster, simulate=simulate, force=force,
+            auto_close=auto_close, terminal_has_colors=terminal_has_colors, tz=tz,
+            initialized=False,
         )
 
         self.initialized = initialized
@@ -138,8 +138,9 @@ class VsphereServer(BaseVsphereHandler):
                 socket.timeout, urllib3.exceptions.ConnectTimeoutError,
                 urllib3.exceptions.MaxRetryError,
                 requests.exceptions.ConnectTimeout) as e:
-            msg = _("Got a {c} on connecting to {h!r}: {e}.").format(
-                c=e.__class__.__name__, h=self.host, e=e)
+            msg = _(
+                "Got a {c} on requesting 'about' information from VSPhere {url}: {e}.").format(
+                c=e.__class__.__name__, url=self.connect_info.url, e=e)
             raise VSphereExpectedError(msg)
 
         finally:

@@ -27,24 +27,21 @@ from fb_tools.handling_obj import HandlingObject
 # Own modules
 from .xlate import XLATOR
 
-from .errors import VSphereCannotConnectError
+from .errors import BaseVSphereHandlerError
+from .errors import VSphereCannotConnectError, VSphereHandlerError
 from .errors import WrongPortTypeError, WrongPortValueError
 
-__version__ = '0.1.5'
+from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
+
+__version__ = '0.2.0'
 
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 
-DEFAULT_HOST = 'vcs01.ppbrln.internal'
-DEFAULT_PORT = 443
-DEFAULT_USER = 'Administrator@vsphere.local'
-DEFAULT_DC = 'vmcc'
-DEFAULT_CLUSTER = 'vmcc-l105-01'
 DEFAULT_TZ_NAME = 'Europe/Berlin'
 DEFAULT_MAX_SEARCH_DEPTH = 10
 
-MAX_PORT_NUMBER = (2 ** 16) - 1
 
 # =============================================================================
 @add_metaclass(ABCMeta)
@@ -58,20 +55,15 @@ class BaseVsphereHandler(HandlingObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            host=DEFAULT_HOST, port=DEFAULT_PORT, user=DEFAULT_USER, password=None,
-            dc=DEFAULT_DC, cluster=DEFAULT_CLUSTER, auto_close=False, simulate=None,
+        self, connect_info, appname=None, verbose=0, version=__version__, base_dir=None,
+            cluster=DEFAULT_VSPHERE_CLUSTER, auto_close=False, simulate=None,
             force=None, terminal_has_colors=False, initialized=False, tz=DEFAULT_TZ_NAME):
 
-        self._host = host
-        self._port = port
-        self._user = user
-        self._password = password
-        self._dc = dc
         self._cluster = cluster
         self._auto_close = False
         self._tz = pytz.timezone(DEFAULT_TZ_NAME)
 
+        self.connect_info = None
         self.service_instance = None
 
         super(BaseVsphereHandler, self).__init__(
@@ -80,37 +72,24 @@ class BaseVsphereHandler(HandlingObject):
             initialized=False,
         )
 
+        if not isinstance(connect_info, VSPhereConfigInfo):
+            msg = _("The given parameter {pc!r} ({pv!r}) is not a {o} object.").format(
+                pc='connect_info', pv=connect_info, o='VSPhereConfigInfo')
+            raise BaseVSphereHandlerError(msg)
+
+        if not connect_info.host:
+            msg = _("No VSPhere host name or address given in {w}.").format(w='connect_info')
+            raise BaseVSphereHandlerError(msg)
+
+        if not connect_info.initialized:
+            msg = _("The {c} object given as {w} is not initialized.").format(
+                c='VSPhereConfigInfo', w='connect_info')
+            raise BaseVSphereHandlerError(msg)
+
         self.tz = tz
-        self.port = port
         self.auto_close = auto_close
 
         self.initialized = initialized
-
-    # -----------------------------------------------------------
-    @property
-    def host(self):
-        """The hostname or IP address of the VSpere server."""
-        return self._host
-
-    # -----------------------------------------------------------
-    @property
-    def port(self):
-        """The TCP port number of the VSphere server."""
-        return self._port
-
-    @port.setter
-    def port(self, value):
-        if value is None:
-            self._port = self.default_port
-            return
-        try:
-            val = int(value)
-            if val <= 0 or val > MAX_PORT_NUMBER:
-                raise WrongPortValueError(val, MAX_PORT_NUMBER)
-        except TypeError as e:
-            raise WrongPortTypeError(val, stra(e))
-
-        self._port = val
 
     # -----------------------------------------------------------
     @property
@@ -125,21 +104,13 @@ class BaseVsphereHandler(HandlingObject):
 
     # -----------------------------------------------------------
     @property
-    def user(self):
-        """The username to connect to the VSpere server."""
-        return self._user
-
-    # -----------------------------------------------------------
-    @property
-    def password(self):
-        """The username to connect to the VSpere server."""
-        return self._password
-
-    # -----------------------------------------------------------
-    @property
     def dc(self):
-        """The name of the VSphere data center to use."""
-        return self._dc
+        """The name of the VSphere datacenter to use."""
+
+        connect_info = getattr(self, 'connect_info', None)
+        if connect_info:
+            return connect_info.dc
+        return None
 
     # -----------------------------------------------------------
     @property
@@ -174,11 +145,11 @@ class BaseVsphereHandler(HandlingObject):
         out = "<%s(" % (self.__class__.__name__)
 
         fields = []
-        fields.append("host={!r}".format(self.host))
-        fields.append("port={!r}".format(self.port))
-        fields.append("user={!r}".format(self.user))
-        fields.append("dc={!r}".format(self.dc))
+        fields.append("connect_info={}".format(self.connect_info._repr()))
         fields.append("cluster={!r}".format(self.cluster))
+        fields.append("auto_close={!r}".format(self.auto_close))
+        fields.append("simulate={!r}".format(self.simulate))
+        fields.append("force={!r}".format(self.force))
 
         out += ", ".join(fields) + ")>"
         return out
@@ -196,9 +167,6 @@ class BaseVsphereHandler(HandlingObject):
         """
 
         res = super(BaseVsphereHandler, self).as_dict(short=short)
-        res['host'] = self.host
-        res['port'] = self.port
-        res['user'] = self.user
         res['dc'] = self.dc
         res['tz'] = None
         if self.tz:
@@ -206,39 +174,39 @@ class BaseVsphereHandler(HandlingObject):
         res['cluster'] = self.cluster
         res['auto_close'] = self.auto_close
         res['max_search_depth'] = self.max_search_depth
-        res['password'] = None
-        if self.password:
-            if self.verbose > 4:
-                res['password'] = self.password
-            else:
-                res['password'] = '*******'
-        else:
-            res['password'] = None
 
         return res
 
     # -------------------------------------------------------------------------
     def connect(self):
 
-        LOG.debug(_("Connecting to vSphere host {h}:{p} as {u!r} ...").format(
-            h=self.host, p=self.port, u=self.user))
+        LOG.debug(_("Connecting to vSphere {} ...").format(self.connect_info.url))
 
-        ssl_context = None
-        if hasattr(ssl, '_create_unverified_context'):
-            ssl_context = ssl._create_unverified_context()
+        if self.connect_info.use_https:
 
-        self.service_instance = SmartConnect(
-            host=self.host, port=self.port, user=self.user, pwd=self.password,
-            sslContext=ssl_context)
+            ssl_context = None
+            if hasattr(ssl, '_create_unverified_context'):
+                ssl_context = ssl._create_unverified_context()
+
+            self.service_instance = SmartConnect(
+                protocol='https', host=self.connect_info.host, port=self.connect_info.port,
+                user=self.connect_info.user, pwd=self.connect_info.password,
+                sslContext=ssl_context)
+
+        else:
+
+            self.service_instance = SmartConnect(
+                protocol='http', host=self.connect_info.host, port=self.connect_info.port,
+                user=self.connect_info.user, pwd=self.connect_info.password)
 
         if not self.service_instance:
-            raise VSphereCannotConnectError(host=self.host, port=self.port, user=self.user)
+            raise VSphereCannotConnectError(self.connect_info.url)
 
     # -------------------------------------------------------------------------
     def disconnect(self):
 
         if self.service_instance:
-            LOG.debug(_("Disconnecting from vSphere host {}.").format(self.host))
+            LOG.debug(_("Disconnecting from vSphere {}.").format(self.connect_info.url))
             Disconnect(self.service_instance)
 
         self.service_instance = None

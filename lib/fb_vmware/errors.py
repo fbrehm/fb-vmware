@@ -17,13 +17,25 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.0'
+__version__ = '0.3.1'
 
 _ = XLATOR.gettext
 
 
 # =============================================================================
-class VSphereHandlerError(FbHandlerError):
+class FbVMWareError(FbHandlerError):
+    """Base class for all exception belonging to VSphere/VMWare."""
+    pass
+
+
+# =============================================================================
+class BaseVSphereHandlerError(FbVMWareError):
+    """Base class for all exception belonging to VSphere."""
+    pass
+
+
+# =============================================================================
+class VSphereHandlerError(BaseVSphereHandlerError):
     """Base class for all exception belonging to VSphere."""
     pass
 
@@ -150,17 +162,14 @@ class VSphereCannotConnectError(VSphereExpectedError):
         to the given vSphere server."""
 
     # -------------------------------------------------------------------------
-    def __init__(self, host, port, user):
+    def __init__(self, url):
 
-        self.host = host
-        self.port = port
-        self.user = user
+        self.url = url
 
     # -------------------------------------------------------------------------
     def __str__(self):
 
-        msg = _("Could not connect to the vSphere host {h}:{p} as user {u!r}.").format(
-            h=self.host, p=self.port, u=self.user)
+        msg = _("Could not connect to the vSphere {!r}.").format(self.url)
         return msg
 
 
@@ -189,7 +198,7 @@ class TimeoutCreateVmError(VSphereExpectedError):
 
 
 # =============================================================================
-class WrongPortTypeError(VSphereHandlerError, TypeError):
+class WrongPortTypeError(FbVMWareError, TypeError):
 
     # -------------------------------------------------------------------------
     def __init__(self, port, emesg=None):
@@ -209,7 +218,7 @@ class WrongPortTypeError(VSphereHandlerError, TypeError):
         return msg
 
 # =============================================================================
-class WrongPortValueError(VSphereHandlerError, ValueError):
+class WrongPortValueError(FbVMWareError, ValueError):
 
     default_max_port = (2 ** 16) - 1
 

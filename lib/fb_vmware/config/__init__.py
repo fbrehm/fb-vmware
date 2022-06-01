@@ -21,13 +21,13 @@ from fb_tools.obj import FbGenericBaseObject, FbBaseObject
 
 # Own modules
 
-from .errors import WrongPortTypeError, WrongPortValueError
+from ..errors import WrongPortTypeError, WrongPortValueError
 
-from .base import MAX_PORT_NUMBER
+from ..base import MAX_PORT_NUMBER
 
-from .xlate import XLATOR
+from ..xlate import XLATOR
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

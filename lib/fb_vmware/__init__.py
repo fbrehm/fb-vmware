@@ -18,9 +18,7 @@ import logging
 from .xlate import XLATOR
 
 from .base import BaseVsphereHandler                                            # noqa
-from .base import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER                      # noqa
-from .base import DEFAULT_DC, DEFAULT_CLUSTER, DEFAULT_TZ_NAME                  # noqa
-from .base import DEFAULT_MAX_SEARCH_DEPTH                                      # noqa
+from .base import DEFAULT_MAX_SEARCH_DEPTH, DEFAULT_TZ_NAME                     # noqa
 
 from .obj import VsphereObject, DEFAULT_OBJ_STATUS                              # noqa
 
@@ -55,8 +53,11 @@ from .vm import VsphereVm, VsphereVmList                                        
 from .server import VsphereServer, DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION   # noqa
 
 from .config import VmwareConfigError, VmwareConfiguration                      # noqa
+from .config import DEFAULT_CONFIG_DIR, DEFAULT_VSPHERE_PORT                    # noqa
+from .config import DEFAULT_VSPHERE_USER, DEFAULT_VSPHERE_DC                    # noqa
+from .config import DEFAULT_VSPHERE_CLUSTER                                     # noqa
 
-__version__ = '0.4.2'
+__version__ = '0.4.3'
 
 LOG = logging.getLogger(__name__)
 

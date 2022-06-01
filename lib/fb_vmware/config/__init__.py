@@ -25,7 +25,7 @@ from ..errors import WrongPortTypeError, WrongPortValueError
 
 from ..xlate import XLATOR
 
-__version__ = '0.5.3'
+__version__ = '0.5.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -227,7 +227,7 @@ class VSPhereConfigInfo(FbBaseObject):
         else:
             pw = ''
 
-        return '{s}://{u}{pw}@{{h}{p}'.format(
+        return '{s}://{u}{pw}@{h}{p}'.format(
             s=self.schema, u=self.user, pw=pw, h=self.host, p=port)
 
     # -------------------------------------------------------------------------

@@ -60,7 +60,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.8.0'
+__version__ = '1.8.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux7_64Guest'
@@ -107,7 +107,7 @@ class VsphereServer(BaseVsphereHandler):
 
         super(VsphereServer, self).__init__(
             connect_info=connect_info, appname=appname, verbose=verbose, version=version,
-            base_dir=base_dir, dc=dc, cluster=cluster, simulate=simulate, force=force,
+            base_dir=base_dir, cluster=cluster, simulate=simulate, force=force,
             auto_close=auto_close, terminal_has_colors=terminal_has_colors, tz=tz,
             initialized=False,
         )

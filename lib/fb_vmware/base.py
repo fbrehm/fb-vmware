@@ -86,6 +86,8 @@ class BaseVsphereHandler(HandlingObject):
                 c='VSPhereConfigInfo', w='connect_info')
             raise BaseVSphereHandlerError(msg)
 
+        self.connect_info = connect_info
+
         self.tz = tz
         self.auto_close = auto_close
 

@@ -53,8 +53,19 @@ class TestVsphereServer(FbVMWareTestcase):
 
         from fb_vmware import VsphereServer
         from fb_vmware.errors import VSphereNameError
+        from fb_vmware.config import VSPhereConfigInfo
+
+        my_vsphere_host = 'my-vsphere.uhu-banane.de'
+        my_vsphere_user = 'test.user'
+        my_vsphere_passwd = 'test-password'
+        my_vsphere_dc = 'mydc'
+
+        connect_info = VSPhereConfigInfo(
+            host=my_vsphere_host, user=my_vsphere_user, password=my_vsphere_passwd,
+            dc=my_vsphere_dc, appname=self.appname, verbose=1, initialized=True)
 
         server = VsphereServer(
+            connect_info=connect_info,
             appname=self.appname,
             verbose=1,
         )

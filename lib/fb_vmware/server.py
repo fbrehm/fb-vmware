@@ -60,7 +60,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.8.1'
+__version__ = '1.8.2'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux7_64Guest'
@@ -139,7 +139,7 @@ class VsphereServer(BaseVsphereHandler):
                 urllib3.exceptions.MaxRetryError,
                 requests.exceptions.ConnectTimeout) as e:
             msg = _(
-                "Got a {c} on requesting 'about' information from VSPhere {url}: {e}.").format(
+                "Got a {c} on requesting 'about' information from VSPhere {url}: {e}").format(
                 c=e.__class__.__name__, url=self.connect_info.url, e=e)
             raise VSphereExpectedError(msg)
 

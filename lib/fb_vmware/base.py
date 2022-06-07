@@ -33,7 +33,7 @@ from .errors import WrongPortTypeError, WrongPortValueError
 
 from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 LOG = logging.getLogger(__name__)
 
@@ -182,7 +182,7 @@ class BaseVsphereHandler(HandlingObject):
     # -------------------------------------------------------------------------
     def connect(self):
 
-        LOG.debug(_("Connecting to vSphere {!r} ...").format(self.connect_info.url))
+        LOG.debug(_("Connecting to vSphere {!r} ...").format(self.connect_info.full_url))
 
         if self.connect_info.use_https:
 

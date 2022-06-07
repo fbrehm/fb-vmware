@@ -1,0 +1,13 @@
+---
+
+vsphere:
+  live:
+    host: 'vcs01.pixelpark.net'
+    dc: 'vmcc'
+    user: 'Administrator@vsphere.local'
+    password: 'bla'
+  test:
+    host: 'test-vcsa01.pixelpark.net'
+    dc: 'test-vmcc'
+    user: 'Administrator@vsphere.local'
+    password: 'blub'

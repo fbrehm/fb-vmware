@@ -13,7 +13,7 @@ import logging
 
 # Third party modules
 
-from fb_tools.common import is_sequence, to_bool
+from fb_tools.common import is_sequence, to_bool, pp
 from fb_tools.multi_config import MultiConfigError, BaseMultiConfig
 from fb_tools.multi_config import DEFAULT_ENCODING
 from fb_tools.obj import FbGenericBaseObject, FbBaseObject
@@ -25,7 +25,7 @@ from ..errors import WrongPortTypeError, WrongPortValueError
 
 from ..xlate import XLATOR
 
-__version__ = '0.5.4'
+__version__ = '0.5.5'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -104,6 +104,7 @@ class VSPhereConfigInfo(FbBaseObject):
         res['password'] = self.show_password
         res['schema'] = self.schema
         res['url'] = self.url
+        res['full_url'] = self.full_url
 
         return res
 
@@ -211,6 +212,23 @@ class VSPhereConfigInfo(FbBaseObject):
     @property
     def url(self):
         """The URL, which can be used to connect to the VSPhere server."""
+        if not self.host:
+            return None
+
+        port = ''
+        if self.use_https:
+            if self.port != DEFAULT_PORT_HTTPS:
+                port = ':{}'.format(self.port)
+        else:
+            if self.port != DEFAULT_PORT_HTTP:
+                port = ':{}'.format(self.port)
+
+        return '{s}://{h}{p}'.format(s=self.schema, h=self.host, p=port)
+
+    # -----------------------------------------------------------
+    @property
+    def full_url(self):
+        """The full URL, which can be used to connect to the VSPhere server."""
         if not self.host:
             return None
 
@@ -416,6 +434,10 @@ class VmwareConfiguration(BaseMultiConfig):
 
             section = self.cfg[section_name]
 
+            if self.verbose > 2:
+                LOG.debug(
+                    _("Evaluating config section {!r}:").format(section_name) + '\n' + pp(section))
+
             if sn == 'vsphere':
                 return self._eval_bare_vsphere(section_name, section)
 
@@ -439,7 +461,7 @@ class VmwareConfiguration(BaseMultiConfig):
         try:
             vsphere_info = VSPhereConfigInfo.from_config(
                 section_name=section_name, vsphere_name=vsphere_name, section=section,
-                verbose=self.verbose, base_dir=base_dir)
+                verbose=self.verbose, base_dir=self.base_dir)
             self.vsphere[vsphere_name] = vsphere_info
         except VmwareConfigError as e:
             LOG.error(str(e))

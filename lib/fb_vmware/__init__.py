@@ -50,14 +50,15 @@ from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList             
 
 from .vm import VsphereVm, VsphereVmList                                        # noqa
 
-from .server import VsphereServer, DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION   # noqa
+from .connect import VsphereConnection                                          # noqa
+from .connect import DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION                 # noqa
 
 from .config import VmwareConfigError, VmwareConfiguration                      # noqa
 from .config import DEFAULT_CONFIG_DIR, DEFAULT_VSPHERE_PORT                    # noqa
 from .config import DEFAULT_VSPHERE_USER, DEFAULT_VSPHERE_DC                    # noqa
 from .config import DEFAULT_VSPHERE_CLUSTER                                     # noqa
 
-__version__ = '0.4.3'
+__version__ = '0.4.4'
 
 LOG = logging.getLogger(__name__)
 

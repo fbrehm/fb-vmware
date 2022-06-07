@@ -5,7 +5,7 @@
 @contact: frank@brehm-online.com
 @copyright: © 2022 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.server
+@summary: test script (and module) for unit tests on module fb_vmware.connect
 '''
 
 import os
@@ -23,11 +23,11 @@ sys.path.insert(0, libdir)
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 from general import SimpleTestObject
 
-LOG = logging.getLogger('test-server')
+LOG = logging.getLogger('test-connection')
 
 
 # =============================================================================
-class TestVsphereServer(FbVMWareTestcase):
+class TestVsphereConnection(FbVMWareTestcase):
 
     # -------------------------------------------------------------------------
     def setUp(self):
@@ -38,20 +38,20 @@ class TestVsphereServer(FbVMWareTestcase):
 
         if self.verbose >= 1:
             print()
-        LOG.info("Testing import of fb_vmware.server ...")
-        import fb_vmware.server
-        from fb_vmware import VsphereServer                          # noqa
+        LOG.info("Testing import of fb_vmware.connect ...")
+        import fb_vmware.connect
+        from fb_vmware import VsphereConnection                          # noqa
 
-        LOG.debug("Version of fb_vmware.server: {!r}.".format(fb_vmware.server.__version__))
+        LOG.debug("Version of fb_vmware.connect: {!r}.".format(fb_vmware.connect.__version__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
 
         if self.verbose >= 1:
             print()
-        LOG.info("Testing init of a VsphereServer object ...")
+        LOG.info("Testing init of a VsphereConnection object ...")
 
-        from fb_vmware import VsphereServer
+        from fb_vmware import VsphereConnection
         from fb_vmware.errors import VSphereNameError
         from fb_vmware.config import VSPhereConfigInfo
 
@@ -64,18 +64,18 @@ class TestVsphereServer(FbVMWareTestcase):
             host=my_vsphere_host, user=my_vsphere_user, password=my_vsphere_passwd,
             dc=my_vsphere_dc, appname=self.appname, verbose=1, initialized=True)
 
-        server = VsphereServer(
+        connect = VsphereConnection(
             connect_info=connect_info,
             appname=self.appname,
             verbose=1,
         )
 
-        LOG.debug("VsphereServer %r: {!r}".format(server))
-        LOG.debug("VsphereServer %s:\n{}".format(server))
+        LOG.debug("VsphereConnection %r: {!r}".format(connect))
+        LOG.debug("VsphereConnection %s:\n{}".format(connect))
 
-        self.assertIsInstance(server, VsphereServer)
-        self.assertEqual(server.appname, self.appname)
-        self.assertEqual(server.verbose, 1)
+        self.assertIsInstance(connect, VsphereConnection)
+        self.assertEqual(connect.appname, self.appname)
+        self.assertEqual(connect.verbose, 1)
 
 
 # =============================================================================
@@ -90,9 +90,9 @@ if __name__ == '__main__':
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVsphereServer('test_import', verbose))
-    suite.addTest(TestVsphereServer('test_init_object', verbose))
-    # suite.addTest(TestVsphereServer('test_init_from_summary', verbose))
+    suite.addTest(TestVsphereConnection('test_import', verbose))
+    suite.addTest(TestVsphereConnection('test_init_object', verbose))
+    # suite.addTest(TestVsphereConnection('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

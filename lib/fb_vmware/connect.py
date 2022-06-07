@@ -4,7 +4,7 @@
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere server object.
+@summary: The module for a VSphere connection object.
 """
 from __future__ import absolute_import
 
@@ -60,10 +60,10 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.8.2'
+__version__ = '1.9.0'
 LOG = logging.getLogger(__name__)
 
-DEFAULT_OS_VERSION = 'oracleLinux7_64Guest'
+DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'
 DEFAULT_VM_CFG_VERSION = 'vmx-14'
 
 _ = XLATOR.gettext
@@ -71,9 +71,9 @@ ngettext = XLATOR.ngettext
 
 
 # =============================================================================
-class VsphereServer(BaseVsphereHandler):
+class VsphereConnection(BaseVsphereHandler):
     """
-    Class for a VSphere server handler object.
+    Class for a VSphere connection handler object.
     """
 
     re_local_ds = re.compile(r'^local[_-]', re.IGNORECASE)
@@ -84,6 +84,10 @@ class VsphereServer(BaseVsphereHandler):
         '6.0': 11,
         '6.5': 13,
         '6.7': 14,
+        '6.7 u2': 15,
+        '7.0.0-0': 17,
+        '7.0 u1': 18,
+        '7.0 u2': 19,
     }
 
     # -------------------------------------------------------------------------
@@ -105,7 +109,7 @@ class VsphereServer(BaseVsphereHandler):
         self.clusters = []
         self.hosts = {}
 
-        super(VsphereServer, self).__init__(
+        super(VsphereConnection, self).__init__(
             connect_info=connect_info, appname=appname, verbose=verbose, version=version,
             base_dir=base_dir, cluster=cluster, simulate=simulate, force=force,
             auto_close=auto_close, terminal_has_colors=terminal_has_colors, tz=tz,
@@ -148,7 +152,7 @@ class VsphereServer(BaseVsphereHandler):
                 self.disconnect()
 
         if self.verbose:
-            LOG.info(_("VSphere server version: {!r}").format(self.about.os_version))
+            LOG.info(_("VSphere version: {!r}").format(self.about.os_version))
         if self.verbose > 1:
             LOG.debug(_("Found VSphere about-information:") + '\n' + pp(self.about.as_dict()))
 

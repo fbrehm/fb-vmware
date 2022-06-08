@@ -17,6 +17,7 @@ from operator import itemgetter, attrgetter
 # Third party modules
 from fb_tools.common import pp, to_bool
 from fb_tools.argparse_actions import RegexOptionAction
+from fb_tools.xlate import format_list
 
 # Own modules
 from .. import __version__ as GLOBAL_VERSION
@@ -27,7 +28,7 @@ from . import BaseVmwareApplication, VmwareAppError
 
 from ..vm import VsphereVm
 
-__version__ = '1.6.0'
+__version__ = '1.6.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -47,6 +48,8 @@ class GetVmListApplication(BaseVmwareApplication):
     """
 
     default_vm_pattern = r'.*'
+    avail_sort_keys = ('name', 'vsphere', 'cluster', 'path', 'type', 'onl_str', 'cfg_ver', 'os')
+    default_sort_keys = ['name', 'vsphere']
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -60,6 +63,8 @@ class GetVmListApplication(BaseVmwareApplication):
 
         self._vm_pattern = self.default_vm_pattern
         self._details = False
+
+        self.sort_keys = self.default_sort_keys
 
         self._re_hw = None
         self._re_os = None
@@ -186,6 +191,15 @@ class GetVmListApplication(BaseVmwareApplication):
             help=_("Detailed output list (quering data needs some time longer).")
         )
 
+        output_options.add_argument(
+            '-S', '--sort', metavar='KEY', nargs='+', dest='sort_keys',
+            choices=self.avail_sort_keys, help=_(
+                "The keys for sorting the output. Available keys are: {avail}. "
+                "The default sorting keys are: {default}.").format(
+                avail=format_list(self.avail_sort_keys, do_repr=True),
+                default=format_list(self.default_sort_keys, do_repr=True))
+        )
+
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
 
@@ -209,6 +223,24 @@ class GetVmListApplication(BaseVmwareApplication):
                     self.args.vm_type != 'all':
                 LOG.info(_("Detailed output is required because of your given options."))
                 self.details = True
+
+        if self.args.sort_keys:
+            if self.details:
+                self.sort_keys = self.args.sort_keys
+            else:
+                self.sort_keys = []
+                for key in self.args.sort_keys:
+                    if key in ('name', 'vsphere', 'path'):
+                        self.sort_keys.append(key)
+                    else:
+                        LOG.warn(_(
+                            "Sorting key {!r} not usable, if not detailed output "
+                            "was given.").format(key))
+                if not self.sort_keys:
+                    LOG.warn(_(
+                        "No usable sorting keys found, using default sorting keys {}.").format(
+                        format_list(self.default_sort_keys, do_repr=True)))
+                    self.sort_keys = self.default_sort_keys
 
         if self.args.hw:
             self._re_hw = re.compile(self.args.hw, re.IGNORECASE)
@@ -240,6 +272,9 @@ class GetVmListApplication(BaseVmwareApplication):
         for vsphere_name in self.vsphere:
             all_vms += self.get_vms(vsphere_name, re_name)
 
+        if self.verbose > 1:
+            LOG.debug(_("Using sorting keys:") + ' ' + format_list(self.sort_keys, do_repr=True))
+
         if self.details:
             self.print_vms_detailed(all_vms)
         else:
@@ -262,7 +297,7 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_vms_detailed(self, all_vms):
 
-        label_list = ('name', 'vsphere', 'cluster', 'path', 'type', 'onl_str', 'cfg_ver', 'os')
+        label_list = self.avail_sort_keys
         labels = {
             'name': 'Host',
             'vsphere': 'VSphere',
@@ -316,6 +351,8 @@ class GetVmListApplication(BaseVmwareApplication):
             print(tpl.format(**labels))
             print('-' * max_len)
 
+        all_vms.sort(key=itemgetter(*self.sort_keys))
+
         for cdata in all_vms:
             count += 1
 
@@ -357,8 +394,13 @@ class GetVmListApplication(BaseVmwareApplication):
             LOG.debug("Mangling VM list:\n" + pp(vm_list))
 
         vms = []
+        first = True
 
         for vm in sorted(vm_list, key=itemgetter(0, 1)):
+
+            if self.verbose > 2 and first:
+                LOG.debug("VM:\n" + pp(vm))
+
             cdata = {
                 'vsphere': vsphere_name,
                 'name': vm[0],
@@ -369,6 +411,11 @@ class GetVmListApplication(BaseVmwareApplication):
                 cdata['path'] = '/' + cdata['path']
             else:
                 cdata['path'] = '/'
+
+            if self.verbose > 2 and first:
+                LOG.debug("Mangled VM:\n" +  pp(cdata))
+
+            first = False
 
             vms.append(cdata)
 
@@ -390,9 +437,13 @@ class GetVmListApplication(BaseVmwareApplication):
 
             if self.verbose > 2 and first:
                 LOG.debug("VM:\n" + pp(vm.as_dict()))
-            first = False
 
             cdata = self._mangle_vm_details(vm, vsphere_name)
+            if self.verbose > 2 and first and cdata:
+                LOG.debug("Mangled VM:\n" +  pp(cdata))
+
+            first = False
+
             if not cdata:
                 continue
 

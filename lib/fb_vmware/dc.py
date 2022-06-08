@@ -159,6 +159,9 @@ class VsphereDatacenter(VsphereObject):
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
 
+        if verbose > 3:
+            LOG.debug("Creating {} object by data:".format(cls.__name__) + '\n' + pp(data))
+
         if test_mode:
 
             necessary_fields = (

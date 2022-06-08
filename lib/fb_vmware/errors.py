@@ -17,7 +17,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 _ = XLATOR.gettext
 
@@ -170,6 +170,25 @@ class VSphereCannotConnectError(VSphereExpectedError):
     def __str__(self):
 
         msg = _("Could not connect to the vSphere {!r}.").format(self.url)
+        return msg
+
+# =============================================================================
+class VSphereVimFault(VSphereExpectedError):
+    """Special error class for the case, it cannot connect
+        to the given vSphere server and gets a vim.fault.VimFault."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, fault, url):
+
+        self.fault = fault
+        self.url = url
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _("Got a {c} on connecting to vSphere {url!r}:").format(
+                c=self.fault.__class__.__name__, url=self.url)
+        msg += ' ' + self.fault.msg
         return msg
 
 

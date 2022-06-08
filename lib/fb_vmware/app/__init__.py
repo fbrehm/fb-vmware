@@ -30,7 +30,9 @@ from ..config import VmwareConfiguration
 
 from ..connect import VsphereConnection
 
-__version__ = '0.2.0'
+from ..errors import VSphereExpectedError
+
+__version__ = '0.2.1'
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone('Europe/Berlin')
 
@@ -97,6 +99,9 @@ class BaseVmwareApplication(FbConfigApplication):
 
         super(BaseVmwareApplication, self).post_init()
 
+        if self.verbose > 2:
+            LOG.debug(_("{what} of {app} ..").format(what='post_init()', app=self.appname))
+
         if not self.cfg.vsphere.keys():
             msg = _("Did not found any configured Vsphere environments.")
             LOG.error(msg)
@@ -128,14 +133,11 @@ class BaseVmwareApplication(FbConfigApplication):
 
         for vsphere_name in self.cfg.vsphere.keys():
             vsphere_data = self.cfg.vsphere[vsphere_name]
-            pw = None
-            if 'password' in vsphere_data:
-                pw = vsphere_data['password']
-                if pw is None or pw == '':
-                    prompt = (
-                        _('Enter password for {n} VSPhere user {u!r} on host {h!r}:').format(
-                            n=vsphere_name, u=vsphere_data['user'], h=vsphere_data['host'])) + ' '
-                    vsphere_data['password'] = getpass.getpass(prompt=prompt)
+            if vsphere_data.password is None or vsphere_data.password == '':
+                prompt = (
+                    _('Enter password for {n} VSPhere user {u!r} on host {h!r}:').format(
+                        n=vsphere_name, u=vsphere_data.user, h=vsphere_data.host)) + ' '
+                vsphere_data.password = getpass.getpass(prompt=prompt)
 
         self.init_vsphere_handlers()
 
@@ -162,23 +164,27 @@ class BaseVmwareApplication(FbConfigApplication):
     # -------------------------------------------------------------------------
     def init_vsphere_handlers(self):
 
-        for vsphere_name in self.do_vspheres:
-            self.init_vsphere_handler(vsphere_name)
+        if self.verbose > 1:
+            LOG.debug(_("Initializing VSphere handlers ..."))
+
+        try:
+            for vsphere_name in self.do_vspheres:
+                self.init_vsphere_handler(vsphere_name)
+        except VSphereExpectedError as e:
+            LOG.error(str(e))
+            self.exit(7)
 
     # -------------------------------------------------------------------------
     def init_vsphere_handler(self, vsphere_name):
 
+        if self.verbose > 2:
+            LOG.debug(_("Initializing handler for VSPhere {!r} ...").format(vsphere_name))
+
         vsphere_data = self.cfg.vsphere[vsphere_name]
 
-        pwd = None
-        if 'password' in vsphere_data:
-            pwd = vsphere_data['password']
-
         vsphere = VsphereConnection(
+            vsphere_data, auto_close=True, simulate=self.simulate, force=self.force,
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            host=vsphere_data['host'], port=vsphere_data['port'], dc=vsphere_data['dc'],
-            user=vsphere_data['user'], password=pwd,
-            auto_close=True, simulate=self.simulate, force=self.force,
             terminal_has_colors=self.terminal_has_colors, initialized=False)
 
         if vsphere:
@@ -186,7 +192,7 @@ class BaseVmwareApplication(FbConfigApplication):
             vsphere.initialized = True
         else:
             msg = _("Could not initialize {} object from:").format('VsphereConnection')
-            msg += '\n' + pp(vsphere_data)
+            msg += '\n' + str(vsphere_data)
             LOG.error(msg)
 
     # -------------------------------------------------------------------------

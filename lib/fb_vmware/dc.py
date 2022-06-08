@@ -22,7 +22,7 @@ from .obj import VsphereObject, DEFAULT_OBJ_STATUS
 
 from .xlate import XLATOR
 
-__version__ = '0.3.2'
+__version__ = '0.4.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = 'host'
@@ -44,7 +44,8 @@ class VsphereDatacenter(VsphereObject):
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS,
             ds_folder=DEFAULT_DS_FOLDER, host_folder=DEFAULT_HOST_FOLDER,
-            network_folder=DEFAULT_NETWORK_FOLDER, vm_folder=DEFAULT_VM_FOLDER):
+            network_folder=DEFAULT_NETWORK_FOLDER, vm_folder=DEFAULT_VM_FOLDER,
+            default_hw_version_key=None, max_hw_version_key=None):
 
         self.repr_fields = (
             'name', 'obj_type', 'name_prefix', 'status', 'config_status',
@@ -54,6 +55,8 @@ class VsphereDatacenter(VsphereObject):
         self._vm_folder = DEFAULT_VM_FOLDER
         self._ds_folder = DEFAULT_DS_FOLDER
         self._network_folder = DEFAULT_NETWORK_FOLDER
+        self._default_hw_version_key = None
+        self._max_hw_version_key = None
 
         super(VsphereDatacenter, self).__init__(
             name=name, obj_type='vsphere_datacenter', name_prefix="dc", status=status,
@@ -64,6 +67,8 @@ class VsphereDatacenter(VsphereObject):
         self._host_folder = host_folder
         self._network_folder = network_folder
         self._vm_folder = vm_folder
+        self._default_hw_version_key = default_hw_version_key
+        self._max_hw_version_key = max_hw_version_key
 
         if initialized is not None:
             self.initialized = initialized
@@ -93,6 +98,18 @@ class VsphereDatacenter(VsphereObject):
         return self._vm_folder
 
     # -------------------------------------------------------------------------
+    @property
+    def default_hw_version_key(self):
+        """Key for Default Hardware Version used on this datacenter."""
+        return self._default_hw_version_key
+
+    # -------------------------------------------------------------------------
+    @property
+    def max_hw_version_key(self):
+        """Key for Maximum Hardware Version used on this datacenter."""
+        return self._max_hw_version_key
+
+    # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
         Transforms the elements of the object into a dict
@@ -109,6 +126,8 @@ class VsphereDatacenter(VsphereObject):
         res['host_folder'] = self.host_folder
         res['network_folder'] = self.network_folder
         res['vm_folder'] = self.vm_folder
+        res['default_hw_version_key'] = self.default_hw_version_key
+        res['max_hw_version_key'] = self.max_hw_version_key
 
         return res
 
@@ -118,7 +137,9 @@ class VsphereDatacenter(VsphereObject):
         return VsphereDatacenter(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name,
-            status=self.status, config_status=self.config_status)
+            status=self.status, config_status=self.config_status,
+            default_hw_version_key=self.default_hw_version_key,
+            max_hw_version_key=self.max_hw_version_key)
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
@@ -183,7 +204,15 @@ class VsphereDatacenter(VsphereObject):
             'host_folder': data.hostFolder.name,
             'network_folder': data.networkFolder.name,
             'vm_folder': data.vmFolder.name,
+            'default_hw_version_key': None,
+            'max_hw_version_key': None,
         }
+
+        if hasattr(data, 'configuration'):
+            if hasattr(data.configuration, 'defaultHardwareVersionKey'):
+                params['default_hw_version_key'] = data.configuration.defaultHardwareVersionKey
+            if hasattr(data.configuration, 'maximumHardwareVersionKey'):
+                params['max_hw_version_key'] = data.configuration.maximumHardwareVersionKey
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))

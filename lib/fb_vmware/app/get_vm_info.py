@@ -28,7 +28,7 @@ from ..controller import VsphereDiskController
 
 from ..ether import VsphereEthernetcard
 
-__version__ = '1.6.0'
+__version__ = '1.6.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -131,6 +131,16 @@ class GetVmApplication(BaseVmwareApplication):
         for vsphere_name in self.vsphere:
             vsphere = self.vsphere[vsphere_name]
             vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True, as_obj=True)
+            vm.full_custom_data = []
+            if vm.custom_data:
+                for cdata in vm.custom_data:
+                    for custom_key in cdata.keys():
+                        custom_value = cdata[custom_key]
+                        custom_name = vsphere.custom_field_name(custom_key)
+                        if custom_name is None:
+                            custom_name = custom_key
+                        vm.full_custom_data.append({custom_name: custom_value})
+
             if vm:
                 break
 
@@ -230,6 +240,24 @@ class GetVmApplication(BaseVmwareApplication):
                 print(msg)
         else:
             print("    Ethernet:    {}".format(_('None')))
+
+        if vm.custom_data:
+            no_vals = len(vm.custom_data)
+            label = ngettext('Custom Value', 'Custom Values', no_vals)
+            print("    {}:".format(label))
+            max_key_len = 1
+            for custom_data in vm.full_custom_data:
+                for custom_name in custom_data.keys():
+                    if len(custom_name) > max_key_len:
+                        max_key_len = len(custom_name)
+            max_key_len += 1
+            for custom_data in vm.full_custom_data:
+                for custom_name in custom_data.keys():
+                    custom_value = custom_data[custom_name]
+                    name = custom_name + ':'
+                    line = '        - {n:<{len}} {val}'.format(
+                        n=name, len=max_key_len, val=custom_value)
+                    print(line.rstrip())
 
         return True
 

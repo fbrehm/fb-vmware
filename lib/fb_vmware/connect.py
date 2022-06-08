@@ -60,7 +60,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.9.0'
+__version__ = '1.9.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'
@@ -108,6 +108,7 @@ class VsphereConnection(BaseVsphereHandler):
 
         self.clusters = []
         self.hosts = {}
+        self.custom_fields = None
 
         super(VsphereConnection, self).__init__(
             connect_info=connect_info, appname=appname, verbose=verbose, version=version,
@@ -1329,6 +1330,48 @@ class VsphereConnection(BaseVsphereHandler):
         self.wait_for_tasks([task])
         LOG.debug(_("Successful changed MAC address of VM {v!r} to {m!r}.").format(
             v=vm_name, m=new_mac))
+
+    # -------------------------------------------------------------------------
+    def custom_field_name(self, key_id):
+        """Tries to evaluate the verbose custom field name by the given key ID.
+           On the first attempt to get a lib/fb_vmware/ all available field
+           names are cached in the dict self.custom_fields from the customFieldsManager.
+           If the key could not be detected, None is returned."""
+
+        if self.custom_fields is None:
+
+            if self.verbose > 1:
+                msg = _("Trying to detect all field names of custom field definitions.")
+
+            self.custom_fields = {}
+
+            try:
+                if not self.service_instance:
+                    self.connect()
+                content = self.service_instance.RetrieveContent()
+                cfm = content.customFieldsManager
+
+                for custom_field in cfm.field:
+                    self.custom_fields[custom_field.key] = custom_field.name
+
+            except (
+                    socket.timeout, urllib3.exceptions.ConnectTimeoutError,
+                    urllib3.exceptions.MaxRetryError,
+                    requests.exceptions.ConnectTimeout) as e:
+                msg = _(
+                    "Got a {c} on requesting custom field names from VSPhere {url}: {e}").format(
+                    c=e.__class__.__name__, url=self.connect_info.url, e=e)
+                raise VSphereExpectedError(msg)
+
+            if self.verbose > 2:
+                msg = _("Got custom field names from VSPhere {}:").format(self.connect_info.url)
+                msg += "\n" + pp(self.custom_fields)
+                LOG.debug(msg)
+
+        if key_id in self.custom_fields:
+            return self.custom_fields[key_id]
+
+        return None
 
 
 # =============================================================================

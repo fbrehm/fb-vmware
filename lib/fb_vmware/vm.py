@@ -37,7 +37,7 @@ from .controller import VsphereDiskController, VsphereDiskControllerList
 
 from .xlate import XLATOR
 
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -74,6 +74,7 @@ class VsphereVm(VsphereObject):
         self.disks = []
         self.interfaces = []
         self.controllers = []
+        self.custom_data = []
 
         self.vm_tools = None
 
@@ -532,6 +533,16 @@ class VsphereVm(VsphereObject):
         vm.power_state = data.runtime.powerState
         vm.config_path = data.summary.config.vmPathName
         vm.config_version = data.config.version
+
+        if hasattr(data.summary, 'customValue'):
+            for custom_data in data.summary.customValue:
+                custom_key = custom_data.key
+                custom_value = ''
+
+                if hasattr(custom_data, 'value'):
+                    custom_value = custom_data.value
+
+                vm.custom_data.append({custom_key: custom_value,})
 
         if data.guest:
 

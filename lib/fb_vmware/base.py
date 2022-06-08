@@ -20,6 +20,7 @@ from six import add_metaclass
 import pytz
 
 from pyVim.connect import SmartConnect, Disconnect
+from pyVmomi import vim
 
 from fb_tools.common import to_bool
 from fb_tools.handling_obj import HandlingObject
@@ -28,12 +29,12 @@ from fb_tools.handling_obj import HandlingObject
 from .xlate import XLATOR
 
 from .errors import BaseVSphereHandlerError
-from .errors import VSphereCannotConnectError, VSphereHandlerError
+from .errors import VSphereCannotConnectError, VSphereVimFault
 from .errors import WrongPortTypeError, WrongPortValueError
 
 from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 LOG = logging.getLogger(__name__)
 
@@ -184,22 +185,27 @@ class BaseVsphereHandler(HandlingObject):
 
         LOG.debug(_("Connecting to vSphere {!r} ...").format(self.connect_info.full_url))
 
-        if self.connect_info.use_https:
+        try:
+            if self.connect_info.use_https:
 
-            ssl_context = None
-            if hasattr(ssl, '_create_unverified_context'):
-                ssl_context = ssl._create_unverified_context()
+                ssl_context = None
+                if hasattr(ssl, '_create_unverified_context'):
+                    ssl_context = ssl._create_unverified_context()
 
-            self.service_instance = SmartConnect(
-                protocol='https', host=self.connect_info.host, port=self.connect_info.port,
-                user=self.connect_info.user, pwd=self.connect_info.password,
-                sslContext=ssl_context)
+                self.service_instance = SmartConnect(
+                    protocol='https', host=self.connect_info.host, port=self.connect_info.port,
+                    user=self.connect_info.user, pwd=self.connect_info.password,
+                    sslContext=ssl_context)
 
-        else:
+            else:
 
-            self.service_instance = SmartConnect(
-                protocol='http', host=self.connect_info.host, port=self.connect_info.port,
-                user=self.connect_info.user, pwd=self.connect_info.password)
+                self.service_instance = SmartConnect(
+                    protocol='http', host=self.connect_info.host, port=self.connect_info.port,
+                    user=self.connect_info.user, pwd=self.connect_info.password)
+
+
+        except vim.fault.VimFault as e:
+            raise VSphereVimFault(e, self.connect_info.full_url)
 
         if not self.service_instance:
             raise VSphereCannotConnectError(self.connect_info.url)

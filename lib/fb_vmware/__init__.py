@@ -58,7 +58,7 @@ from .config import DEFAULT_CONFIG_DIR, DEFAULT_VSPHERE_PORT                    
 from .config import DEFAULT_VSPHERE_USER, DEFAULT_VSPHERE_DC                    # noqa
 from .config import DEFAULT_VSPHERE_CLUSTER                                     # noqa
 
-__version__ = '0.4.6'
+__version__ = '0.5.0'
 
 LOG = logging.getLogger(__name__)
 

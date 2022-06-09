@@ -60,7 +60,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.9.1'
+__version__ = '1.9.2'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'
@@ -443,9 +443,18 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_hosts(self, disconnect=False):
+    def get_hosts(self, re_name=None, vsphere_name=None, disconnect=False):
 
-        LOG.debug(_("Trying to get all host systems from VSphere ..."))
+        if re_name is not None:
+            if not hasattr(re_name, 'match'):
+                msg = _("Parameter {p!r} => {r!r} seems not to be a regex object.").format(
+                    p='re_name', r=re_name)
+                raise TypeError(msg)
+            LOG.debug(_(
+                "Trying to get all host systems from VSphere with name pattern {!r} ...").format(
+                re_name.pattern))
+        else:
+            LOG.debug(_("Trying to get all host systems from VSphere ..."))
 
         self.clusters = []
         self.hosts = {}
@@ -461,7 +470,7 @@ class VsphereConnection(BaseVsphereHandler):
                 raise VSphereDatacenterNotFoundError(self.dc)
 
             for child in dc.hostFolder.childEntity:
-                self._get_hosts(child)
+                self._get_hosts(child, re_name=re_name, vsphere_name=vsphere_name)
 
         finally:
             if disconnect:
@@ -480,7 +489,7 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Found hosts:") + '\n' + pp(out))
 
     # -------------------------------------------------------------------------
-    def _get_hosts(self, child, depth=1, cluster_name=None):
+    def _get_hosts(self, child, depth=1, re_name=None, vsphere_name=None, cluster_name=None):
 
         if self.verbose > 3:
             LOG.debug(_("Checking {o}-object in cluster {c!r} ...").format(
@@ -510,11 +519,18 @@ class VsphereConnection(BaseVsphereHandler):
             self.clusters.append(cluster)
 
             for host_def in child.host:
+
+                hostname = host_def.summary.config.name
+
+                if re_name is not None:
+                    if not re_name.search(hostname):
+                        continue
+
                 LOG.debug(_("Found host {h!r} in cluster {c!r}.").format(
-                    h=host_def.summary.config.name, c=cluster_name))
+                    h=hostname, c=cluster_name))
                 host = VsphereHost.from_summary(
-                    host_def, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-                    cluster_name=cluster_name)
+                    host_def, vsphere=vsphere_name, cluster_name=cluster_name,
+                    appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
                 self.hosts[host.name] = host
 
         return

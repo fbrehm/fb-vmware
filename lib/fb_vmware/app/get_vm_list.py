@@ -22,13 +22,13 @@ from fb_tools.xlate import format_list
 # Own modules
 from .. import __version__ as GLOBAL_VERSION
 
-from ..xlate import XLATOR, format_list
+from ..xlate import XLATOR
 
 from . import BaseVmwareApplication, VmwareAppError
 
 from ..vm import VsphereVm
 
-__version__ = '1.6.1'
+__version__ = '1.6.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -87,7 +87,7 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     @property
     def details(self):
-        """Should the list be diisplyed with all details."""
+        """Should the list be displyed with all details."""
         return self._details
 
     @details.setter
@@ -107,8 +107,8 @@ class GetVmListApplication(BaseVmwareApplication):
         """
 
         res = super(GetVmListApplication, self).as_dict(short=short)
-        res['vm_pattern'] = self.vm_pattern
         res['details'] = self.details
+        res['vm_pattern'] = self.vm_pattern
         res['default_vm_pattern'] = self.default_vm_pattern
 
         return res
@@ -299,7 +299,7 @@ class GetVmListApplication(BaseVmwareApplication):
 
         label_list = self.avail_sort_keys
         labels = {
-            'name': 'Host',
+            'name': 'VM/Template',
             'vsphere': 'VSphere',
             'cluster': 'Cluster',
             'path': 'Path',
@@ -344,7 +344,7 @@ class GetVmListApplication(BaseVmwareApplication):
                 tpl += '  '
             tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug("Line template: {}".format(tpl))
+            LOG.debug(_("Line template: {}").format(tpl))
 
         if not self.quiet:
             print()

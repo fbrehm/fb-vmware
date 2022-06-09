@@ -11,6 +11,7 @@ from __future__ import absolute_import, print_function
 # Standard modules
 import logging
 import re
+import sys
 
 from operator import itemgetter
 
@@ -25,11 +26,13 @@ from .. import __version__ as GLOBAL_VERSION
 
 from ..xlate import XLATOR
 
+from ..spinner import Spinner
+
 from . import BaseVmwareApplication, VmwareAppError
 
 from ..host import VsphereHost, VsphereHostBiosInfo
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -174,8 +177,17 @@ class GetHostsListApplication(BaseVmwareApplication):
         ret = 0
         all_hosts = []
 
-        for vsphere_name in self.vsphere:
-            all_hosts += self.get_hosts(vsphere_name)
+        if self.verbose:
+            for vsphere_name in self.vsphere:
+                all_hosts += self.get_hosts(vsphere_name)
+        elif not self.quiet:
+            spin_prompt = _("Getting all VSPhere hosts ...") + ' '
+            with Spinner(spin_prompt):
+                for vsphere_name in self.vsphere:
+                    all_hosts += self.get_hosts(vsphere_name)
+            sys.stdout.write(' ' * len(spin_prompt))
+            sys.stdout.write('\r')
+            sys.stdout.flush()
 
         first = True
         out_hosts = []
@@ -244,17 +256,17 @@ class GetHostsListApplication(BaseVmwareApplication):
             'model': _('Model'),
             'maintenance': _('Maintenance'),
             'online': _('Online'),
-            'no_portgroups': _('Portgroups'),
+            # 'no_portgroups': _('Portgroups'),
             'power_state': _('Power State'),
             'os_name': _('OS Name'),
             'os_version': _('OS Version'),
-            'quarantaine': _('Quarantaine'),
+            # 'quarantaine': _('Quarantaine'),
         }
 
         label_list = (
             'name', 'vsphere', 'cluster', 'vendor', 'model', 'os_name', 'os_version', 'cpus',
-            'memory_gb', 'no_portgroups', 'power_state', 'connection_state', 'online',
-            'maintenance', 'quarantaine')
+            'memory_gb', 'power_state', 'connection_state', 'online',
+            'maintenance')
 
         str_lengths = {}
         for label in labels.keys():

@@ -11,6 +11,7 @@ from __future__ import absolute_import, print_function
 # Standard modules
 import logging
 import re
+import sys
 
 from operator import itemgetter, attrgetter
 
@@ -24,11 +25,13 @@ from .. import __version__ as GLOBAL_VERSION
 
 from ..xlate import XLATOR
 
+from ..spinner import Spinner
+
 from . import BaseVmwareApplication, VmwareAppError
 
 from ..vm import VsphereVm
 
-__version__ = '1.6.2'
+__version__ = '1.6.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -269,8 +272,17 @@ class GetVmListApplication(BaseVmwareApplication):
 
         re_name = re.compile(self.vm_pattern, re.IGNORECASE)
 
-        for vsphere_name in self.vsphere:
-            all_vms += self.get_vms(vsphere_name, re_name)
+        if self.verbose:
+            for vsphere_name in self.vsphere:
+                all_vms += self.get_vms(vsphere_name, re_name)
+        elif not self.quiet:
+            spin_prompt = _("Getting all VSPhere VMs ...") + ' '
+            with Spinner(spin_prompt):
+                for vsphere_name in self.vsphere:
+                    all_vms += self.get_vms(vsphere_name, re_name)
+            sys.stdout.write(' ' * len(spin_prompt))
+            sys.stdout.write('\r')
+            sys.stdout.flush()
 
         if self.verbose > 1:
             LOG.debug(_("Using sorting keys:") + ' ' + format_list(self.sort_keys, do_repr=True))

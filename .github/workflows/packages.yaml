@@ -217,6 +217,220 @@ jobs:
           retention-days: 15
 
   ###########################
+  build_rpm:
+    runs-on: ubuntu-latest
+    name: Building RPM packages for Enterprise Linux
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/test') || startsWith(github.ref, 'refs/tags/') }}
+    needs:
+      - linter
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - el_version: '7'
+            yum: 'yum'
+            py_minor_version: '6'
+            py_version_dot: '3.6'
+            py_version_nodot: '36'
+            image: centos:7
+            epel_package: epel-release
+          - el_version: '8'
+            yum: 'dnf'
+            py_minor_version: '8'
+            py_version_dot: '3.8'
+            py_version_nodot: '38'
+            image: dokken/centos-stream-8
+            epel_package: epel-release
+    container: ${{ matrix.image }}
+    env:
+      EL_VERSION: ${{ matrix.el_version }}
+      EPEL_PACKAGE: ${{ matrix.epel_package }}
+      PY_VERSION_DOT: ${{ matrix.py_version_dot}}
+      PY_VERSION_NODOT: ${{ matrix.py_version_nodot}}
+      PYTHON: "python${{ matrix.py_version_nodot}}"
+      USED_CHARSET: 'utf8'
+      USED_LOCALE: 'en_US'
+      USED_LC: 'en_US.utf8'
+      YUM: ${{ matrix.yum }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checking locales
+        shell: bash
+        run: |
+          echo "All locales"
+          locale -a
+          echo
+          echo "Installing locales ..."
+          if [[ "${EL_VERSION}" == "7" ]] ; then
+            echo "${USED_LOCALE}.${USED_CHARSET}"
+            localedef --charmap UTF-8 --inputfile "${USED_LOCALE}" "${USED_LC}"
+          else
+            yum --assumeyes install langpacks-en glibc-all-langpacks
+          fi
+          echo
+          echo "All locales"
+          locale -a
+          echo
+          echo "locales:"
+          locale
+          echo
+          export LC_ALL="${USED_LC}"
+          locale
+      - uses: ./.github/actions/add-fb-yum-repo
+        with:
+          el_major_version: ${{ matrix.el_version }}
+      - name: Enabling PowerTools YUM repo
+        shell: bash
+        run: |
+          if [[ -f /etc/yum.repos.d/CentOS-Stream-PowerTools.repo ]] ; then
+            echo "Enabling powertools YUM repo ..."
+            echo
+            sed -i -e 's/^enabled=.*/enabled=1/' /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
+            echo
+            echo "Content of /etc/yum.repos.d/CentOS-Stream-PowerTools.repo:"
+            cat /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
+            echo
+          fi
+      - name: Install EPEL repo
+        shell: bash
+        run: ${YUM} --assumeyes install "${EPEL_PACKAGE}"
+      - name: Upgrade all packages
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          echo "Cleaning ${YUM} ..."
+          ${YUM} clean all
+          echo
+          echo "${YUM} makecache ..."
+          ${YUM} makecache
+          echo
+          echo "Upgrading all packages"
+          ${YUM} --assumeyes upgrade
+      - name: Install TZdata
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          if rpm -qa | grep '^tzdata-' >/dev/null ; then
+            echo "Reinstalling tzdata ..."
+            yum --assumeyes reinstall tzdata || true
+          else
+            echo "Installing tzdata ..."
+            yum --assumeyes install tzdata || true
+          fi
+          echo
+          ls -l --color=always /usr/share/zoneinfo/zone.tab
+      - name: Install Python 3
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          echo "Installing Python ${PY_VERSION_NODOT} ..."
+          if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING=python3-packaging ; fi
+          yum --assumeyes install ${PYTHON} \
+                                  ${PYTHON_PACKAGING} \
+                                  ${PYTHON}-setuptools \
+                                  ${PYTHON}-pip \
+                                  ${PYTHON}-devel \
+                                  ${PYTHON}-babel \
+                                  ${PYTHON}-pytz \
+                                  ${PYTHON}-six \
+                                  ${PYTHON}-fb-logging \
+                                  ${PYTHON}-fb-tools \
+                                  ${PYTHON}-pyvmomi
+          echo
+          echo "Python binaries:"
+          ls -l --color=always /bin/python* /bin/pip* || true
+          echo
+          echo "Installing Python-Debian with pip3 ..."
+          pip3 install python-debian packaging
+          echo
+          echo "Pip3 list:"
+          pip3 list --format columns
+      - name: Installing build tools
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          echo "Installing build tools"
+          yum --assumeyes install gnupg2 rpm-build gettext
+      - name: Create build environment
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          echo "Creating directories ..."
+          mkdir -pv rpmdir
+          mkdir -pv rpmdir/SOURCES
+          ODIR=$(pwd)
+          ROOT_OBJECTS=$( ls -A1 | egrep -vw ".git|rpmdir" )
+          echo
+          echo "Root objects:"; for o in ${ROOT_OBJECTS}; do echo " * ${o}"; done
+          PKG_VERSION=$( ./get-rpm-version )
+          PKG_RELEASE=$( ./get-rpm-release )
+          echo
+          echo "Version to build: ${PKG_VERSION}-${PKG_RELEASE}"
+          echo
+          RPM_SRC_DIR="python${PY_VERSION_NODOT}_${PKG_NAME}-${PKG_VERSION}"
+          mkdir -pv "rpmdir/SOURCES/${RPM_SRC_DIR}"
+          echo
+          echo "Copying sources recursive into rpmdir/SOURCES/${RPM_SRC_DIR} ..."
+          tar cf - ${ROOT_OBJECTS} | (cd "rpmdir/SOURCES/${RPM_SRC_DIR}" ; tar xf -)
+          echo
+          echo "Creating rpmdir/SOURCES/${PKG_NAME}.${PKG_VERSION}.tar.gz ..."
+          cd rpmdir/SOURCES
+          tar cfz "${PKG_NAME}.${PKG_VERSION}.tar.gz" "${RPM_SRC_DIR}"
+          echo
+          echo "Source file:"
+          ls -lA --color=always *.tar.gz
+          cd "${ODIR}"
+          echo
+          echo "Generating spec file 'fb_logging.spec' ..."
+          if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING=python3-packaging ; fi
+          cat template.spec | tail -n +3 | \
+                  sed -e "s/@@@Version@@@/${PKG_VERSION}/gi" \
+                      -e "s/@@@Release@@@/${PKG_RELEASE}/gi" \
+                      -e "s/@@@py_version_nodot@@@/${PY_VERSION_NODOT}/gi" \
+                      -e "s/@@@py_version_dot@@@/${PY_VERSION_DOT}/gi" \
+                      -e "s/@@@python_packaging@@@/${PYTHON_PACKAGING}/gi" \
+                      > fb-vmware.spec
+          if [[ "${EL_VERSION}" -lt "8" ]] ; then
+              sed -i '/^Recommends/d' fb-tools.spec
+          fi
+          python${PY_VERSION_DOT} changelog-deb2rpm.py debian/changelog >>fb-vmware.spec
+          echo
+          echo "Generated Spec file:"
+          cat fb-vmware.spec
+          echo
+          RPM_MACROS="${HOME}/.rpmmacros"
+          echo "Creating '${RPM_MACROS}' ..."
+          echo "%__python3 /bin/python${PY_VERSION_DOT}" >"${RPM_MACROS}"
+          echo "%_signature gpg" >>"${RPM_MACROS}"
+          echo
+          echo "Generated '${RPM_MACROS}':"
+          cat "${RPM_MACROS}"
+      - name: Creating RPMs
+        shell: bash
+        env:
+          LC_ALL: "en_US.utf8"
+        run: |
+          rpmbuild -ba --nocheck --verbose \
+              --define "_topdir $(pwd)/rpmdir" \
+              fb-tools.spec
+          echo
+          echo "Results:"
+          find rpmdir/*RPMS -type f -print0 | xargs --null --no-run-if-empty ls -l -d --color=always
+      - name: 'Upload RPM Packages'
+        uses: actions/upload-artifact@v2
+        with:
+          name: rpm_pkgs_el${{ matrix.el_version }}
+          path: |
+            rpmdir/RPMS/*/*.rpm
+            rpmdir/SRPMS/*.rpm
+          retention-days: 15
+
+  ###########################
   deploy_to_pypi:
     runs-on: ubuntu-latest
     name: "Deployment of the Python package to PyPi"

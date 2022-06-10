@@ -77,7 +77,7 @@ jobs:
       - name: "Checking module version against tag."
         shell: bash
         run: |
-          MODULE_VERSION=$( cat lib/fb_tools/__init__.py | grep -P '^__version__(\s|=)' | sed -e "s/^[^'\"]*['\"]//"  -e "s/['\"][ »]*\$//" )
+          MODULE_VERSION=$( cat lib/fb_vmware/__init__.py | grep -P '^__version__(\s|=)' | sed -e "s/^[^'\"]*['\"]//"  -e "s/['\"][ »]*\$//" )
           echo "Module version: '${MODULE_VERSION}'"
           if echo "${GITREF}" | grep -q -P '^refs/tags/' ; then
               TAG_VERSION=$( echo "${GITREF}" | sed -e 's|^refs/tags/||' )
@@ -95,7 +95,7 @@ jobs:
       - name: Execute Shellcheck
         shell: bash
         run: >
-          shellcheck -x compile-xlate-msgs.sh test.py-*.sh test.rc test/call_script.sh test/call_sleep.sh update-env.sh xtract-xlate-msgs.sh
+          shellcheck -x compile-xlate-msgs.sh update-env.sh xtract-xlate-msgs.sh
       - name: Execute Yamllint
         shell: bash
         run: yamllint -c yamllint.yaml .gitlab-ci.yml

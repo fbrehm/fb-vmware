@@ -96,8 +96,8 @@ jobs:
         shell: bash
         run: >
           shellcheck -x compile-xlate-msgs.sh update-env.sh xtract-xlate-msgs.sh
-      - name: Execute Yamllint
-        shell: bash
-        run: yamllint -c yamllint.yaml .gitlab-ci.yml
+      # - name: Execute Yamllint
+      #   shell: bash
+      #   run: yamllint -c yamllint.yaml .gitlab-ci.yml
 
 # vim: et tabstop=2 expandtab shiftwidth=2 softtabstop=2 list

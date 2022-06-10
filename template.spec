@@ -25,7 +25,6 @@ BuildRequires:  python@@@py_version_nodot@@@-six
 BuildRequires:  python@@@py_version_nodot@@@-fb-logging
 BuildRequires:  python@@@py_version_nodot@@@-fb-tools
 BuildRequires:  python@@@py_version_nodot@@@-pyvmomi
-BuildRequires:  @@@python_packaging@@@
 Requires:       python@@@py_version_nodot@@@
 Requires:       python@@@py_version_nodot@@@-libs
 Requires:       python@@@py_version_nodot@@@-babel
@@ -35,7 +34,6 @@ Requires:       python@@@py_version_nodot@@@-six
 Requires:       python@@@py_version_nodot@@@-fb-logging
 Requires:       python@@@py_version_nodot@@@-fb-tools
 Requires:       python@@@py_version_nodot@@@-pyvmomi
-Requires:       @@@python_packaging@@@
 Recommends:     python@@@py_version_nodot@@@-pyyaml
 BuildArch:      noarch
 

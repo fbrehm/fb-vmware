@@ -327,7 +327,7 @@ jobs:
           LC_ALL: "en_US.utf8"
         run: |
           echo "Installing Python ${PY_VERSION_NODOT} ..."
-          if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING=python3-packaging ; fi
+          if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING="" ; fi
           yum --assumeyes install ${PYTHON} \
                                   ${PYTHON_PACKAGING} \
                                   ${PYTHON}-setuptools \
@@ -344,7 +344,7 @@ jobs:
           ls -l --color=always /bin/python* /bin/pip* || true
           echo
           echo "Installing Python-Debian with pip3 ..."
-          pip3 install python-debian packaging
+          pip3 install python-debian
           echo
           echo "Pip3 list:"
           pip3 list --format columns
@@ -387,13 +387,11 @@ jobs:
           cd "${ODIR}"
           echo
           echo "Generating spec file 'fb-vmware.spec' ..."
-          if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING=python3-packaging ; fi
           cat template.spec | tail -n +3 | \
                   sed -e "s/@@@Version@@@/${PKG_VERSION}/gi" \
                       -e "s/@@@Release@@@/${PKG_RELEASE}/gi" \
                       -e "s/@@@py_version_nodot@@@/${PY_VERSION_NODOT}/gi" \
                       -e "s/@@@py_version_dot@@@/${PY_VERSION_DOT}/gi" \
-                      -e "s/@@@python_packaging@@@/${PYTHON_PACKAGING}/gi" \
                       > fb-vmware.spec
           if [[ "${EL_VERSION}" -lt "8" ]] ; then
               sed -i '/^Recommends/d' fb-vmware.spec

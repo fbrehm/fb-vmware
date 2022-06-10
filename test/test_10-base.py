@@ -51,6 +51,7 @@ class TestVMWareBase(FbVMWareTestcase):
         LOG.info("Testing init of a BaseVsphereHandler object ...")
 
         from fb_vmware import BaseVsphereHandler
+        from fb_vmware.config import VSPhereConfigInfo
 
         with self.assertRaises(TypeError) as cm:
             gen_handler = BaseVsphereHandler()
@@ -59,9 +60,17 @@ class TestVMWareBase(FbVMWareTestcase):
         e = cm.exception
         LOG.debug("TypeError raised on instantiate a BaseVsphereHandler: %s", str(e))
 
-        from fb_vmware import DEFAULT_HOST, DEFAULT_PORT, DEFAULT_USER
-        from fb_vmware import DEFAULT_DC, DEFAULT_CLUSTER, DEFAULT_TZ_NAME
         from fb_vmware import DEFAULT_MAX_SEARCH_DEPTH
+        from fb_vmware import DEFAULT_VSPHERE_PORT, DEFAULT_TZ_NAME
+
+        my_vsphere_host = 'my-vsphere.uhu-banane.de'
+        my_vsphere_user = 'test.user'
+        my_vsphere_passwd = 'test-password'
+        my_vsphere_dc = 'mydc'
+
+        connect_info = VSPhereConfigInfo(
+            host=my_vsphere_host, user=my_vsphere_user, password=my_vsphere_passwd,
+            dc=my_vsphere_dc, appname=self.appname, verbose=1, initialized=True)
 
         class TestVsphereHandler(BaseVsphereHandler):
 
@@ -69,6 +78,7 @@ class TestVMWareBase(FbVMWareTestcase):
                 return self._repr()
 
         gen_handler = TestVsphereHandler(
+            connect_info=connect_info,
             appname=self.appname,
             verbose=1,
         )
@@ -77,13 +87,13 @@ class TestVMWareBase(FbVMWareTestcase):
 
         self.assertIsInstance(gen_handler, BaseVsphereHandler)
         self.assertEqual(gen_handler.verbose, 1)
-        self.assertEqual(gen_handler.host, DEFAULT_HOST)
-        self.assertEqual(gen_handler.port, DEFAULT_PORT)
-        self.assertEqual(gen_handler.user, DEFAULT_USER)
-        self.assertEqual(gen_handler.dc, DEFAULT_DC)
-        self.assertEqual(gen_handler.cluster, DEFAULT_CLUSTER)
+        self.assertEqual(gen_handler.connect_info.host, my_vsphere_host)
+        self.assertEqual(gen_handler.connect_info.port, DEFAULT_VSPHERE_PORT)
+        self.assertTrue(gen_handler.connect_info.use_https)
+        self.assertEqual(gen_handler.connect_info.user, my_vsphere_user)
+        self.assertEqual(gen_handler.connect_info.password, my_vsphere_passwd)
+        self.assertEqual(gen_handler.connect_info.dc, my_vsphere_dc)
         self.assertEqual(gen_handler.tz.zone, DEFAULT_TZ_NAME)
-        self.assertIs(gen_handler.password, None)
         self.assertFalse(gen_handler.auto_close)
         self.assertEqual(gen_handler.max_search_depth, DEFAULT_MAX_SEARCH_DEPTH)
 

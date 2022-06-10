@@ -189,24 +189,21 @@ class TestVMWareErrors(FbVMWareTestcase):
         if self.verbose >= 1:
             print()
 
-        from fb_vmware.errors import VSphereHandlerError
+        from fb_vmware.errors import VSphereHandlerError, VSphereExpectedError
 
         LOG.info("Test raising a VSphereCannotConnectError exception ...")
 
         from fb_vmware.errors import VSphereCannotConnectError
 
         wrong_params_list = (
-            [], ['test-vca.nowhere.net'], ['test-vca.nowhere.net', 9100],
-            ['test-vca.nowhere.net', 9100, 'admin', 'blub'],
-        )
-
+            [], ['test-vca.nowhere.net', 9100], ['test-vca.nowhere.net', 9100, 'admin', 'blub'])
         for wrong_params in wrong_params_list:
             with self.assertRaises(TypeError) as cm:
                 raise VSphereCannotConnectError(*wrong_params)
             e = cm.exception
             LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        good_params = ['test-vca.nowhere.net', 9100, 'admin']
+        good_params = ['test-vca.nowhere.net']
         with self.assertRaises(VSphereHandlerError) as cm:
             raise VSphereCannotConnectError(*good_params)
         e = cm.exception

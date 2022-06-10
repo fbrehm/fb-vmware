@@ -30,11 +30,10 @@ from .xlate import XLATOR
 
 from .errors import BaseVSphereHandlerError
 from .errors import VSphereCannotConnectError, VSphereVimFault
-from .errors import WrongPortTypeError, WrongPortValueError
 
 from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 
 LOG = logging.getLogger(__name__)
 
@@ -202,7 +201,6 @@ class BaseVsphereHandler(HandlingObject):
                 self.service_instance = SmartConnect(
                     protocol='http', host=self.connect_info.host, port=self.connect_info.port,
                     user=self.connect_info.user, pwd=self.connect_info.password)
-
 
         except vim.fault.VimFault as e:
             raise VSphereVimFault(e, self.connect_info.full_url)

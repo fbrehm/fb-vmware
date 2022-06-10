@@ -63,8 +63,8 @@ class Spinner(object):
             sys.stdout.write('\r')
 
 
-
-### usage example: 
+################
+# usage example:
 #
 # with Spinner("just waiting a bit.. "):
 #

@@ -16,7 +16,6 @@ from pyVmomi import vim
 
 from fb_tools.common import pp, RE_MAC_ADRESS
 from fb_tools.obj import FbBaseObject
-from fb_tools.xlate import format_list
 
 # Own modules
 from .errors import VSphereNameError
@@ -24,7 +23,7 @@ from .errors import VSphereNameError
 from .xlate import XLATOR
 
 
-__version__ = '1.2.1'
+__version__ = '1.2.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

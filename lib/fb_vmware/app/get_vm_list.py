@@ -31,7 +31,7 @@ from . import BaseVmwareApplication, VmwareAppError
 
 from ..vm import VsphereVm
 
-__version__ = '1.6.3'
+__version__ = '1.6.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -425,7 +425,7 @@ class GetVmListApplication(BaseVmwareApplication):
                 cdata['path'] = '/'
 
             if self.verbose > 2 and first:
-                LOG.debug("Mangled VM:\n" +  pp(cdata))
+                LOG.debug("Mangled VM:\n" + pp(cdata))
 
             first = False
 
@@ -452,7 +452,7 @@ class GetVmListApplication(BaseVmwareApplication):
 
             cdata = self._mangle_vm_details(vm, vsphere_name)
             if self.verbose > 2 and first and cdata:
-                LOG.debug("Mangled VM:\n" +  pp(cdata))
+                LOG.debug("Mangled VM:\n" + pp(cdata))
 
             first = False
 

@@ -17,7 +17,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 _ = XLATOR.gettext
 
@@ -187,7 +187,7 @@ class VSphereVimFault(VSphereExpectedError):
     def __str__(self):
 
         msg = _("Got a {c} on connecting to vSphere {url!r}:").format(
-                c=self.fault.__class__.__name__, url=self.url)
+            c=self.fault.__class__.__name__, url=self.url)
         msg += ' ' + self.fault.msg
         return msg
 

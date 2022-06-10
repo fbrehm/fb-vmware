@@ -37,7 +37,7 @@ from .controller import VsphereDiskController, VsphereDiskControllerList
 
 from .xlate import XLATOR
 
-__version__ = '0.6.2'
+__version__ = '0.6.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -542,7 +542,7 @@ class VsphereVm(VsphereObject):
                 if hasattr(custom_data, 'value'):
                     custom_value = custom_data.value
 
-                vm.custom_data.append({custom_key: custom_value,})
+                vm.custom_data.append({custom_key: custom_value, })
 
         if data.guest:
 

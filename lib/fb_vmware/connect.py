@@ -30,12 +30,11 @@ import urllib3
 
 from fb_tools.common import pp, RE_TF_NAME
 from fb_tools.errors import HandlerError
-from fb_tools.xlate import format_list
 
 # Own modules
 from .base import BaseVsphereHandler, DEFAULT_TZ_NAME
 
-from .config import VSPhereConfigInfo, DEFAULT_VSPHERE_CLUSTER
+from .config import DEFAULT_VSPHERE_CLUSTER
 
 from .about import VsphereAboutInfo
 
@@ -60,7 +59,7 @@ from .errors import VSphereDatacenterNotFoundError, VSphereNoDatastoresFoundErro
 
 from .xlate import XLATOR
 
-__version__ = '1.9.2'
+__version__ = '1.9.3'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'

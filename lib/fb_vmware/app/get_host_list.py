@@ -17,7 +17,7 @@ from operator import itemgetter
 
 # Third party modules
 
-from fb_tools.common import pp, to_bool
+from fb_tools.common import pp
 from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.xlate import format_list
 
@@ -30,9 +30,7 @@ from ..spinner import Spinner
 
 from . import BaseVmwareApplication, VmwareAppError
 
-from ..host import VsphereHost, VsphereHostBiosInfo
-
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -197,7 +195,9 @@ class GetHostsListApplication(BaseVmwareApplication):
                 LOG.debug(_("First found host:") + '\n' + pp(host.as_dict()))
             first = False
             is_online = True
-            if not host.connection_state or host.maintenance or not host.online or host.quarantaine:
+            if not host.connection_state or host.maintenance:
+                is_online = False
+            if not host.online or host.quarantaine:
                 is_online = False
             if self.args.online:
                 if not is_online:

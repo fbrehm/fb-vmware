@@ -10,6 +10,7 @@ from __future__ import absolute_import
 
 # Standard module
 import logging
+import copy
 
 # Third party modules
 
@@ -18,14 +19,13 @@ from fb_tools.multi_config import MultiConfigError, BaseMultiConfig
 from fb_tools.multi_config import DEFAULT_ENCODING
 from fb_tools.obj import FbGenericBaseObject, FbBaseObject
 
-
 # Own modules
 
 from ..errors import WrongPortTypeError, WrongPortValueError
 
 from ..xlate import XLATOR
 
-__version__ = '0.5.5'
+__version__ = '0.5.6'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -144,7 +144,7 @@ class VSPhereConfigInfo(FbBaseObject):
             if val <= 0 or val > MAX_PORT_NUMBER:
                 raise WrongPortValueError(val, MAX_PORT_NUMBER)
         except TypeError as e:
-            raise WrongPortTypeError(val, stra(e))
+            raise WrongPortTypeError(val, str(e))
 
         self._port = val
 
@@ -288,7 +288,7 @@ class VSPhereConfigInfo(FbBaseObject):
         except Exception as e:
             msg = _("{e} in section {sn!r} for VSphere {vs!r}:").format(
                 e=e.__class__.__name__, sn=section_name, vs=vsphere_name)
-            ms += ' ' + str(e)
+            msg += ' ' + str(e)
             raise VmwareConfigError(msg)
 
         if not info.host:

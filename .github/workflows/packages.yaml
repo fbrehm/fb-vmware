@@ -386,7 +386,7 @@ jobs:
           ls -lA --color=always *.tar.gz
           cd "${ODIR}"
           echo
-          echo "Generating spec file 'fb_logging.spec' ..."
+          echo "Generating spec file 'fb-vmware.spec' ..."
           if [[ "${EL_VERSION}" == "7" ]] ; then PYTHON_PACKAGING="${PYTHON}-packaging" ; else PYTHON_PACKAGING=python3-packaging ; fi
           cat template.spec | tail -n +3 | \
                   sed -e "s/@@@Version@@@/${PKG_VERSION}/gi" \
@@ -396,7 +396,7 @@ jobs:
                       -e "s/@@@python_packaging@@@/${PYTHON_PACKAGING}/gi" \
                       > fb-vmware.spec
           if [[ "${EL_VERSION}" -lt "8" ]] ; then
-              sed -i '/^Recommends/d' fb-tools.spec
+              sed -i '/^Recommends/d' fb-vmware.spec
           fi
           python${PY_VERSION_DOT} changelog-deb2rpm.py debian/changelog >>fb-vmware.spec
           echo
@@ -417,7 +417,7 @@ jobs:
         run: |
           rpmbuild -ba --nocheck --verbose \
               --define "_topdir $(pwd)/rpmdir" \
-              fb-tools.spec
+              fb-vmware.spec
           echo
           echo "Results:"
           find rpmdir/*RPMS -type f -print0 | xargs --null --no-run-if-empty ls -l -d --color=always

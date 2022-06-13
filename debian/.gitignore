@@ -1,0 +1,6 @@
+*.debhelper
+*.log
+*.substvars
+files
+fb-vmware
+python3-fb-vmware

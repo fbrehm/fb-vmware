@@ -25,13 +25,16 @@ import babel
 import babel.lists
 from babel.support import Translations
 
-from packaging.version import Version
+try:
+    from packaging.version import Version
+except ImportError:
+    from distutils.version import LooseVersion as Version
 
 DOMAIN = 'fb_vmware'
 
 LOG = logging.getLogger(__name__)
 
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 __me__ = Path(__file__).resolve()
 __module_dir__ = __me__.parent

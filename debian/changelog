@@ -1,4 +1,11 @@
-fb-vmware (0.5.1) UNRELEASED; urgency=medium
+fb-vmware (0.5.2) UNRELEASED; urgency=medium
+
+  * Fixing tests for current status
+  * Applying linting rules to Python modules
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Fri, 10 Jun 2022 12:56:08 +0200
+
+fb-vmware (0.5.1) all; urgency=medium
 
   * Adding Github workflow and actions
 

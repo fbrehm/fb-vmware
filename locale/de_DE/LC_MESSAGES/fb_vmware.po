@@ -358,7 +358,7 @@ msgstr "Kein VSPhere-Hostname oder -Adresse übergeben in {w}."
 
 #: lib/fb_vmware/base.py:86
 msgid "The {c} object given as {w} is not initialized."
-msgstr "Das als {w} übergebene {o}-Objekt ist nicht initialisiert."
+msgstr "Das als {w} übergebene {c}-Objekt ist nicht initialisiert."
 
 #: lib/fb_vmware/base.py:186
 msgid "Connecting to vSphere {!r} ..."

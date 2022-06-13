@@ -1,3 +1,9 @@
+fb-vmware (0.5.3) UNRELEASED; urgency=medium
+
+  * Fixing typo in locale/de_DE/LC_MESSAGES/fb_vmware.po
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Mon, 13 Jun 2022 14:12:55 +0200
+
 fb-vmware (0.5.2) all; urgency=medium
 
   * Fixing tests for current status

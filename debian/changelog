@@ -1,4 +1,4 @@
-fb-vmware (0.5.3) UNRELEASED; urgency=medium
+fb-vmware (0.5.3) all; urgency=medium
 
   * Fixing typo in locale/de_DE/LC_MESSAGES/fb_vmware.po
 

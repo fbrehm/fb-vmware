@@ -133,4 +133,4 @@ tmp/
 etc/*.ini
 rpmdir/*
 .rpm-version*
-
+local_version.py

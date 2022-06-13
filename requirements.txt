@@ -1,0 +1,12 @@
+pyvmomi>=v6.5.0.2017.5-1
+fb_tools
+fb_logging
+packaging
+requests
+six
+pytz
+setuptools
+wheel
+Babel
+PyYAML
+toml

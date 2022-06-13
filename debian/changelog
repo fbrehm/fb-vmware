@@ -1,4 +1,4 @@
-fb-vmware (0.5.2) UNRELEASED; urgency=medium
+fb-vmware (0.5.2) all; urgency=medium
 
   * Fixing tests for current status
   * Applying linting rules to Python modules

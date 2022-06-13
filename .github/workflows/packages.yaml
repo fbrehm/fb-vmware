@@ -241,6 +241,13 @@ jobs:
             py_version_nodot: '38'
             image: dokken/centos-stream-8
             epel_package: epel-release
+          - el_version: '9'
+            yum: 'dnf'
+            py_minor_version: '9'
+            py_version_dot: '3'
+            py_version_nodot: '3'
+            image: dokken/centos-stream-9
+            epel_package: https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
     container: ${{ matrix.image }}
     env:
       EL_VERSION: ${{ matrix.el_version }}

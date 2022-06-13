@@ -17,11 +17,25 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
+__version__ = '0.3.3'
+
 _ = XLATOR.gettext
 
 
 # =============================================================================
-class VSphereHandlerError(FbHandlerError):
+class FbVMWareError(FbHandlerError):
+    """Base class for all exception belonging to VSphere/VMWare."""
+    pass
+
+
+# =============================================================================
+class BaseVSphereHandlerError(FbVMWareError):
+    """Base class for all exception belonging to VSphere."""
+    pass
+
+
+# =============================================================================
+class VSphereHandlerError(BaseVSphereHandlerError):
     """Base class for all exception belonging to VSphere."""
     pass
 
@@ -148,17 +162,33 @@ class VSphereCannotConnectError(VSphereExpectedError):
         to the given vSphere server."""
 
     # -------------------------------------------------------------------------
-    def __init__(self, host, port, user):
+    def __init__(self, url):
 
-        self.host = host
-        self.port = port
-        self.user = user
+        self.url = url
 
     # -------------------------------------------------------------------------
     def __str__(self):
 
-        msg = _("Could not connect to the vSphere host {h}:{p} as user {u!r}.").format(
-            h=self.host, p=self.port, u=self.user)
+        msg = _("Could not connect to the vSphere {!r}.").format(self.url)
+        return msg
+
+# =============================================================================
+class VSphereVimFault(VSphereExpectedError):
+    """Special error class for the case, it cannot connect
+        to the given vSphere server and gets a vim.fault.VimFault."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, fault, url):
+
+        self.fault = fault
+        self.url = url
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _("Got a {c} on connecting to vSphere {url!r}:").format(
+            c=self.fault.__class__.__name__, url=self.url)
+        msg += ' ' + self.fault.msg
         return msg
 
 
@@ -166,13 +196,11 @@ class VSphereCannotConnectError(VSphereExpectedError):
 class TimeoutCreateVmError(VSphereExpectedError):
 
     # -------------------------------------------------------------------------
-    def __init__(self, vm, timeout):
+    def __init__(self, vm, timeout=None):
 
         t_o = None
-        try:
+        if timeout is not None:
             t_o = float(timeout)
-        except ValueError:
-            pass
         self.timeout = t_o
 
         self.vm = vm
@@ -180,8 +208,55 @@ class TimeoutCreateVmError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
 
-        msg = _("Timeout on creating VM {vm!r} after {to:0.1f} seconds.").format(
-            vm=self.vm, to=self.timeout)
+        if self.timeout is not None:
+            msg = _("Timeout on creating VM {vm!r} after {to:0.1f} seconds.").format(
+                vm=self.vm, to=self.timeout)
+        else:
+            msg = _("Timeout on creating VM {!r}.").format(self.vm)
+        return msg
+
+
+# =============================================================================
+class WrongPortTypeError(FbVMWareError, TypeError):
+
+    # -------------------------------------------------------------------------
+    def __init__(self, port, emesg=None):
+
+        self.port = port
+        self.emesg = emesg
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _("Invalid type of {!r} for a port of a VSPhere server").format(self.port)
+        if self.emesg:
+            msg += ': ' + self.emesg
+        else:
+            msg += '.'
+
+        return msg
+
+# =============================================================================
+class WrongPortValueError(FbVMWareError, ValueError):
+
+    default_max_port = (2 ** 16) - 1
+
+    # -------------------------------------------------------------------------
+    def __init__(self, port, max_port=None):
+
+        self.port = port
+        self.max_port = max_port
+        if self.max_port is None:
+            self.max_port = self.default_max_port
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+
+        msg = _(
+            "Invalid port number {port!r} for the VSphere server, "
+            "PORT must be greater than zero and less or equal to {max}.").format(
+            port=self.port, max=self.max_port)
+
         return msg
 
 

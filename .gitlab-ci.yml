@@ -337,7 +337,6 @@ build CentOS 8 with Python 3.8:
     PYTHON_VERSION_NODOT: '38'
   extends:
     - '.pkg-build-rules'
-  # image: centos:8
   image: dokken/centos-stream-8
 
 # ---------------------------
@@ -347,8 +346,8 @@ build CentOS 9 with Python 3:
     YUM: dnf
     PYTHON_PACKAGES: >
       python3 python3-six python3-pip python3-devel python3-setuptools
-      python3-babel python3-pytz
-      python3-fb-logging python3-fb-tools python3-fb-vmware
+      python3-babel python3-pytz python3-pyvmomi
+      python3-fb-logging python3-fb-tools
     PYTHON_VERSION_DOT: '3'
     PYTHON_VERSION_NODOT: '3'
   extends:

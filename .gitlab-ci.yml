@@ -302,6 +302,9 @@ Linter:
               -e "s/@@@Release@@@/${PKG_RELEASE}/gi" \
               -e "s/@@@py_version_dot@@@/${PYTHON_VERSION_DOT}/gi" \
               -e "s/@@@py_version_nodot@@@/${PYTHON_VERSION_NODOT}/gi" > "${TGT_SPEC_FILE}"
+      if [[ "${EL_MAJOR_VERSION}" -lt "8" ]] ; then
+        sed -i '/^Recommends/d' fb-vmware.spec
+      fi
       echo
       echo "Adding Changelog to '${TGT_SPEC_FILE}' ..."
       dch2speclog debian/changelog >>"${TGT_SPEC_FILE}"

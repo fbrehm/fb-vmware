@@ -96,9 +96,9 @@ jobs:
         shell: bash
         run: >
           shellcheck -x compile-xlate-msgs.sh update-env.sh xtract-xlate-msgs.sh
-      # - name: Execute Yamllint
-      #   shell: bash
-      #   run: yamllint -c yamllint.yaml .gitlab-ci.yml
+      - name: Execute Yamllint
+        shell: bash
+        run: yamllint -c .yamllint.yaml .gitlab-ci.yml
 
   ###########################
   build_debian_sources:

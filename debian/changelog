@@ -1,3 +1,9 @@
+fb-vmware (0.5.5) all; urgency=medium
+
+  * Adding rpm-addsign-wrapper.expect
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 24 Nov 2022 09:31:34 +0100
+
 fb-vmware (0.5.4) all; urgency=medium
 
   * Adding .gitlab-ci.yml

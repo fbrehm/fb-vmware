@@ -1,3 +1,9 @@
+fb-vmware (0.5.4) all; urgency=medium
+
+  * Adding .gitlab-ci.yml
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 24 Nov 2022 08:40:30 +0100
+
 fb-vmware (0.5.3) all; urgency=medium
 
   * Fixing typo in locale/de_DE/LC_MESSAGES/fb_vmware.po

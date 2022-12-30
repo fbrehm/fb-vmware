@@ -520,6 +520,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Sending Success message
     needs:
+      - 'deploy_to_pypi'
       - 'deploy_to_fbrepo'
     steps:
       - name: Sending message

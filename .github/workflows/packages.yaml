@@ -474,7 +474,6 @@ jobs:
       - 'build_debian_sources'
       - 'build_debian_bin'
       - 'build_rpm'
-      - 'deploy_to_pypi'
     steps:
       - uses: actions/checkout@v2
       - name: Downloading all artifacts

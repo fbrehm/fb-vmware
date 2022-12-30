@@ -1,3 +1,12 @@
+fb-vmware (0.5.6) all; urgency=medium
+
+  * Updating package dependencies in template.spec and debian/control
+  * Adding signing of all Debian packages in Github workflow
+  * Adding Python 3.11 to test matrix in Github workflow
+  * Using shared pipelines in .gitlab-ci.yml
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Fri, 30 Dec 2022 16:57:51 +0100
+
 fb-vmware (0.5.5) all; urgency=medium
 
   * Adding rpm-addsign-wrapper.expect

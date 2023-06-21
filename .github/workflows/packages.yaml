@@ -93,7 +93,7 @@ jobs:
       - name: Execute Flake 8
         shell: bash
         run: |
-          flake8 --max-line-length=$FLAKE8_MAX_LINE_LENGTH --max-complexity=$FLAKE8_MAX_COMPLEXITY --ignore=$FLAKE8_IGNORE_ERRORS bin lib
+          flake8 --max-line-length=$FLAKE8_MAX_LINE_LENGTH --max-complexity=$FLAKE8_MAX_COMPLEXITY --ignore=$FLAKE8_IGNORE_ERRORS bin/* lib
       - name: Execute Shellcheck
         shell: bash
         run: >

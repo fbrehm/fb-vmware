@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for capsulating a VSphere about info object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for capsulating a VSphere about info object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -14,16 +15,16 @@ import uuid
 
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.3'
+__version__ = '0.3.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -31,11 +32,12 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereAboutInfo(FbBaseObject):
+    """This is a wrapper for the about-information of a VMWare-VSphere center."""
 
     # -------------------------------------------------------------------------
     def __init__(
             self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None):
-
+        """Initialize a VsphereAboutInfo object."""
         self._api_type = None
         self._api_version = None
         self._name = None
@@ -240,7 +242,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -248,7 +250,6 @@ class VsphereAboutInfo(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereAboutInfo, self).as_dict(short=short)
         res['api_type'] = self.api_type
         res['api_version'] = self.api_version
@@ -266,7 +267,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereAboutInfo object based on the data given from pyvmomi module."""
         if test_mode:
 
             necessary_fields = (
@@ -280,16 +281,16 @@ class VsphereAboutInfo(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.AboutInfo):
                 msg = _(
-                    "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    'Parameter {t!r} must be a {e} object, a {v} object was given '
+                    'instead.').format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
@@ -300,7 +301,7 @@ class VsphereAboutInfo(FbBaseObject):
         }
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
         info = cls(**params)
 
 #        'about': (vim.AboutInfo) {
@@ -336,13 +337,13 @@ class VsphereAboutInfo(FbBaseObject):
         info.initialized = True
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(info.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(info.as_dict()))
 
         return info
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereAboutInfo object with data from current object copied in."""
         info = VsphereAboutInfo(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=False)
@@ -364,7 +365,7 @@ class VsphereAboutInfo(FbBaseObject):
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

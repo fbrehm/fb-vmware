@@ -11,7 +11,6 @@
 from __future__ import print_function
 
 import locale
-import logging
 import os
 import sys
 
@@ -48,8 +47,9 @@ if os.path.exists(module_dir):
     sys.path.insert(0, lib_dir)
 
 from fb_vmware.app.get_vm_list import GetVmListApplication
+from fb_vmware.xlate import XLATOR
 
-log = logging.getLogger(__name__)
+_ = XLATOR.gettext
 
 __author__ = 'Frank Brehm <frank@brehm-online.com>'
 __copyright__ = '(C) 2023 by Frank Brehm, Berlin'
@@ -62,7 +62,7 @@ app = GetVmListApplication(appname=appname, base_dir=base_dir)
 app.initialized = True
 
 if app.verbose > 2:
-    print('{c}-Object:\n{a}'.format(c=app.__class__.__name__, a=app))
+    print(_('{c}-Object:\n{a}').format(c=app.__class__.__name__, a=app))
 
 app()
 

@@ -28,7 +28,7 @@ if [[ ! -d "${locale_dir}" ]] ; then
     mkdir -v "${locale_dir}"
 fi
 
-pybabel extract lib \
+pybabel extract lib bin/* \
     -o "${pot_file}" \
     -F "${babel_ini}" \
     --width=${po_with} \

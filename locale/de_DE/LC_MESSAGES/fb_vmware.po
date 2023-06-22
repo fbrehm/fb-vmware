@@ -45,7 +45,7 @@ msgid "Created {} object:"
 msgstr "Erstelltes {}-Objekt:"
 
 #: lib/fb_vmware/app/__init__.py:103
-msgid "{what} of {app} .."
+msgid "{what} of {app} ..."
 msgstr "{what} von {app} …"
 
 #: lib/fb_vmware/app/__init__.py:106

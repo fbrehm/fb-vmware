@@ -1,62 +1,56 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a base VSphere handler object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a base VSphere handler object.
 """
+# flake8: noqa
 from __future__ import absolute_import
 
 # Standard modules
 import logging
 
-# Third party modules
-
 # Own modules
 
+from .about import VsphereAboutInfo
+from .base import BaseVsphereHandler
+from .base import DEFAULT_MAX_SEARCH_DEPTH, DEFAULT_TZ_NAME
+from .cluster import VsphereCluster
+from .config import DEFAULT_CONFIG_DIR, DEFAULT_VSPHERE_PORT
+from .config import DEFAULT_VSPHERE_CLUSTER
+from .config import DEFAULT_VSPHERE_DC, DEFAULT_VSPHERE_USER
+from .config import VmwareConfigError, VmwareConfiguration
+from .connect import DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION
+from .connect import VsphereConnection
+from .controller import VsphereDiskController, VsphereDiskControllerList
+from .datastore import VsphereDatastore, VsphereDatastoreDict
+from .dc import DEFAULT_DS_FOLDER
+from .dc import DEFAULT_HOST_FOLDER
+from .dc import DEFAULT_NETWORK_FOLDER
+from .dc import DEFAULT_VM_FOLDER
+from .dc import VsphereDatacenter
+from .disk import VsphereDisk, VsphereDiskList
+from .ds_cluster import VsphereDsCluster
+from .ds_cluster import VsphereDsClusterDict
+from .ether import VsphereEthernetcard
+from .ether import VsphereEthernetcardList
+from .host import VsphereHost
+from .host import VsphereHostBiosInfo
+from .host import VsphereHostList
+from .host_port_group import VsphereHostPortgroup
+from .host_port_group import VsphereHostPortgroupList
+from .iface import VsphereVmInterface
+from .network import VsphereNetwork
+from .network import VsphereNetworkDict
+from .obj import DEFAULT_OBJ_STATUS
+from .obj import VsphereObject
+from .vm import VsphereVm
+from .vm import VsphereVmList
 from .xlate import XLATOR
 
-from .base import BaseVsphereHandler                                            # noqa
-from .base import DEFAULT_MAX_SEARCH_DEPTH, DEFAULT_TZ_NAME                     # noqa
-
-from .obj import VsphereObject, DEFAULT_OBJ_STATUS                              # noqa
-
-from .about import VsphereAboutInfo                                             # noqa
-
-from .cluster import VsphereCluster                                             # noqa
-
-from .datastore import VsphereDatastore, VsphereDatastoreDict                   # noqa
-
-from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict                  # noqa
-
-from .dc import VsphereDatacenter                                               # noqa
-from .dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER                          # noqa
-from .dc import DEFAULT_DS_FOLDER, DEFAULT_NETWORK_FOLDER                       # noqa
-
-from .controller import VsphereDiskController, VsphereDiskControllerList        # noqa
-
-from .disk import VsphereDisk, VsphereDiskList                                  # noqa
-
-from .ether import VsphereEthernetcard, VsphereEthernetcardList                 # noqa
-
-from .iface import VsphereVmInterface                                           # noqa
-
-from .network import VsphereNetwork, VsphereNetworkDict                         # noqa
-
-from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList     # noqa
-
-from .host import VsphereHostBiosInfo, VsphereHost, VsphereHostList             # noqa
-
-from .vm import VsphereVm, VsphereVmList                                        # noqa
-
-from .connect import VsphereConnection                                          # noqa
-from .connect import DEFAULT_OS_VERSION, DEFAULT_VM_CFG_VERSION                 # noqa
-
-from .config import VmwareConfigError, VmwareConfiguration                      # noqa
-from .config import DEFAULT_CONFIG_DIR, DEFAULT_VSPHERE_PORT                    # noqa
-from .config import DEFAULT_VSPHERE_USER, DEFAULT_VSPHERE_DC                    # noqa
-from .config import DEFAULT_VSPHERE_CLUSTER                                     # noqa
 
 __version__ = '0.5.7'
 
@@ -67,7 +61,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

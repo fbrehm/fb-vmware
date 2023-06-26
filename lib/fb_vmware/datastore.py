@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere datastore object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere datastore object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -12,25 +13,23 @@ from __future__ import absolute_import
 import logging
 import random
 import re
-
 try:
     from collections.abc import MutableMapping
 except ImportError:
     from collections import MutableMapping
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
+from .obj import VsphereObject
 from .xlate import XLATOR
 
-from .obj import VsphereObject
-
-__version__ = '1.4.2'
+__version__ = '1.4.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -38,6 +37,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDatastore(VsphereObject):
+    """Wrapper class for a VSphere datastore object."""
 
     re_is_nfs = re.compile(r'(?:share[_-]*nfs|nfs[_-]*share)', re.IGNORECASE)
     re_vmcb_fs = re.compile(r'vmcb-\d+-fc-\d+', re.IGNORECASE)
@@ -50,7 +50,7 @@ class VsphereDatastore(VsphereObject):
             name=None, status='gray', config_status='gray', accessible=True, capacity=None,
             free_space=None, maintenance_mode=None, multiple_host_access=True, fs_type=None,
             uncommitted=None, url=None, for_k8s=None):
-
+        """Initialize the VsphereDatastore object."""
         self.repr_fields = (
             'name', 'status', 'accessible', 'capacity', 'free_space', 'fs_type', 'storage_type',
             'appname', 'verbose', 'version')
@@ -78,7 +78,7 @@ class VsphereDatastore(VsphereObject):
         self._calculated_usage = 0.0
 
         super(VsphereDatastore, self).__init__(
-            name=name, obj_type='vsphere_datastore', name_prefix="ds", status=status,
+            name=name, obj_type='vsphere_datastore', name_prefix='ds', status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
@@ -133,8 +133,7 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def multiple_host_access(self):
-        """More than one host in the datacenter has been configured
-            with access to the datastore."""
+        """More than one host has been configured with access to the datastore."""
         return self._multiple_host_access
 
     # -----------------------------------------------------------
@@ -146,15 +145,21 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def uncommitted(self):
-        """Total additional storage space, in bytes,
-            potentially used by all virtual machines on this datastore."""
+        """
+        Total additional storage space, in bytes.
+
+        This is potentially used by all virtual machines on this datastore.
+        """
         return self._uncommitted
 
     # -----------------------------------------------------------
     @property
     def uncommitted_gb(self):
-        """Total additional storage space, in GiBytes,
-            potentially used by all virtual machines on this datastore."""
+        """
+        Total additional storage space, in GiBytes.
+
+        This is potentially used by all virtual machines on this datastore.
+        """
         return float(self._uncommitted) / 1024.0 / 1024.0 / 1024.0
 
     # -----------------------------------------------------------
@@ -203,7 +208,7 @@ class VsphereDatastore(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereDatastore object based on the data given from pyvmomi module."""
         if test_mode:
 
             necessary_fields = ('summary', 'overallStatus', 'configStatus')
@@ -223,15 +228,15 @@ class VsphereDatastore(VsphereObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.Datastore):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
                     t='data', e='vim.Datastore', v=data)
                 raise TypeError(msg)
 
@@ -262,7 +267,7 @@ class VsphereDatastore(VsphereObject):
             params['uncommitted'] = data.summary.uncommitted
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         ds = cls(**params)
         return ds
@@ -270,9 +275,7 @@ class VsphereDatastore(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def storage_type_by_name(cls, name):
-        """Trying to guess the storage type by its name.
-            May be overridden in descentant classes."""
-
+        """Guess the storage type by its name. May be overridden in descentant classes."""
         if cls.re_is_nfs.search(name):
             return 'NFS'
 
@@ -296,9 +299,11 @@ class VsphereDatastore(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def detect_k8s(cls, name):
-        """Method for detecting from given name, whether the datastore
-            is intended to use as PV in Kubernetes or not."""
+        """
+        Is the datastore intended to use as PV in Kubernetes or not.
 
+        This detection is made on evaluating the datastore name.
+        """
         if cls.re_k8s_ds.search(name):
             return True
         return False
@@ -306,7 +311,7 @@ class VsphereDatastore(VsphereObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -314,7 +319,6 @@ class VsphereDatastore(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereDatastore, self).as_dict(short=short)
         res['accessible'] = self.accessible
         res['capacity'] = self.capacity
@@ -336,7 +340,7 @@ class VsphereDatastore(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDatastore object with data from current object copied in."""
         return VsphereDatastore(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name, accessible=self.accessible,
@@ -347,9 +351,9 @@ class VsphereDatastore(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDatastore):
             return False
@@ -364,20 +368,21 @@ class VsphereDatastore(VsphereObject):
 class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     """
     A dictionary containing VsphereDatastore objects.
+
     It works like a dict.
     """
 
-    msg_invalid_ds_type = _("Invalid item type {{!r}} to set, only {} allowed.").format(
+    msg_invalid_ds_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
         'VsphereDatastore')
-    msg_key_not_name = _("The key {k!r} must be equal to the datastore name {n!r}.")
-    msg_none_type_error = _("None type as key is not allowed.")
-    msg_empty_key_error = _("Empty key {!r} is not allowed.")
-    msg_no_ds_dict = _("Object {{!r}} is not a {} object.").format('VsphereDatastoreDict')
+    msg_key_not_name = _('The key {k!r} must be equal to the datastore name {n!r}.')
+    msg_none_type_error = _('None type as key is not allowed.')
+    msg_empty_key_error = _('Empty key {!r} is not allowed.')
+    msg_no_ds_dict = _('Object {{!r}} is not a {} object.').format('VsphereDatastoreDict')
 
     # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
-        '''Use the object dict'''
-        self._map = dict()
+        """Initialize a VsphereDatastoreDict object."""
+        self._map = {}
 
         for arg in args:
             self.append(arg)
@@ -396,7 +401,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def append(self, ds):
-
+        """Set the given datastore in the current dict with its name as key."""
         if not isinstance(ds, VsphereDatastore):
             raise TypeError(self.msg_invalid_ds_type.format(ds.__class__.__name__))
         self._set_item(ds.name, ds)
@@ -415,6 +420,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def get(self, key):
+        """Get the datastore from dict by its name."""
         return self._get_item(key)
 
     # -------------------------------------------------------------------------
@@ -435,35 +441,39 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     # The next five methods are requirements of the ABC.
     def __setitem__(self, key, value):
+        """Set the given datastore in the current dict by key."""
         self._set_item(key, value)
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get the datastore from dict by the key."""
         return self._get_item(key)
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
+        """Remove the datastore from dict by the key."""
         self._del_item(key)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through datastore names as keys."""
         for ds_name in self.keys():
             yield ds_name
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of datastores in current dict."""
         return len(self._map)
 
     # -------------------------------------------------------------------------
     # The next methods aren't required, but nice for different purposes:
     def __str__(self):
-        '''returns simple dict representation of the mapping'''
+        """Return a simple dict representation of the mapping."""
         return str(self._map)
 
     # -------------------------------------------------------------------------
     def __repr__(self):
-        '''echoes class, id, & reproducible representation in the REPL'''
+        """Transform into a string for reproduction."""
         return '{}, {}({})'.format(
             super(VsphereDatastoreDict, self).__repr__(),
             self.__class__.__name__,
@@ -471,6 +481,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __contains__(self, key):
+        """Return whether the given datastore name is contained in current dict as a key."""
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -482,12 +493,12 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def keys(self):
-
+        """Return all datastore names of this dict in a sorted manner."""
         return sorted(self._map.keys(), key=str.lower)
 
     # -------------------------------------------------------------------------
     def items(self):
-
+        """Return tuples (datastore name + object as tuple) of this dict in a sorted manner."""
         item_list = []
 
         for ds_name in self.keys():
@@ -497,7 +508,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def values(self):
-
+        """Return all datastore objects of this dict."""
         value_list = []
         for ds_name in self.keys():
             value_list.append(self._map[ds_name])
@@ -505,7 +516,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if not isinstance(other, VsphereDatastoreDict):
             raise TypeError(self.msg_no_ds_dict.format(other))
 
@@ -513,7 +524,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __ne__(self, other):
-
+        """Magic method for using it as the '!='-operator."""
         if not isinstance(other, VsphereDatastoreDict):
             raise TypeError(self.msg_no_ds_dict.format(other))
 
@@ -521,7 +532,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def pop(self, key, *args):
-
+        """Get the datastore by its name and remove it in dict."""
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -533,7 +544,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def popitem(self):
-
+        """Remove and return a arbitrary (datastore name and object) pair from the dictionary."""
         if not len(self._map):
             return None
 
@@ -544,11 +555,16 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        self._map = dict()
+        """Remove all items from the dictionary."""
+        self._map = {}
 
     # -------------------------------------------------------------------------
     def setdefault(self, key, default):
+        """
+        Return the datastore, if the key is in dict.
 
+        If not, insert key with a value of default and return default.
+        """
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -567,7 +583,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def update(self, other):
-
+        """Update the dict with the key/value pairs from other, overwriting existing keys."""
         if isinstance(other, VsphereDatastoreDict) or isinstance(other, dict):
             for ds_name in other.keys():
                 self._set_item(ds_name, other[ds_name])
@@ -580,7 +596,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
-
+        """Transform the elements of the object into a dict."""
         res = {}
         for ds_name in self._map:
             res[ds_name] = self._map[ds_name].as_dict(short)
@@ -588,7 +604,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def as_list(self, short=True):
-
+        """Return a list with all datastores transformed to a dict."""
         res = []
         for ds_name in self.keys():
             res.append(self._map[ds_name].as_dict(short))
@@ -596,7 +612,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def find_ds(self, needed_gb, ds_type='sata', reserve_space=True, use_ds=None, no_k8s=False):
-
+        """Find a datastore in dict with the given minimum free space and the given type."""
         search_chains = {
             'sata': ('sata', 'sas', 'ssd'),
             'sas': ('sas', 'sata', 'ssd'),
@@ -604,21 +620,21 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
         }
 
         if ds_type not in search_chains:
-            raise ValueError(_("Could not handle datastore type {!r}.").format(ds_type))
+            raise ValueError(_('Could not handle datastore type {!r}.').format(ds_type))
         for dstp in search_chains[ds_type]:
             ds_name = self._find_ds(
                 needed_gb, dstp, reserve_space, use_ds=use_ds, no_k8s=no_k8s)
             if ds_name:
                 return ds_name
 
-        LOG.error(_("Could not found a datastore for {c:0.1f} GiB of type {t!r}.").format(
+        LOG.error(_('Could not found a datastore for {c:0.1f} GiB of type {t!r}.').format(
             c=needed_gb, t=ds_type))
         return None
 
     # -------------------------------------------------------------------------
     def _find_ds(self, needed_gb, ds_type, reserve_space=True, use_ds=None, no_k8s=False):
 
-        LOG.debug(_("Searching datastore for {c:0.1f} GiB of type {t!r}.").format(
+        LOG.debug(_('Searching datastore for {c:0.1f} GiB of type {t!r}.').format(
             c=needed_gb, t=ds_type))
 
         avail_ds_names = []
@@ -645,7 +661,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

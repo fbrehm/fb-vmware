@@ -37,7 +37,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -------------------------------------------------------------------------
     def __init__(
             self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None):
-        """Initialize a VsphereAboutInfo object."""
+        """Initialize the VsphereAboutInfo object."""
         self._api_type = None
         self._api_version = None
         self._name = None

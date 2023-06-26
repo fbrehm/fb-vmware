@@ -430,7 +430,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __contains__(self, ctrl):
-        """Return whther the given conntroller is contained in current list."""
+        """Return whether the given conntroller is contained in current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))

@@ -1,28 +1,32 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: A module for providing a configuration for VSPhere.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: A module for providing a configuration for VSPhere
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard module
-import logging
 import copy
+import logging
 
 # Third party modules
 
-from fb_tools.common import is_sequence, to_bool, pp
-from fb_tools.multi_config import MultiConfigError, BaseMultiConfig
+from fb_tools.common import is_sequence
+from fb_tools.common import pp
+from fb_tools.common import to_bool
+from fb_tools.multi_config import BaseMultiConfig
 from fb_tools.multi_config import DEFAULT_ENCODING
-from fb_tools.obj import FbGenericBaseObject, FbBaseObject
+from fb_tools.multi_config import MultiConfigError
+from fb_tools.obj import FbBaseObject
+from fb_tools.obj import FbGenericBaseObject
 
 # Own modules
-
-from ..errors import WrongPortTypeError, WrongPortValueError
-
+from ..errors import WrongPortTypeError
+from ..errors import WrongPortValueError
 from ..xlate import XLATOR
 
 __version__ = '0.5.6'
@@ -45,8 +49,7 @@ MAX_PORT_NUMBER = (2 ** 16) - 1
 
 # =============================================================================
 class VmwareConfigError(MultiConfigError):
-    """Base error class for all exceptions happened during
-    execution this configured application"""
+    """Base error class for all exceptions in this module."""
 
     pass
 
@@ -60,7 +63,7 @@ class VSPhereConfigInfo(FbBaseObject):
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             host=None, use_https=True, port=DEFAULT_VSPHERE_PORT, dc=DEFAULT_VSPHERE_DC,
             user=DEFAULT_VSPHERE_USER, password=None, initialized=False):
-
+        """Initialize the VSPhereConfigInfo object."""
         self._host = None
         self._port = DEFAULT_VSPHERE_PORT
         self._use_https = True
@@ -85,7 +88,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -93,7 +96,6 @@ class VSPhereConfigInfo(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VSPhereConfigInfo, self).as_dict(short=short)
 
         res['host'] = self.host
@@ -111,7 +113,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def host(self):
-        """The host name (or IP address) of the VSPhere server."""
+        """Return the host name (or IP address) of the VSPhere server."""
         return self._host
 
     @host.setter
@@ -124,7 +126,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def use_https(self):
-        """Should there be used HTTPS for communicating with the VSPhere server?"""
+        """Return the need for HTTPS for communicating with the VSPhere server."""
         return self._use_https
 
     @use_https.setter
@@ -134,7 +136,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def port(self):
-        "The TCP port number of the VSPhere server."
+        """Return the TCP port number of the VSPhere server."""
         return self._port
 
     @port.setter
@@ -151,13 +153,13 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def dc(self):
-        """The name of the datacenter in VSPhere to use."""
+        """Return the name of the datacenter in VSPhere to use."""
         return self._dc
 
     @dc.setter
     def dc(self, value):
         if value is None or str(value).strip() == '':
-            msg = _("An empty name for a VSPhere datacenter is not allowed.")
+            msg = _('An empty name for a VSPhere datacenter is not allowed.')
             LOG.warn(msg)
             return
         self._dc = str(value).strip()
@@ -171,7 +173,7 @@ class VSPhereConfigInfo(FbBaseObject):
     @user.setter
     def user(self, value):
         if value is None or str(value).strip() == '':
-            msg = _("An empty user name for connecting to a VSPhere datacenter is not allowed.")
+            msg = _('An empty user name for connecting to a VSPhere datacenter is not allowed.')
             LOG.warn(msg)
             return
         self._user = str(value).strip()
@@ -252,7 +254,7 @@ class VSPhereConfigInfo(FbBaseObject):
     @classmethod
     def from_config(
             cls, section_name, vsphere_name, section, appname=None, verbose=0, base_dir=None):
-
+        """Create a new VSPhereConfigInfo object based on the data from config."""
         info = cls(appname=appname, verbose=verbose, base_dir=base_dir, initialized=False)
 
         try:
@@ -281,20 +283,20 @@ class VSPhereConfigInfo(FbBaseObject):
                     continue
 
                 msg = _(
-                    "Unknown key {k!r} with value {v!r} for VSphere {vs!r} in section "
-                    "{sec!r} found.").format(k=key, v=value, vs=vsphere_name, sec=section_name)
+                    'Unknown key {k!r} with value {v!r} for VSphere {vs!r} in section '
+                    '{sec!r} found.').format(k=key, v=value, vs=vsphere_name, sec=section_name)
                 LOG.warn(msg)
 
         except Exception as e:
-            msg = _("{e} in section {sn!r} for VSphere {vs!r}:").format(
+            msg = _('{e} in section {sn!r} for VSphere {vs!r}:').format(
                 e=e.__class__.__name__, sn=section_name, vs=vsphere_name)
             msg += ' ' + str(e)
             raise VmwareConfigError(msg)
 
         if not info.host:
             msg = _(
-                "There must be given at least the VSPhere hostname in section {sn!r} "
-                "for VSphere {vs!r}.").format(vs=vsphere_name, sec=section_name)
+                'There must be given at least the VSPhere hostname in section {sn!r} '
+                'for VSphere {vs!r}.').format(vs=vsphere_name, sec=section_name)
             raise VmwareConfigError(msg)
 
         info.initialized = True
@@ -304,44 +306,42 @@ class VSPhereConfigInfo(FbBaseObject):
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Typecasting into a string for reproduction."""
-
-        out = "<%s(" % (self.__class__.__name__)
+        out = '<%s(' % (self.__class__.__name__)
 
         fields = []
-        fields.append("appname={!r}".format(self.appname))
-        fields.append("host={!r}".format(self.host))
-        fields.append("use_https={!r}".format(self.use_https))
-        fields.append("port={!r}".format(self.port))
-        fields.append("dc={!r}".format(self.dc))
-        fields.append("user={!r}".format(self.user))
-        fields.append("password={!r}".format(self.password))
-        fields.append("verbose={!r}".format(self.verbose))
-        fields.append("base_dir={!r}".format(self.base_dir))
-        fields.append("initialized={!r}".format(self.initialized))
+        fields.append('appname={!r}'.format(self.appname))
+        fields.append('host={!r}'.format(self.host))
+        fields.append('use_https={!r}'.format(self.use_https))
+        fields.append('port={!r}'.format(self.port))
+        fields.append('dc={!r}'.format(self.dc))
+        fields.append('user={!r}'.format(self.user))
+        fields.append('password={!r}'.format(self.password))
+        fields.append('verbose={!r}'.format(self.verbose))
+        fields.append('base_dir={!r}'.format(self.base_dir))
+        fields.append('initialized={!r}'.format(self.initialized))
 
-        out += ", ".join(fields) + ")>"
+        out += ', '.join(fields) + ')>'
         return out
 
     # -------------------------------------------------------------------------
     def _repr(self):
-        """A typecasting into a string for reproduction only with relevant information."""
-
-        out = "<%s(" % (self.__class__.__name__)
+        """Typecasting into a string for reproduction only with relevant information."""
+        out = '<%s(' % (self.__class__.__name__)
 
         fields = []
-        fields.append("host={!r}".format(self.host))
-        fields.append("use_https={!r}".format(self.use_https))
-        fields.append("port={!r}".format(self.port))
-        fields.append("dc={!r}".format(self.dc))
-        fields.append("user={!r}".format(self.user))
-        fields.append("password={!r}".format(self.show_password))
+        fields.append('host={!r}'.format(self.host))
+        fields.append('use_https={!r}'.format(self.use_https))
+        fields.append('port={!r}'.format(self.port))
+        fields.append('dc={!r}'.format(self.dc))
+        fields.append('user={!r}'.format(self.user))
+        fields.append('password={!r}'.format(self.show_password))
 
-        out += ", ".join(fields) + ")>"
+        out += ', '.join(fields) + ')>'
         return out
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VSPhereConfigInfo object with data from current object copied in."""
         new = self.__class__(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, host=self.host,
             use_https=self.use_https, port=self.port, dc=self.dc, user=self.user,
@@ -357,7 +357,7 @@ class VSPhereConfigInfoDict(dict, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -365,7 +365,6 @@ class VSPhereConfigInfoDict(dict, FbGenericBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VSPhereConfigInfoDict, self).as_dict(short=short)
 
         for key in self.keys():
@@ -375,7 +374,7 @@ class VSPhereConfigInfoDict(dict, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VSPhereConfigInfoDict object with data from current object copied in."""
         new = self.__class__()
 
         for key in self.keys():
@@ -387,8 +386,9 @@ class VSPhereConfigInfoDict(dict, FbGenericBaseObject):
 # =============================================================================
 class VmwareConfiguration(BaseMultiConfig):
     """
-    A class for providing a configuration for an arbitrary Vmware Application
-    and methods to read it from configuration files.
+    A class for providing a configuration for an arbitrary Vmware Application.
+
+    There are also methods to read it from configuration files.
     """
 
     # -------------------------------------------------------------------------
@@ -397,7 +397,7 @@ class VmwareConfiguration(BaseMultiConfig):
             append_appname_to_stems=True, additional_stems=None, config_dir=DEFAULT_CONFIG_DIR,
             additional_config_file=None, additional_cfgdirs=None, encoding=DEFAULT_ENCODING,
             use_chardet=True, initialized=False):
-
+        """Initialize a VmwareConfiguration object."""
         add_stems = []
         if additional_stems:
             if is_sequence(additional_stems):
@@ -426,7 +426,7 @@ class VmwareConfiguration(BaseMultiConfig):
 
     # -------------------------------------------------------------------------
     def eval_section(self, section_name):
-
+        """Evaluate a particular configuration section."""
         super(VmwareConfiguration, self).eval_section(section_name)
         sn = section_name.lower()
 
@@ -436,7 +436,7 @@ class VmwareConfiguration(BaseMultiConfig):
 
             if self.verbose > 2:
                 LOG.debug(
-                    _("Evaluating config section {!r}:").format(section_name) + '\n' + pp(section))
+                    _('Evaluating config section {!r}:').format(section_name) + '\n' + pp(section))
 
             if sn == 'vsphere':
                 return self._eval_bare_vsphere(section_name, section)
@@ -445,7 +445,7 @@ class VmwareConfiguration(BaseMultiConfig):
                 vsphere_name = sn.replace('vsphere:', '').strip()
                 return self._eval_vsphere_instance(section_name, vsphere_name, section)
 
-            LOG.error(_("Empty VSphere name found."))
+            LOG.error(_('Empty VSphere name found.'))
 
     # -------------------------------------------------------------------------
     def _eval_bare_vsphere(self, section_name, section):
@@ -468,7 +468,7 @@ class VmwareConfiguration(BaseMultiConfig):
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

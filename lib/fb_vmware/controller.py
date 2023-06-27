@@ -380,7 +380,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, ctrl, *args):
-        """Return the numeric index of the given controller in curren list."""
+        """Return the numeric index of the given controller in current list."""
         i = None
         j = None
 
@@ -430,7 +430,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __contains__(self, ctrl):
-        """Return whether the given conntroller is contained in current list."""
+        """Return whether the given controller is contained in current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -446,7 +446,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, ctrl):
-        """Return the number of controllers which are equal ti the given one in current list."""
+        """Return the number of controllers which are equal to the given one in current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))

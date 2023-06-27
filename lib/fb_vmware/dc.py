@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for capsulating a VSphere datacenter object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for capsulating a VSphere datacenter object.
 """
 from __future__ import absolute_import
 
@@ -12,17 +13,17 @@ from __future__ import absolute_import
 import logging
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp
 from fb_tools.xlate import format_list
 
-# Own modules
-from .obj import VsphereObject, DEFAULT_OBJ_STATUS
+from pyVmomi import vim
 
+# Own modules
+from .obj import DEFAULT_OBJ_STATUS
+from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = 'host'
@@ -35,9 +36,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDatacenter(VsphereObject):
-    """
-    Class for a VSphere Datacenter object.
-    """
+    """Encapsulation class for a VSphere Datacenter object."""
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -46,7 +45,7 @@ class VsphereDatacenter(VsphereObject):
             ds_folder=DEFAULT_DS_FOLDER, host_folder=DEFAULT_HOST_FOLDER,
             network_folder=DEFAULT_NETWORK_FOLDER, vm_folder=DEFAULT_VM_FOLDER,
             default_hw_version_key=None, max_hw_version_key=None):
-
+        """Initialize a VsphereDatacenter object."""
         self.repr_fields = (
             'name', 'obj_type', 'name_prefix', 'status', 'config_status',
             'appname', 'verbose', 'version')
@@ -59,7 +58,7 @@ class VsphereDatacenter(VsphereObject):
         self._max_hw_version_key = None
 
         super(VsphereDatacenter, self).__init__(
-            name=name, obj_type='vsphere_datacenter', name_prefix="dc", status=status,
+            name=name, obj_type='vsphere_datacenter', name_prefix='dc', status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
@@ -112,7 +111,7 @@ class VsphereDatacenter(VsphereObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -120,7 +119,6 @@ class VsphereDatacenter(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereDatacenter, self).as_dict(short=short)
         res['ds_folder'] = self.ds_folder
         res['host_folder'] = self.host_folder
@@ -133,7 +131,7 @@ class VsphereDatacenter(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDatacenter as a deep copy of the current object."""
         return VsphereDatacenter(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name,
@@ -143,9 +141,9 @@ class VsphereDatacenter(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDatacenter):
             return False
@@ -158,9 +156,9 @@ class VsphereDatacenter(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereDatacenter object based on the data given from pyvmomi."""
         if verbose > 3:
-            LOG.debug("Creating {} object by data:".format(cls.__name__) + '\n' + pp(data))
+            LOG.debug('Creating {} object by data:'.format(cls.__name__) + '\n' + pp(data))
 
         if test_mode:
 
@@ -183,16 +181,16 @@ class VsphereDatacenter(VsphereObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.Datacenter):
                 msg = _(
-                    "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format(t='data', e='vim.Datacenter', v=data.__class__.__qualname__)
+                    'Parameter {t!r} must be a {e} object, a {v} object was given '
+                    'instead.').format(t='data', e='vim.Datacenter', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
@@ -218,7 +216,7 @@ class VsphereDatacenter(VsphereObject):
                 params['max_hw_version_key'] = data.configuration.maximumHardwareVersionKey
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         dc = cls(**params)
 
@@ -227,7 +225,7 @@ class VsphereDatacenter(VsphereObject):
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

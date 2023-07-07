@@ -1,34 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere host portgroup object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere host portgroup object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
-import logging
 import copy
-
+import logging
 try:
     from collections.abc import MutableSequence
 except ImportError:
     from collections import MutableSequence
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp
 # from fb_tools.common import to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.3'
+__version__ = '0.2.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -36,12 +36,13 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereHostPortgroup(FbBaseObject):
+    """This is a wrapeer for a vim.host.PortGroup object."""
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             name=None, vlan_id=None, vswitch_name=None, hostname=None):
-
+        """Initialize a VsphereHostPortgroup object."""
         self._name = None
         self._vlan_id = None
         self._vswitch_name = None
@@ -126,7 +127,7 @@ class VsphereHostPortgroup(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -136,7 +137,6 @@ class VsphereHostPortgroup(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         if bare:
             res = {
                 'name': self.name,
@@ -156,9 +156,9 @@ class VsphereHostPortgroup(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereHostPortgroup):
             return False
@@ -172,7 +172,7 @@ class VsphereHostPortgroup(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereHostPortgroup as a deep copy of the current object."""
         group = VsphereHostPortgroup(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name, vlan_id=self.vlan_id,
@@ -184,7 +184,7 @@ class VsphereHostPortgroup(FbBaseObject):
     @classmethod
     def from_summary(
             cls, data, hostname=None, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereHostPortgroup object based on the data given from pyvmomi."""
         if test_mode:
 
             failing_fields = []
@@ -196,14 +196,14 @@ class VsphereHostPortgroup(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.host.PortGroup):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
                     t='data', e='vim.host.PortGroup', v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
 
@@ -219,29 +219,27 @@ class VsphereHostPortgroup(FbBaseObject):
         }
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         group = cls(**params)
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(group.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(group.as_dict()))
 
         return group
 
 
 # =============================================================================
 class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
-    """
-    A list containing VsphereHostPortgroup objects.
-    """
+    """A list containing VsphereHostPortgroup objects."""
 
-    msg_no_portgroup = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_portgroup = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             initialized=None, hostname=None, *groups):
-
+        """Initialize a VsphereHostPortgroupList object."""
         self._list = []
         self._hostname = None
 
@@ -277,7 +275,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -287,7 +285,6 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
         @return: structure as dict or list
         @rtype:  dict or list
         """
-
         if bare:
             res = []
             for group in self:
@@ -305,7 +302,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereHostPortgroupList as a deep copy of the current object."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             hostname=self.hostname, initialized=False)
@@ -318,13 +315,13 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, group, *args):
-
+        """Return the numeric index of the given port group in current list."""
         i = None
         j = None
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
                     m='index()', max=3, n=len(args) + 1))
             i = int(args[0])
             if len(args) > 1:
@@ -363,12 +360,12 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
             if item == group:
                 return index
 
-        msg = _("group is not in group list.")
+        msg = _('group is not in group list.')
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, group):
-
+        """Return whether the given port group is contained in current list."""
         if not isinstance(group, VsphereHostPortgroup):
             raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
@@ -384,7 +381,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, group):
-
+        """Return the number of port groups which are equal to the given one in current list."""
         if not isinstance(group, VsphereHostPortgroup):
             raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
@@ -400,15 +397,17 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of port groups in current list."""
         return len(self._list)
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get a port group from current list by the given numeric index."""
         return self._list.__getitem__(key)
 
     # -------------------------------------------------------------------------
     def __reversed__(self):
-
+        """Reverse the port groups in list in place."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -421,7 +420,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __setitem__(self, key, group):
-
+        """Replace the port group at the given numeric index by the given one."""
         if not isinstance(group, VsphereHostPortgroup):
             raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
@@ -430,12 +429,12 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
-
+        """Remove the port group at the given numeric index from list."""
         del self._list[key]
 
     # -------------------------------------------------------------------------
     def append(self, group):
-
+        """Append the given port group to the current list."""
         if not isinstance(group, VsphereHostPortgroup):
             raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
@@ -444,7 +443,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def insert(self, index, group):
-
+        """Insert the given port group in current list at given index."""
         if not isinstance(group, VsphereHostPortgroup):
             raise TypeError(self.msg_no_portgroup.format(
                 t=group.__class__.__name__, c=self.__class__.__name__, o='VsphereHostPortgroup'))
@@ -453,13 +452,12 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        "Remove all items from the VsphereHostPortgroupList."
-
+        """Remove all items from the VsphereHostPortgroupList."""
         self._list = []
 
     # -------------------------------------------------------------------------
     def ordered(self):
-
+        """Iterate through the port groups in sorted order."""
         try:
             for group in sorted(self._list, key=lambda x: x.name.lower()):
                 yield group
@@ -468,7 +466,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

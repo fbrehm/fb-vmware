@@ -510,7 +510,7 @@ class VsphereNetworkDict(MutableMapping, FbGenericBaseObject):
 
             LOG.debug(_('Could not find VSphere network for IP {}.').format(ip))
 
-        ips_str = ', '.join(map(lambda x: str(x), list(filter(bool, ips))))
+        ips_str = ', '.join((str(x) for x in list(filter(bool, ips))))
         LOG.error(_('Could not find VSphere network for IP addresses {}.').format(ips_str))
         return None
 

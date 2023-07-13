@@ -108,7 +108,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Building Debian Source Packages
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/test') || startsWith(github.ref, 'refs/tags/') }}
-    container: debian:bullseye
+    container: debian:bookworm
     needs:
       - linter
     steps:
@@ -188,6 +188,12 @@ jobs:
             os_release: '11'
             container: 'debian:bullseye'
             version_prefix: 'deb11'
+            compat: '12'
+          - distributor: 'Debian'
+            os_codename: 'bookworm'
+            os_release: '12'
+            container: 'debian:bookworm'
+            version_prefix: 'deb12'
             compat: '12'
           - distributor: 'Ubuntu'
             os_codename: 'bionic'

@@ -1,28 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a base VSphere class.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The base module module for a VSphere object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
-import re
-import logging
 import copy
+import logging
+import re
 
 # Third party modules
-from fb_tools.common import pp, RE_TF_NAME
+from fb_tools.common import RE_TF_NAME
+from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
 
 # Own modules
+from .errors import VSphereNameError
 from .xlate import XLATOR
 
-from .errors import VSphereNameError
-
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -33,6 +34,11 @@ OBJ_STATUS_GREEN = 'green'
 
 # =============================================================================
 class VsphereObject(FbBaseObject):
+    """
+    A base class for some other VSphere classes.
+
+    It is especially intended for classes mapping other classes from the pyVmomi package.
+    """
 
     re_ws = re.compile(r'\s+')
 
@@ -43,10 +49,10 @@ class VsphereObject(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, name=None, obj_type=None, name_prefix="unknown", status=DEFAULT_OBJ_STATUS,
+        self, name=None, obj_type=None, name_prefix='unknown', status=DEFAULT_OBJ_STATUS,
             config_status=DEFAULT_OBJ_STATUS, appname=None, verbose=0, version=__version__,
             base_dir=None, initialized=None):
-
+        """Initialize a VsphereObject object."""
         self._name = None
         self._obj_type = None
         self._name_prefix = None
@@ -75,12 +81,12 @@ class VsphereObject(FbBaseObject):
     def obj_type(self, value):
 
         if value is None:
-            msg = _("The type of a {} may not be None.").format('VsphereObject')
+            msg = _('The type of a {} may not be None.').format('VsphereObject')
             raise TypeError(msg)
 
         val = self.re_ws.sub('', str(value))
         if val == '':
-            msg = _("Invalid {w}.{p} {v!r}.").format(
+            msg = _('Invalid {w}.{p} {v!r}.').format(
                 w='VsphereObject', p='type', v=value)
             raise ValueError(msg)
 
@@ -103,7 +109,7 @@ class VsphereObject(FbBaseObject):
             self._status = 'gray'
             return
         if val not in self.available_status_color:
-            msg = _("Invalid {w}.{p} {v!r}.").format(
+            msg = _('Invalid {w}.{p} {v!r}.').format(
                 w='VsphereObject', p='status', v=value)
             raise ValueError(msg)
 
@@ -126,7 +132,7 @@ class VsphereObject(FbBaseObject):
             self._config_status = 'gray'
             return
         if val not in self.available_status_color:
-            msg = _("Invalid {w}.{p} {v!r}.").format(
+            msg = _('Invalid {w}.{p} {v!r}.').format(
                 w='VsphereObject', p='config_status', v=value)
             raise ValueError(msg)
 
@@ -142,11 +148,11 @@ class VsphereObject(FbBaseObject):
     def name_prefix(self, value):
 
         if value is None:
-            raise TypeError(_("The name prefix of a {} may not be None.").format('VsphereObject'))
+            raise TypeError(_('The name prefix of a {} may not be None.').format('VsphereObject'))
 
         val = self.re_ws.sub('', str(value))
         if val == '':
-            msg = _("Invalid name prefix {p!r} for a {o}.").format(p=value, o='VsphereObject')
+            msg = _('Invalid name prefix {p!r} for a {o}.').format(p=value, o='VsphereObject')
             raise ValueError(msg)
 
         self._name_prefix = val
@@ -173,7 +179,6 @@ class VsphereObject(FbBaseObject):
     @property
     def qual_name(self):
         """The qualified name of the object, including object_type and name."""
-
         if self.obj_type is None:
             if self.name is None:
                 return ''
@@ -200,7 +205,7 @@ class VsphereObject(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -208,8 +213,8 @@ class VsphereObject(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereObject, self).as_dict(short=short)
+
         res['name'] = self.name
         res['qual_name'] = self.qual_name
         res['obj_type'] = self.obj_type
@@ -225,52 +230,49 @@ class VsphereObject(FbBaseObject):
     # -------------------------------------------------------------------------
     def __str__(self):
         """
-        Typecasting function for translating object structure
-        into a string
+        Typecast function for translating object structure into a string.
 
         @return: structure as string
         @rtype:  str
         """
-
         return pp(self.as_dict(short=True))
 
     # -------------------------------------------------------------------------
     def __repr__(self):
-        """Typecasting into a string for reproduction."""
-
-        out = "<%s(" % (self.__class__.__name__)
+        """Typecast into a string for reproduction."""
+        out = '<%s(' % (self.__class__.__name__)
 
         fields = []
         for field in self.repr_fields:
-            token = "{f}={v!r}".format(f=field, v=getattr(self, field))
+            token = '{f}={v!r}'.format(f=field, v=getattr(self, field))
             fields.append(token)
 
-        out += ", ".join(fields) + ")>"
+        out += ', '.join(fields) + ')>'
         return out
 
     # -------------------------------------------------------------------------
     def __lt__(self, other):
-
+        """Magic method for using it as the '<'-operator."""
         if not isinstance(other, VsphereObject):
-            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            msg = _('Object {{!r}} is not a {} object.').format('VsphereObject')
             raise TypeError(msg.format(other))
 
         return self.qual_name < other.qual_name
 
     # -------------------------------------------------------------------------
     def __gt__(self, other):
-
+        """Magic method for using it as the '>'.operator."""
         if not isinstance(other, VsphereObject):
-            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            msg = _('Object {{!r}} is not a {} object.').format('VsphereObject')
             raise TypeError(msg.format(other))
 
         return self.qual_name > other.qual_name
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereObject):
             return False
@@ -279,9 +281,9 @@ class VsphereObject(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __le__(self, other):
-
+        """Magic method for using it as the '<='-operator."""
         if not isinstance(other, VsphereObject):
-            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            msg = _('Object {{!r}} is not a {} object.').format('VsphereObject')
             raise TypeError(msg.format(other))
 
         if self == other:
@@ -291,9 +293,9 @@ class VsphereObject(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __ge__(self, other):
-
+        """Magic method for using it as the '>='-operator."""
         if not isinstance(other, VsphereObject):
-            msg = _("Object {{!r}} is not a {} object.").format('VsphereObject')
+            msg = _('Object {{!r}} is not a {} object.').format('VsphereObject')
             raise TypeError(msg.format(other))
 
         if self == other:
@@ -304,7 +306,7 @@ class VsphereObject(FbBaseObject):
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

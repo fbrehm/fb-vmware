@@ -25,15 +25,22 @@ import sys
 import threading
 import time
 
+__version__ = '1.0.1'
+
 
 # =============================================================================
 class Spinner(object):
     """Displaying  on console a rotating or somehow other animated character."""
 
+        cycle_list = ['-', '/', '|', '\\']
+
     # -------------------------------------------------------------------------
-    def __init__(self, message, delay=0.1):
+    def __init__(self, message, delay=0.1, cycle_list=None):
         """Initialize a Spinner object."""
-        self.spinner = itertools.cycle(['-', '/', '|', '\\'])
+        _cycle_list = cycle_list
+        if not cycle_list:
+            _cycle_list = self.cycle_list
+        self.spinner = itertools.cycle(_cycle_list)
         self.delay = delay
         self.busy = False
         self.spinner_visible = False

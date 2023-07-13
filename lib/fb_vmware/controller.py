@@ -1,33 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere disk controller object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere disk controller object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
-import logging
 import copy
-
+import logging
 try:
     from collections.abc import MutableSequence
 except ImportError:
     from collections import MutableSequence
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -35,6 +35,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDiskController(FbBaseObject):
+    """This is a wrapper for a vim.vm.device.VirtualController object."""
 
     ctrl_types = (
         (vim.vm.device.VirtualIDEController, 'ide'),
@@ -76,7 +77,7 @@ class VsphereDiskController(FbBaseObject):
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             ctrl_type='unknown', bus_nr=None, devices=None, hot_add_remove=False,
             scsi_ctrl_nr=None, sharing=None):
-
+        """Initialize a VsphereDiskController object."""
         self._ctrl_type = 'unknown'
         self._bus_nr = None
         self.devices = []
@@ -182,9 +183,9 @@ class VsphereDiskController(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDiskController):
             return False
@@ -203,7 +204,7 @@ class VsphereDiskController(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -213,7 +214,6 @@ class VsphereDiskController(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         if bare:
             res = {
                 'ctrl_type': self.ctrl_type,
@@ -239,7 +239,7 @@ class VsphereDiskController(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDiskController as a deep copy of the current object."""
         ctrl = VsphereDiskController(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, ctrl_type=self.ctrl_type, bus_nr=self.bus_nr,
@@ -251,7 +251,7 @@ class VsphereDiskController(FbBaseObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereDiskController object based on the data given from pyvmomi."""
         if test_mode:
 
             necessary_fields = ('busNumber', 'disk')
@@ -264,15 +264,15 @@ class VsphereDiskController(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.vm.device.VirtualController):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
                     t='data', e='vim.vm.device.VirtualController',
                     v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
@@ -294,7 +294,7 @@ class VsphereDiskController(FbBaseObject):
             params['sharing'] = data.sharedBus
 
         if verbose > 2:
-            LOG.debug(_("Checking class of controller: {!r}").format(data.__class__.__name__))
+            LOG.debug(_('Checking class of controller: {!r}').format(data.__class__.__name__))
 
         try:
             for pair in cls.ctrl_types:
@@ -305,29 +305,27 @@ class VsphereDiskController(FbBaseObject):
             pass
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         ctrl = cls(**params)
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(ctrl.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(ctrl.as_dict()))
 
         return ctrl
 
 
 # =============================================================================
 class VsphereDiskControllerList(FbBaseObject, MutableSequence):
-    """
-    A list containing VsphereDiskController objects.
-    """
+    """A list containing VsphereDiskController objects."""
 
-    msg_no_controller = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_controller = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             initialized=None, *ctrls):
-
+        """Initialize a VsphereDiskControllerList object."""
         self._list = []
 
         super(VsphereDiskControllerList, self).__init__(
@@ -343,7 +341,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -353,7 +351,6 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
         @return: structure as dict or list
         @rtype:  dict or list
         """
-
         if bare:
             res = []
             for ctrl in self:
@@ -370,7 +367,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDiskControllerList as a deep copy of the current object."""
         new_list = VsphereDiskControllerList(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -383,13 +380,13 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, ctrl, *args):
-
+        """Return the numeric index of the given controller in current list."""
         i = None
         j = None
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
                     m='index()', max=3, n=len(args) + 1))
             i = int(args[0])
             if len(args) > 1:
@@ -428,12 +425,12 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
             if item == ctrl:
                 return index
 
-        msg = _("Controller is not in controller list.")
+        msg = _('Controller is not in controller list.')
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, ctrl):
-
+        """Return whether the given controller is contained in current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -449,7 +446,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, ctrl):
-
+        """Return the number of controllers which are equal to the given one in current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -465,26 +462,28 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of controllers in current list."""
         return len(self._list)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through all controllers in current list."""
         for item in self._list:
             yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get a controller from current list by the given numeric index."""
         return self._list.__getitem__(key)
 
     # -------------------------------------------------------------------------
     def __reversed__(self):
-
+        """Reverse the controllers in list in place."""
         return reversed(self._list)
 
     # -------------------------------------------------------------------------
     def __setitem__(self, key, ctrl):
-
+        """Replace the controller at the given numeric index by the given one."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -493,12 +492,12 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
-
+        """Remove the controller at the given numeric index from list."""
         del self._list[key]
 
     # -------------------------------------------------------------------------
     def append(self, ctrl):
-
+        """Append the given controller to the current list."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -507,7 +506,7 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def insert(self, index, ctrl):
-
+        """Insert the given controller in current list at given index."""
         if not isinstance(ctrl, VsphereDiskController):
             raise TypeError(self.msg_no_controller.format(
                 t=ctrl.__class__.__name__, c=self.__class__.__name__, o='VsphereDiskController'))
@@ -516,13 +515,12 @@ class VsphereDiskControllerList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        "Remove all items from the VsphereDiskControllerList."
-
+        """Remove all items from the VsphereDiskControllerList."""
         self._list = []
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

@@ -1,35 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: Mdule for capsulating a VSphere disk object, which can be assigned to a VM.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for capsulating a VSphere disk object, which can be assigned
-          to a virtual machine..
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
 import logging
-import uuid
 import re
-
+import uuid
 try:
     from collections.abc import MutableSequence
 except ImportError:
     from collections import MutableSequence
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -37,6 +36,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDisk(FbBaseObject):
+    """Encapsulation of a VSphere disk object, which can be assigned to a VM."""
 
     re_file_storage = re.compile(r'^\s*\[\s*([^\s\]]+)')
     re_file_rel = re.compile(r'^\s*\[[^\]]*]\s*(\S.*)\s*$')
@@ -46,11 +46,10 @@ class VsphereDisk(FbBaseObject):
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             uuid=None, file_name=None, unit_nr=None, label=None, key=None, controller_key=None,
             size=None, disk_id=None, summary=None):
-
+        """Initialize a VsphereDisk object."""
         # self.repr_fields = (
         #     'uuid', 'file_name', 'unit_nr', 'label', 'key', 'controller_key',
         #     'size', 'disk_id', 'appname', 'verbose')
-
         self._uuid = None
         self._file_name = None
         self._unit_nr = None
@@ -140,9 +139,12 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def unit_nr(self):
-        """The unit number of this device on its controller.
-            This property is None if the controller property is None
-            (for example, when the device is not attached to a specific controller object)."""
+        """
+        The unit number of this device on its controller.
+
+        This property is None if the controller property is None
+        (for example, when the device is not attached to a specific controller object).
+        """
         return self._unit_nr
 
     @unit_nr.setter
@@ -189,8 +191,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def key(self):
-        """A unique key that distinguishes this device from other devices
-            in the same virtual machine."""
+        """A unique key that distinguishes this device from other devices in the same VM."""
         return self._key
 
     @key.setter
@@ -269,9 +270,9 @@ class VsphereDisk(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDisk):
             return False
@@ -300,7 +301,7 @@ class VsphereDisk(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -310,7 +311,6 @@ class VsphereDisk(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         if bare:
             res = {
                 'uuid': self.uuid,
@@ -350,7 +350,7 @@ class VsphereDisk(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDisk as a deep copy of the current object."""
         disk = VsphereDisk(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, uuid=self.uuid, file_name=self.file_name,
@@ -362,7 +362,7 @@ class VsphereDisk(FbBaseObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereDisk object based on the data given from pyvmomi."""
         if test_mode:
 
             necessary_fields = (
@@ -386,8 +386,8 @@ class VsphereDisk(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
@@ -395,8 +395,8 @@ class VsphereDisk(FbBaseObject):
 
             if not isinstance(data, vim.vm.device.VirtualDisk):
                 msg = _(
-                    "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format(
+                    'Parameter {t!r} must be a {e} object, a {v} object was given '
+                    'instead.').format(
                         t='data', e='vim.vm.device.VirtualDisk', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
@@ -416,29 +416,27 @@ class VsphereDisk(FbBaseObject):
         }
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         disk = cls(**params)
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(disk.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(disk.as_dict()))
 
         return disk
 
 
 # =============================================================================
 class VsphereDiskList(FbBaseObject, MutableSequence):
-    """
-    A list containing VsphereDisk objects.
-    """
+    """A list containing VsphereDisk objects."""
 
-    msg_no_disk = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_disk = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             initialized=None, *disks):
-
+        """Initialize a VsphereDiskList object."""
         self._list = []
 
         super(VsphereDiskList, self).__init__(
@@ -454,7 +452,7 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -464,7 +462,6 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
         @return: structure as dict or list
         @rtype:  dict or list
         """
-
         if bare:
             res = []
             for disk in self:
@@ -481,7 +478,7 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDiskList as a deep copy of the current object."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -494,13 +491,13 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, disk, *args):
-
+        """Return the numeric index of the given disk in current list."""
         i = None
         j = None
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
                     m='index()', max=3, n=len(args) + 1))
             i = int(args[0])
             if len(args) > 1:
@@ -540,12 +537,12 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
             if item == disk:
                 return index
 
-        msg = _("Disk is not in disk list.")
+        msg = _('Disk is not in disk list.')
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, disk):
-
+        """Return whether the given disk is contained in current list."""
         if not isinstance(disk, VsphereDisk):
             raise TypeError(self.msg_no_disk.format(
                 t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
@@ -561,7 +558,7 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, disk):
-
+        """Return the number of disks which are equal to the given one in current list."""
         if not isinstance(disk, VsphereDisk):
             raise TypeError(self.msg_no_disk.format(
                 t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
@@ -577,26 +574,28 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of disks in current list."""
         return len(self._list)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through all disks in current list."""
         for item in self._list:
             yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get a disk from current list by the given numeric index."""
         return self._list.__getitem__(key)
 
     # -------------------------------------------------------------------------
     def __reversed__(self):
-
+        """Reverse the disks in list in place."""
         return reversed(self._list)
 
     # -------------------------------------------------------------------------
     def __setitem__(self, key, disk):
-
+        """Replace the disk at the given numeric index by the given one."""
         if not isinstance(disk, VsphereDisk):
             raise TypeError(self.msg_no_disk.format(
                 t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
@@ -605,12 +604,12 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
-
+        """Remove the disk at the given numeric index from list."""
         del self._list[key]
 
     # -------------------------------------------------------------------------
     def append(self, disk):
-
+        """Append the given disk to the current list."""
         if not isinstance(disk, VsphereDisk):
             raise TypeError(self.msg_no_disk.format(
                 t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
@@ -619,7 +618,7 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def insert(self, index, disk):
-
+        """Insert the given disk in current list at given index."""
         if not isinstance(disk, VsphereDisk):
             raise TypeError(self.msg_no_disk.format(
                 t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
@@ -628,13 +627,12 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        "Remove all items from the VsphereDiskList."
-
+        """Remove all items from the VsphereDiskList."""
         self._list = []
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for i18n.
+
+          It provides a translation object, usable from all other
+          modules in this package.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for i18n.
-          It provides translation object, usable from all other
-          modules in this package.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import, print_function
 
 # Standard modules
-import logging
-import gettext
 import copy
-
+import gettext
+import logging
 try:
     from pathlib import Path
 except ImportError:
@@ -34,7 +35,7 @@ DOMAIN = 'fb_vmware'
 
 LOG = logging.getLogger(__name__)
 
-__version__ = '0.1.2'
+__version__ = '0.1.4'
 
 __me__ = Path(__file__).resolve()
 __module_dir__ = __me__.parent
@@ -76,6 +77,7 @@ _ = XLATOR.gettext
 def format_list(lst, do_repr=False, style='standard', locale=DEFAULT_LOCALE):
     """
     Format the items in `lst` as a list.
+
     :param lst: a sequence of items to format in to a list
     :param locale: the locale
     """
@@ -95,21 +97,21 @@ def format_list(lst, do_repr=False, style='standard', locale=DEFAULT_LOCALE):
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     out_list = []
-    out_list.append([_("Module directory:"), str(__module_dir__)])
-    out_list.append([_("Base directory:"), str(__base_dir__)])
-    out_list.append([_("Locale directory:"), str(LOCALE_DIR)])
-    out_list.append([_("Locale domain:"), DOMAIN])
-    out_list.append([_("Found .mo-file:"), __mo_file__])
+    out_list.append([_('Module directory:'), str(__module_dir__)])
+    out_list.append([_('Base directory:'), str(__base_dir__)])
+    out_list.append([_('Locale directory:'), str(LOCALE_DIR)])
+    out_list.append([_('Locale domain:'), DOMAIN])
+    out_list.append([_('Found .mo-file:'), __mo_file__])
 
     max_len = 1
     for pair in out_list:
         if len(pair[0]) > max_len:
             max_len = len(pair[0])
 
-    template = "{{label:<{}}} {{val!r}}".format(max_len)
+    template = '{{label:<{}}} {{val!r}}'.format(max_len)
     for pair in out_list:
         print(template.format(label=pair[0], val=pair[1]))
 

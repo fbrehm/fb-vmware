@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for capsulating a VSphere calculation cluster object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for capsulating a VSphere calculation cluster object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -12,17 +13,17 @@ from __future__ import absolute_import
 import logging
 
 # Third party modules
-from pyVmomi import vim
-
-from fb_tools.common import pp, to_bool, is_sequence
+from fb_tools.common import is_sequence, pp, to_bool
 from fb_tools.xlate import format_list
 
-# Own modules
-from .obj import VsphereObject, DEFAULT_OBJ_STATUS
+from pyVmomi import vim
 
+# Own modules
+from .obj import DEFAULT_OBJ_STATUS
+from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.4.2'
+__version__ = '1.4.3'
 LOG = logging.getLogger(__name__)
 
 
@@ -31,6 +32,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereCluster(VsphereObject):
+    """An object for encapsulating a VSphere calculation cluster object."""
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -38,7 +40,7 @@ class VsphereCluster(VsphereObject):
             name=None, status=DEFAULT_OBJ_STATUS, cpu_cores=0, cpu_threads=0,
             config_status=DEFAULT_OBJ_STATUS, hosts_effective=0, hosts_total=0,
             mem_mb_effective=0, mem_total=0, standalone=False):
-
+        """Initialize a VsphereCluster object."""
         self.repr_fields = (
             'name', 'status', 'config_status', 'cpu_cores', 'cpu_threads', 'hosts_effective',
             'hosts_total', 'mem_mb_effective', 'mem_total', 'appname', 'verbose', 'version')
@@ -56,7 +58,7 @@ class VsphereCluster(VsphereObject):
         self.resource_pool = None
 
         super(VsphereCluster, self).__init__(
-            name=name, obj_type='vsphere_cluster', name_prefix="cluster", status=status,
+            name=name, obj_type='vsphere_cluster', name_prefix='cluster', status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
@@ -177,8 +179,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_mb_effective(self):
-        """The effective memory resources (in MB) available
-            to run virtual machines of the cluster."""
+        """The effective memory resources (in MB) available to run VMs of the cluster."""
         return self._mem_mb_effective
 
     @mem_mb_effective.setter
@@ -193,8 +194,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_gb_effective(self):
-        """The effective memory resources (in GiBytes) available
-            to run virtual machines of the cluster."""
+        """The effective memory resources (in GiBytes) available to run VMs of the cluster."""
         if self.mem_mb_effective is None:
             return None
         return float(self.mem_mb_effective) / 1024.0
@@ -202,19 +202,17 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def standalone(self):
-        "Is this a standalone host and not a computing cluster?"
-
+        """Return whether this a standalone host and not a computing cluster."""
         return self._standalone
 
     @standalone.setter
     def standalone(self, value):
-
         self._standalone = to_bool(value)
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -222,8 +220,8 @@ class VsphereCluster(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereCluster, self).as_dict(short=short)
+
         res['resource_pool_name'] = self.resource_pool_name
         res['resource_pool_var'] = self.resource_pool_var
         res['cpu_cores'] = self.cpu_cores
@@ -248,7 +246,7 @@ class VsphereCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Magic method to return a deep copy of the current object."""
         return VsphereCluster(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name, standalone=self.standalone,
@@ -258,9 +256,9 @@ class VsphereCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Use this magic method as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereCluster):
             return False
@@ -273,14 +271,14 @@ class VsphereCluster(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereCluster object based on the appropriate data from pyvomi."""
         if test_mode:
             cls._check_summary_data(data)
         else:
             if not isinstance(data, (vim.ClusterComputeResource, vim.ComputeResource)):
                 msg = _(
-                    "Parameter {t!r} must be a {e} object, a {v} object was given "
-                    "instead.").format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    'Parameter {t!r} must be a {e} object, a {v} object was given '
+                    'instead.').format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
@@ -303,7 +301,7 @@ class VsphereCluster(VsphereObject):
             params['standalone'] = True
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         cluster = cls(**params)
 
@@ -311,14 +309,14 @@ class VsphereCluster(VsphereObject):
             nname = network.name
             if nname not in cluster.networks:
                 if verbose > 2:
-                    LOG.debug(_("Cluster {c!r} has network {n!r}.").format(
+                    LOG.debug(_('Cluster {c!r} has network {n!r}.').format(
                         c=cluster.name, n=nname))
                 cluster.networks.append(nname)
 
         for ds in data.datastore:
             if ds.name not in cluster.datastores:
                 if verbose > 2:
-                    LOG.debug(_("Cluster {c!r} has datastore {d!r}.").format(
+                    LOG.debug(_('Cluster {c!r} has datastore {d!r}.').format(
                         c=cluster.name, d=ds.name))
                 cluster.datastores.append(ds.name)
 
@@ -346,36 +344,36 @@ class VsphereCluster(VsphereObject):
             summary = data.summary
             for field in summary_fields:
                 if not hasattr(summary, field):
-                    failing_fields.append("summary.{}".format(field))
+                    failing_fields.append('summary.{}'.format(field))
 
         if hasattr(data, 'datastore'):
             if not is_sequence(data.datastore):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() is not a sequence "
-                    "type.").format(p='data.datastore', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() is not a sequence '
+                    'type.').format(p='data.datastore', m='from_summary')
                 raise AssertionError(msg)
 
         if hasattr(data, 'network'):
             if not is_sequence(data.network):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() is not a sequence "
-                    "type.").format(p='data.network', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() is not a sequence '
+                    'type.').format(p='data.network', m='from_summary')
                 raise AssertionError(msg)
 
         if hasattr(data, 'resourcePool') and data.resourcePool:
             if not hasattr(data.resourcePool, 'summary'):
-                failing_fields.append("data.resourcePool.summary")
+                failing_fields.append('data.resourcePool.summary')
 
         if len(failing_fields):
             msg = _(
-                "The given parameter {p!r} on calling method {m}() has failing "
-                "attributes").format(p='data', m='from_summary')
+                'The given parameter {p!r} on calling method {m}() has failing '
+                'attributes').format(p='data', m='from_summary')
             msg += ': ' + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

@@ -1,33 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere ethernet card object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere ethernet card object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
-import logging
 import copy
-
+import logging
 try:
     from collections.abc import MutableSequence
 except ImportError:
     from collections import MutableSequence
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -35,6 +35,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereEthernetcard(FbBaseObject):
+    """Wrapper class for a vim.vm.device.VirtualEthernetCard object and for its descendants."""
 
     ether_types = {
         'e1000e': 'Virtual E1000e Ethernet adapter',
@@ -54,7 +55,7 @@ class VsphereEthernetcard(FbBaseObject):
             wake_on_lan=False, backing_device=None, backing_type=None, connected=False,
             connect_status=None, connect_on_start=False, allow_guest_control=False,
             ether_type=None, label=None):
-
+        """Initialize the VsphereEthernetcard object."""
         self._unit_nr = None
         self._key = None
         self._address_type = None
@@ -95,9 +96,12 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def unit_nr(self):
-        """The unit number of this device on its controller.
-            This property is None if the controller property is None
-            (for example, when the device is not attached to a specific controller object)."""
+        """
+        The unit number of this device on its controller.
+
+        This property is None if the controller property is None
+        (for example, when the device is not attached to a specific controller object).
+        """
         return self._unit_nr
 
     @unit_nr.setter
@@ -110,8 +114,11 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def key(self):
-        """A unique key that distinguishes this device from other devices
-            in the same virtual machine."""
+        """
+        A unique numeric key of the network device.
+
+        It distinguishes this device from other devices in the same virtual machine.
+        """
         return self._key
 
     @key.setter
@@ -141,8 +148,11 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def external_id(self):
-        """An ID assigned to the virtual network adapter by external
-            management plane or controller."""
+        """
+        An external ID assigned to the virtual network adapter.
+
+        It is assigned by external management plane or controller.
+        """
         return self._external_id
 
     @external_id.setter
@@ -300,9 +310,9 @@ class VsphereEthernetcard(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereEthernetcard):
             return False
@@ -341,7 +351,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -351,7 +361,6 @@ class VsphereEthernetcard(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         if bare:
             res = {
                 'unit_nr': self.unit_nr,
@@ -391,7 +400,7 @@ class VsphereEthernetcard(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereEthernetcard as a deep copy of the current object."""
         card = VsphereEthernetcard(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, unit_nr=self.unit_nr, key=self.key,
@@ -407,12 +416,12 @@ class VsphereEthernetcard(FbBaseObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereEthernetcard object based on the data given from pyvmomi."""
         if test_mode:
             cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.vm.device.VirtualEthernetCard):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
                     t='data', e='vim.vm.device.VirtualEthernetCard',
                     v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
@@ -440,7 +449,7 @@ class VsphereEthernetcard(FbBaseObject):
             params['label'] = data.deviceInfo.label
 
         if verbose > 2:
-            LOG.debug(_("Checking class of ethernet card: {!r}").format(data.__class__.__name__))
+            LOG.debug(_('Checking class of ethernet card: {!r}').format(data.__class__.__name__))
 
         try:
             if isinstance(data, vim.vm.device.VirtualE1000e):
@@ -463,12 +472,12 @@ class VsphereEthernetcard(FbBaseObject):
             pass
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         card = cls(**params)
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(card.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(card.as_dict()))
 
         return card
 
@@ -499,25 +508,23 @@ class VsphereEthernetcard(FbBaseObject):
 
         if len(failing_fields):
             msg = _(
-                "The given parameter {p!r} on calling method {m}() has failing "
-                "attributes").format(p='data', m='from_summary')
+                'The given parameter {p!r} on calling method {m}() has failing '
+                'attributes').format(p='data', m='from_summary')
             msg += ': ' + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
 # =============================================================================
 class VsphereEthernetcardList(FbBaseObject, MutableSequence):
-    """
-    A list containing VsphereEthernetcard objects.
-    """
+    """A list containing VsphereEthernetcard objects."""
 
-    msg_no_ether_card = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_ether_card = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             initialized=None, *cards):
-
+        """Initialize a VsphereEthernetcardList object."""
         self._list = []
 
         super(VsphereEthernetcardList, self).__init__(
@@ -533,7 +540,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -543,7 +550,6 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
         @return: structure as dict or list
         @rtype:  dict or list
         """
-
         if bare:
             res = []
             for card in self:
@@ -560,7 +566,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereEthernetcardList as a deep copy of the current object."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -573,13 +579,13 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, card, *args):
-
+        """Return the numeric index of the given controller in current list."""
         i = None
         j = None
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
                     m='index()', max=3, n=len(args) + 1))
             i = int(args[0])
             if len(args) > 1:
@@ -618,12 +624,12 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
             if item == card:
                 return index
 
-        msg = _("card is not in card list.")
+        msg = _('card is not in card list.')
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, card):
-
+        """Return whether the given controller is contained in current list."""
         if not isinstance(card, VsphereEthernetcard):
             raise TypeError(self.msg_no_ether_card.format(
                 t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
@@ -639,7 +645,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, card):
-
+        """Return the number of controllers which are equal to the given one in current list."""
         if not isinstance(card, VsphereEthernetcard):
             raise TypeError(self.msg_no_ether_card.format(
                 t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
@@ -655,21 +661,23 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of controllers in current list."""
         return len(self._list)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through all controllers in current list."""
         for item in self._list:
             yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get a controller from current list by the given numeric index."""
         return self._list.__getitem__(key)
 
     # -------------------------------------------------------------------------
     def __reversed__(self):
-
+        """Reverse the controllers in list in place."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -682,7 +690,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __setitem__(self, key, card):
-
+        """Replace the controller at the given numeric index by the given one."""
         if not isinstance(card, VsphereEthernetcard):
             raise TypeError(self.msg_no_ether_card.format(
                 t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
@@ -691,12 +699,12 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
-
+        """Remove the controller at the given numeric index from list."""
         del self._list[key]
 
     # -------------------------------------------------------------------------
     def append(self, card):
-
+        """Append the given controller to the current list."""
         if not isinstance(card, VsphereEthernetcard):
             raise TypeError(self.msg_no_ether_card.format(
                 t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
@@ -705,7 +713,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def insert(self, index, card):
-
+        """Insert the given controller in current list at given index."""
         if not isinstance(card, VsphereEthernetcard):
             raise TypeError(self.msg_no_ether_card.format(
                 t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
@@ -714,13 +722,12 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        "Remove all items from the VsphereEthernetcardList."
-
+        """Remove all items from the VsphereEthernetcardList."""
         self._list = []
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

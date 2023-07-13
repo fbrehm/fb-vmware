@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere object for a network interface of a VM.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere network object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -12,18 +13,18 @@ from __future__ import absolute_import
 import logging
 
 # Third party modules
-from pyVmomi import vim
-
-from fb_tools.common import pp, RE_MAC_ADRESS
+from fb_tools.common import RE_MAC_ADRESS
+from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
+
+from pyVmomi import vim
 
 # Own modules
 from .errors import VSphereNameError
-
 from .xlate import XLATOR
 
 
-__version__ = '1.2.2'
+__version__ = '1.2.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -31,12 +32,13 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereVmInterface(FbBaseObject):
+    """A wrapper class for a network interface of a VM (vim.Network)."""
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             name=None, network=None, network_name=None, mac_address=None, summary=None):
-
+        """Initialize a VsphereVmInterface object."""
         self.repr_fields = (
             'name', 'network_name', 'mac_address', 'summary', 'appname', 'verbose')
 
@@ -54,7 +56,7 @@ class VsphereVmInterface(FbBaseObject):
 
         if network:
             if not isinstance(network, vim.Network):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
                     t='network', e='vim.Network', v=network)
                 raise TypeError(msg)
             self._network = network
@@ -122,7 +124,7 @@ class VsphereVmInterface(FbBaseObject):
             self._mac_address = None
             return
         if not RE_MAC_ADRESS.match(val):
-            msg = _("Invalid MAC address {!r} for interface given.").format(value)
+            msg = _('Invalid MAC address {!r} for interface given.').format(value)
             raise ValueError(msg)
 
         self._mac_address = val.lower()
@@ -147,7 +149,7 @@ class VsphereVmInterface(FbBaseObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -155,8 +157,8 @@ class VsphereVmInterface(FbBaseObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereVmInterface, self).as_dict(short=short)
+
         res['name'] = self.name
         res['obj_type'] = self.obj_type
         res['network_name'] = self.network_name
@@ -168,19 +170,17 @@ class VsphereVmInterface(FbBaseObject):
     # -------------------------------------------------------------------------
     def __str__(self):
         """
-        Typecasting function for translating object structure
-        into a string
+        Typecast function for translating object structure into a string.
 
         @return: structure as string
         @rtype:  str
         """
-
         return pp(self.as_dict(short=True))
 
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

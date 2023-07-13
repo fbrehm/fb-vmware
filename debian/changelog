@@ -1,3 +1,11 @@
+fb-vmware (0.6.0) UNRELEASED; urgency=medium
+
+  * Extending flake8 rules
+  * Applying flake8 rules to all python scripts and modules
+  * Fixing translations
+
+ -- Frank Brehm <frank@brehm-online.com>  Thu, 13 Jul 2023 17:28:46 +0200
+
 fb-vmware (0.5.7) all; urgency=medium
 
   * Fixing .gitlab-ci.yml

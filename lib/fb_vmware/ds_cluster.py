@@ -1,34 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere datastore cluster object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere datastore cluster object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
 import logging
-
 try:
     from collections.abc import MutableMapping
 except ImportError:
     from collections import MutableMapping
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp
 from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
+from .obj import VsphereObject
 from .xlate import XLATOR
 
-from .obj import VsphereObject
-
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -36,12 +35,13 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDsCluster(VsphereObject):
+    """A wrapper for a Datastore cluster (dsPod)."""
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             name=None, status='gray', config_status='gray', capacity=None, free_space=None):
-
+        """Initialize a VsphereDsCluster object."""
         self.repr_fields = (
             'name', 'status', 'config_status', 'capacity', 'free_space',
             'appname', 'verbose', 'version')
@@ -52,7 +52,7 @@ class VsphereDsCluster(VsphereObject):
         self._calculated_usage = 0.0
 
         super(VsphereDsCluster, self).__init__(
-            name=name, obj_type='vsphere_datastore_cluster', name_prefix="dspod",
+            name=name, obj_type='vsphere_datastore_cluster', name_prefix='dspod',
             status=status, config_status=config_status,
             appname=appname, verbose=verbose, version=version, base_dir=base_dir)
 
@@ -107,7 +107,7 @@ class VsphereDsCluster(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-
+        """Create a new VsphereDsCluster object based on the data given from pyvmomi."""
         if test_mode:
 
             necessary_fields = ('summary', 'overallStatus', 'configStatus')
@@ -127,15 +127,15 @@ class VsphereDsCluster(VsphereObject):
 
             if len(failing_fields):
                 msg = _(
-                    "The given parameter {p!r} on calling method {m}() has failing "
-                    "attributes").format(p='data', m='from_summary')
+                    'The given parameter {p!r} on calling method {m}() has failing '
+                    'attributes').format(p='data', m='from_summary')
                 msg += ': ' + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.StoragePod):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
                     t='data', e='vim.StoragePod', v=data)
                 raise TypeError(msg)
 
@@ -152,7 +152,7 @@ class VsphereDsCluster(VsphereObject):
         }
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         cluster = cls(**params)
         return cluster
@@ -160,7 +160,7 @@ class VsphereDsCluster(VsphereObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -168,7 +168,6 @@ class VsphereDsCluster(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(VsphereDsCluster, self).as_dict(short=short)
         res['capacity'] = self.capacity
         res['capacity_gb'] = self.capacity_gb
@@ -181,7 +180,7 @@ class VsphereDsCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereDsCluster as a deep copy of the current object."""
         return VsphereDsCluster(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name, status=self.status,
@@ -189,9 +188,9 @@ class VsphereDsCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDsCluster):
             return False
@@ -206,20 +205,21 @@ class VsphereDsCluster(VsphereObject):
 class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     """
     A dictionary containing VsphereDsCluster objects.
+
     It works like a dict.
     """
 
-    msg_invalid_cluster_type = _("Invalid item type {{!r}} to set, only {} allowed.").format(
+    msg_invalid_cluster_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
         'VsphereDsCluster')
-    msg_key_not_name = _("The key {k!r} must be equal to the datastore cluster name {n!r}.")
-    msg_none_type_error = _("None type as key is not allowed.")
-    msg_empty_key_error = _("Empty key {!r} is not allowed.")
-    msg_no_cluster_dict = _("Object {{!r}} is not a {} object.").format('VsphereDsClusterDict.')
+    msg_key_not_name = _('The key {k!r} must be equal to the datastore cluster name {n!r}.')
+    msg_none_type_error = _('None type as key is not allowed.')
+    msg_empty_key_error = _('Empty key {!r} is not allowed.')
+    msg_no_cluster_dict = _('Object {{!r}} is not a {} object.').format('VsphereDsClusterDict.')
 
     # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
-        '''Use the object dict'''
-        self._map = dict()
+        """Initialize a VsphereDsClusterDict object."""
+        self._map = {}
 
         for arg in args:
             self.append(arg)
@@ -238,7 +238,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def append(self, cluster):
-
+        """Set the given datastore cluster in the current dict with its name as key."""
         if not isinstance(cluster, VsphereDsCluster):
             raise TypeError(self.msg_invalid_cluster_type.format(cluster.__class__.__name__))
         self._set_item(cluster.name, cluster)
@@ -257,6 +257,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def get(self, key):
+        """Get the datastore cluster from dict by its name."""
         return self._get_item(key)
 
     # -------------------------------------------------------------------------
@@ -277,35 +278,39 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     # The next five methods are requirements of the ABC.
     def __setitem__(self, key, value):
+        """Set the given datastore cluster in the current dict by key."""
         self._set_item(key, value)
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get the datastore cluster from dict by the key."""
         return self._get_item(key)
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
+        """Remove the datastore cluster from dict by the key."""
         self._del_item(key)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through datastore cluster names as keys."""
         for cluster_name in self.keys():
             yield cluster_name
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of datastore clusters in current dict."""
         return len(self._map)
 
     # -------------------------------------------------------------------------
     # The next methods aren't required, but nice for different purposes:
     def __str__(self):
-        '''returns simple dict representation of the mapping'''
+        """Return simple dict representation of the mapping."""
         return str(self._map)
 
     # -------------------------------------------------------------------------
     def __repr__(self):
-        '''echoes class, id, & reproducible representation in the REPL'''
+        """Transform into a string for reproduction."""
         return '{}, {}({})'.format(
             super(VsphereDsClusterDict, self).__repr__(),
             self.__class__.__name__,
@@ -313,6 +318,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __contains__(self, key):
+        """Return whether the given datastore cluster name is contained in this dict as a key."""
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -324,12 +330,12 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def keys(self):
-
+        """Return all datastore cluster names of this dict in a sorted manner."""
         return sorted(self._map.keys(), key=str.lower)
 
     # -------------------------------------------------------------------------
     def items(self):
-
+        """Return tuples (ds cluster name + object as tuple) of this dict in a sorted manner."""
         item_list = []
 
         for cluster_name in self.keys():
@@ -339,7 +345,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def values(self):
-
+        """Return all datastore cluster objects of this dict."""
         value_list = []
         for cluster_name in self.keys():
             value_list.append(self._map[cluster_name])
@@ -347,7 +353,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if not isinstance(other, VsphereDsClusterDict):
             raise TypeError(self.msg_no_cluster_dict.format(other))
 
@@ -355,7 +361,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def __ne__(self, other):
-
+        """Magic method for using it as the '!='-operator."""
         if not isinstance(other, VsphereDsClusterDict):
             raise TypeError(self.msg_no_cluster_dict.format(other))
 
@@ -363,7 +369,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def pop(self, key, *args):
-
+        """Get the datastore cluster by its name and remove it in dict."""
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -375,7 +381,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def popitem(self):
-
+        """Remove and return a arbitrary (ds cluster name and object) pair from the dictionary."""
         if not len(self._map):
             return None
 
@@ -386,11 +392,16 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        self._map = dict()
+        """Remove all items from the dictionary."""
+        self._map = {}
 
     # -------------------------------------------------------------------------
     def setdefault(self, key, default):
+        """
+        Return the datastore cluster, if the key is in dict.
 
+        If not, insert key with a value of default and return default.
+        """
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
@@ -409,7 +420,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def update(self, other):
-
+        """Update the dict with the key/value pairs from other, overwriting existing keys."""
         if isinstance(other, VsphereDsClusterDict) or isinstance(other, dict):
             for cluster_name in other.keys():
                 self._set_item(cluster_name, other[cluster_name])
@@ -422,7 +433,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
-
+        """Transform the elements of the object into a dict."""
         res = {}
         for cluster_name in self._map:
             res[cluster_name] = self._map[cluster_name].as_dict(short)
@@ -430,7 +441,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def as_list(self, short=True):
-
+        """Return a list with all datastore clusters transformed to a dict."""
         res = []
         for cluster_name in self.keys():
             res.append(self._map[cluster_name].as_dict(short))
@@ -439,7 +450,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
 # =============================================================================
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

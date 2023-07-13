@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for the application object of the get-vsphere-host-list application.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for the application object of the get-vsphere-host-list application.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import, print_function
 
@@ -12,25 +13,20 @@ from __future__ import absolute_import, print_function
 import logging
 import re
 import sys
-
 from operator import itemgetter
 
 # Third party modules
-
-from fb_tools.common import pp
 from fb_tools.argparse_actions import RegexOptionAction
+from fb_tools.common import pp
 from fb_tools.xlate import format_list
 
 # Own modules
+from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-
+from ..spinner import Spinner
 from ..xlate import XLATOR
 
-from ..spinner import Spinner
-
-from . import BaseVmwareApplication, VmwareAppError
-
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -39,7 +35,8 @@ ngettext = XLATOR.ngettext
 
 # =============================================================================
 class GetVmHostsAppError(VmwareAppError):
-    """ Base exception class for all exceptions in this application."""
+    """Base exception class for all exceptions in this application."""
+
     pass
 
 
@@ -56,10 +53,10 @@ class GetHostsListApplication(BaseVmwareApplication):
         self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
             initialized=False, usage=None, description=None,
             argparse_epilog=None, argparse_prefix_chars='-', env_prefix=None):
-
+        """Initialize a GetHostsListApplication object."""
         desc = _(
-            "Tries to get a list of all physical hosts in "
-            "VMWare VSphere and print it out.")
+            'Tries to get a list of all physical hosts in '
+            'VMWare VSphere and print it out.')
 
         self._host_pattern = self.default_host_pattern
         self.sort_keys = self.default_sort_keys
@@ -82,7 +79,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -90,7 +87,6 @@ class GetHostsListApplication(BaseVmwareApplication):
         @return: structure as dict
         @rtype:  dict
         """
-
         res = super(GetHostsListApplication, self).as_dict(short=short)
         res['host_pattern'] = self.host_pattern
         res['default_host_pattern'] = self.default_host_pattern
@@ -99,10 +95,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
-        """
-        Public available method to initiate the argument parser.
-        """
-
+        """Public available method to initiate the argument parser."""
         super(GetHostsListApplication, self).init_arg_parser()
 
         filter_group = self.arg_parser.add_argument_group(_('Filter options'))
@@ -112,18 +105,18 @@ class GetHostsListApplication(BaseVmwareApplication):
             dest='host_pattern', metavar='REGEX', action=RegexOptionAction,
             topic=_('for names of hosts'), re_options=re.IGNORECASE,
             help=_(
-                "A regular expression to filter the output list of hosts by their name "
-                "(Default: {!r}).").format(self.default_host_pattern)
+                'A regular expression to filter the output list of hosts by their name '
+                '(Default: {!r}).').format(self.default_host_pattern)
         )
 
         online_filter = filter_group.add_mutually_exclusive_group()
         online_filter.add_argument(
-            '--on', '--online', action="store_true", dest="online",
-            help=_("Filter output for online hosts.")
+            '--on', '--online', action='store_true', dest='online',
+            help=_('Filter output for online hosts.')
         )
         online_filter.add_argument(
-            '--off', '--offline', action="store_true", dest="offline",
-            help=_("Filter output for offline hosts and templates.")
+            '--off', '--offline', action='store_true', dest='offline',
+            help=_('Filter output for offline hosts and templates.')
         )
 
         output_options = self.arg_parser.add_argument_group(_('Output options'))
@@ -131,24 +124,24 @@ class GetHostsListApplication(BaseVmwareApplication):
         output_options.add_argument(
             '-S', '--sort', metavar='KEY', nargs='+', dest='sort_keys',
             choices=self.avail_sort_keys, help=_(
-                "The keys for sorting the output. Available keys are: {avail}. "
-                "The default sorting keys are: {default}.").format(
+                'The keys for sorting the output. Available keys are: {avail}. '
+                'The default sorting keys are: {default}.').format(
                 avail=format_list(self.avail_sort_keys, do_repr=True),
                 default=format_list(self.default_sort_keys, do_repr=True))
         )
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
-
+        """Evaluate command line parameters."""
         super(GetHostsListApplication, self).perform_arg_parser()
 
         if self.args.host_pattern:
             try:
                 re_name = re.compile(self.args.host_pattern, re.IGNORECASE)
-                LOG.debug(_("Regular expression for filtering: {!r}").format(re_name.pattern))
+                LOG.debug(_('Regular expression for filtering: {!r}').format(re_name.pattern))
                 self._host_pattern = self.args.host_pattern
             except Exception as e:
-                msg = _("Got a {c} for pattern {p!r}: {e}").format(
+                msg = _('Got a {c} for pattern {p!r}: {e}').format(
                     c=e.__class__.__name__, p=self.args.host_pattern, e=e)
                 LOG.error(msg)
 
@@ -158,7 +151,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _run(self):
 
-        LOG.debug(_("Starting {a!r}, version {v!r} ...").format(
+        LOG.debug(_('Starting {a!r}, version {v!r} ...').format(
             a=self.appname, v=self.version))
 
         ret = 0
@@ -171,7 +164,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_all_hosts(self):
-
+        """Collect all physical VMWare hosts."""
         ret = 0
         all_hosts = []
 
@@ -179,7 +172,7 @@ class GetHostsListApplication(BaseVmwareApplication):
             for vsphere_name in self.vsphere:
                 all_hosts += self.get_hosts(vsphere_name)
         elif not self.quiet:
-            spin_prompt = _("Getting all VSPhere hosts ...") + ' '
+            spin_prompt = _('Getting all VSPhere hosts ...') + ' '
             with Spinner(spin_prompt):
                 for vsphere_name in self.vsphere:
                     all_hosts += self.get_hosts(vsphere_name)
@@ -192,7 +185,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
         for host in all_hosts:
             if self.verbose > 1 and first:
-                LOG.debug(_("First found host:") + '\n' + pp(host.as_dict()))
+                LOG.debug(_('First found host:') + '\n' + pp(host.as_dict()))
             first = False
             is_online = True
             if not host.connection_state or host.maintenance:
@@ -207,7 +200,7 @@ class GetHostsListApplication(BaseVmwareApplication):
                     continue
             out_hosts.append(self.create_host_summary(host))
         if self.verbose > 1:
-            LOG.debug("All hosts:\n{}".format(pp(out_hosts)))
+            LOG.debug('All hosts:\n{}'.format(pp(out_hosts)))
 
         self.print_hosts(out_hosts)
 
@@ -215,7 +208,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def create_host_summary(self, host):
-
+        """Return a dict with host properties as a summary for the given host."""
         summary = {}
 
         summary['vsphere'] = host.vsphere
@@ -244,14 +237,14 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def print_hosts(self, hosts):
-
+        """Print on STDOUT all information about all hosts in a human readable format."""
         labels = {
             'vsphere': 'VSPhere',
             'cluster': 'Cluster',
             'name': 'Host',
-            'connection_state': _("Connect state"),
-            'cpus': _("CPU cores/threads"),
-            'memory_gb': _("Memory in GiB"),
+            'connection_state': _('Connect state'),
+            'cpus': _('CPU cores/threads'),
+            'memory_gb': _('Memory in GiB'),
             'vendor': _('Vendor'),
             'model': _('Model'),
             'maintenance': _('Maintenance'),
@@ -286,9 +279,9 @@ class GetHostsListApplication(BaseVmwareApplication):
                         host[label] = val
                     elif label in ('connection_state', 'maintenance', 'online', 'quarantaine'):
                         if val:
-                            val = _("Yes")
+                            val = _('Yes')
                         else:
-                            val = _("No")
+                            val = _('No')
                         host[label] = val
                 if len(val) > str_lengths[label]:
                     str_lengths[label] = len(val)
@@ -299,8 +292,8 @@ class GetHostsListApplication(BaseVmwareApplication):
             max_len += str_lengths[label]
 
         if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
+            LOG.debug('Label length:\n' + pp(str_lengths))
+            LOG.debug('Max line length: {} chars'.format(max_len))
 
         tpl = ''
         for label in label_list:
@@ -311,7 +304,7 @@ class GetHostsListApplication(BaseVmwareApplication):
             else:
                 tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
+            LOG.debug(_('Line template: {}').format(tpl))
 
         if not self.quiet:
             print()
@@ -327,17 +320,17 @@ class GetHostsListApplication(BaseVmwareApplication):
         if not self.quiet:
             print()
             if count == 0:
-                msg = _("Found no VMWare hosts.")
+                msg = _('Found no VMWare hosts.')
             else:
                 msg = ngettext(
-                    "Found one VMWare host.",
-                    "Found {} VMWare hosts.", count).format(count)
+                    'Found one VMWare host.',
+                    'Found {} VMWare hosts.', count).format(count)
             print(msg)
             print()
 
     # -------------------------------------------------------------------------
     def get_hosts(self, vsphere_name):
-
+        """Get all host of all physical hosts in a VMWare VSPhere."""
         hosts = []
 
         vsphere = self.vsphere[vsphere_name]
@@ -357,7 +350,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

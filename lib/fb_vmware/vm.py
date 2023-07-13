@@ -1,43 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+@summary: The module for a VSphere virtual machine or template object.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 by Frank Brehm, Berlin
-@summary: The module for a VSphere virtual machine or template object.
+@copyright: © 2023 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
 # Standard modules
-import logging
-import uuid
-import re
 import copy
-
+import logging
+import re
+import uuid
 try:
     from collections.abc import MutableSequence
 except ImportError:
     from collections import MutableSequence
 
 # Third party modules
-from pyVmomi import vim
-
 from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
 
+from pyVmomi import vim
+
 # Own modules
-from .errors import VSphereHandlerError
-
-from .obj import VsphereObject, DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
-
-from .disk import VsphereDisk, VsphereDiskList
-from .ether import VsphereEthernetcard, VsphereEthernetcardList
 from .controller import VsphereDiskController, VsphereDiskControllerList
-
+from .disk import VsphereDisk, VsphereDiskList
+from .errors import VSphereHandlerError
+from .ether import VsphereEthernetcard, VsphereEthernetcardList
+from .obj import DEFAULT_OBJ_STATUS
+from .obj import OBJ_STATUS_GREEN
+from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.6.3'
+__version__ = '0.6.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -45,6 +44,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereVm(VsphereObject):
+    """This is a wrapper for a vim.VirtualMachine object."""
 
     re_vm_path_storage = re.compile(r'^\s*\[\s*([^\s\]]+)')
     re_vm_path_rel = re.compile(r'^\s*\[[^\]]*]\s*(\S.*)\s*$')
@@ -53,7 +53,7 @@ class VsphereVm(VsphereObject):
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             vsphere=None, name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS):
-
+        """Initialize a VsphereVm object."""
         self.repr_fields = ('name', 'vsphere')
         self._vsphere = None
         self._cluster_name = None
@@ -79,7 +79,7 @@ class VsphereVm(VsphereObject):
         self.vm_tools = None
 
         super(VsphereVm, self).__init__(
-            name=name, obj_type='vsphere_vm', name_prefix="vm", status=status,
+            name=name, obj_type='vsphere_vm', name_prefix='vm', status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
@@ -96,8 +96,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """The name of the VSPhere from configuration, in which
-            the VM should be existing."""
+        """The name of the VSPhere from configuration, in which the VM should be existing."""
         return self._vsphere
 
     @vsphere.setter
@@ -108,7 +107,7 @@ class VsphereVm(VsphereObject):
 
         val = str(value).strip()
         if val == '':
-            msg = _("The name of the vsphere may not be empty.")
+            msg = _('The name of the vsphere may not be empty.')
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
@@ -167,7 +166,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def template(self):
-        "Is this a VMWare template instead of a VM."
+        """Is this a VMWare template instead of a VM."""
         return self._template
 
     @template.setter
@@ -373,7 +372,7 @@ class VsphereVm(VsphereObject):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -383,7 +382,6 @@ class VsphereVm(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-
         if bare:
             res = {
                 'vsphere': self.vsphere,
@@ -437,7 +435,7 @@ class VsphereVm(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereVm as a deep copy of the current object."""
         vm = VsphereVm(
             appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
             initialized=self.initialized, name=self.name, status=self.status,
@@ -466,9 +464,9 @@ class VsphereVm(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
-
+        """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
+            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
         if not isinstance(other, VsphereVm):
             return False
@@ -487,12 +485,12 @@ class VsphereVm(VsphereObject):
     def from_summary(
             cls, data, cur_path, vsphere=None, appname=None, verbose=0,
             base_dir=None, test_mode=False):
-
+        """Create a new VsphereVm object based on the data given from pyvmomi."""
         if test_mode:
             cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.VirtualMachine):
-                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
                     t='data', e='vim.VirtualMachine', v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
 
@@ -508,7 +506,7 @@ class VsphereVm(VsphereObject):
         }
 
         if verbose > 2:
-            LOG.debug(_("Creating {} object from:").format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         vm = cls(**params)
 
@@ -581,15 +579,15 @@ class VsphereVm(VsphereObject):
                         device, appname=appname, verbose=verbose, base_dir=base_dir)
                     vm.controllers.append(ctrl)
                 elif verbose > 2:
-                    LOG.debug(_("Unknown hardware device of type {}.").format(
+                    LOG.debug(_('Unknown hardware device of type {}.').format(
                         device.__class__.__name__))
         else:
             LOG.error(_(
-                "There is something wrong wit VM {n!r} in cluster {c!r} and "
-                "path {p!r} ...").format(n=vm.name, c=vm.cluster_name, p=vm.path))
+                'There is something wrong wit VM {n!r} in cluster {c!r} and '
+                'path {p!r} ...').format(n=vm.name, c=vm.cluster_name, p=vm.path))
 
         if verbose > 2:
-            LOG.debug(_("Created {} object:").format(cls.__name__) + '\n' + pp(vm.as_dict()))
+            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(vm.as_dict()))
 
         return vm
 
@@ -640,25 +638,23 @@ class VsphereVm(VsphereObject):
 
         if len(failing_fields):
             msg = _(
-                "The given parameter {p!r} on calling method {m}() has failing "
-                "attributes").format(p='data', m='from_summary')
+                'The given parameter {p!r} on calling method {m}() has failing '
+                'attributes').format(p='data', m='from_summary')
             msg += ': ' + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
 # =============================================================================
 class VsphereVmList(FbBaseObject, MutableSequence):
-    """
-    A list containing VsphereVm objects.
-    """
+    """A list containing VsphereVm objects."""
 
-    msg_no_vm = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
+    msg_no_vm = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
 
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             initialized=None, *vms):
-
+        """Initialize a VsphereVmList object."""
         self._list = []
 
         super(VsphereVmList, self).__init__(
@@ -674,7 +670,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     # -------------------------------------------------------------------------
     def as_dict(self, short=True, bare=False):
         """
-        Transforms the elements of the object into a dict
+        Transform the elements of the object into a dict.
 
         @param short: don't include local properties in resulting dict.
         @type short: bool
@@ -684,7 +680,6 @@ class VsphereVmList(FbBaseObject, MutableSequence):
         @return: structure as dict or list
         @rtype:  dict or list
         """
-
         if bare:
             res = []
             for vm in self:
@@ -701,7 +696,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __copy__(self):
-
+        """Return a new VsphereVmList as a deep copy of the current object."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -714,13 +709,13 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def index(self, vm, *args):
-
+        """Return the numeric index of the given VM in current list."""
         i = None
         j = None
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_("{m} takes at most {max} arguments ({n} given).").format(
+                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
                     m='index()', max=3, n=len(args) + 1))
             i = int(args[0])
             if len(args) > 1:
@@ -759,12 +754,12 @@ class VsphereVmList(FbBaseObject, MutableSequence):
             if item == vm:
                 return index
 
-        msg = _("VM is not in VM list.")
+        msg = _('VM is not in VM list.')
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, vm):
-
+        """Return whether the given VM is contained in current list."""
         if not isinstance(vm, VsphereVm):
             raise TypeError(self.msg_no_vm.format(
                 t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
@@ -780,7 +775,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def count(self, vm):
-
+        """Return the number of VMs which are equal to the given one in current list."""
         if not isinstance(vm, VsphereVm):
             raise TypeError(self.msg_no_vm.format(
                 t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
@@ -796,21 +791,23 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __len__(self):
+        """Return the number of VMs in current list."""
         return len(self._list)
 
     # -------------------------------------------------------------------------
     def __iter__(self):
-
+        """Iterate through all VMs in current list."""
         for item in self._list:
             yield item
 
     # -------------------------------------------------------------------------
     def __getitem__(self, key):
+        """Get a VM from current list by the given numeric index."""
         return self._list.__getitem__(key)
 
     # -------------------------------------------------------------------------
     def __reversed__(self):
-
+        """Reverse the VMs in list in place."""
         new_list = self.__class__(
             appname=self.appname, verbose=self.verbose,
             base_dir=self.base_dir, initialized=False)
@@ -823,7 +820,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __setitem__(self, key, vm):
-
+        """Replace the VM at the given numeric index by the given one."""
         if not isinstance(vm, VsphereVm):
             raise TypeError(self.msg_no_vm.format(
                 t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
@@ -832,12 +829,12 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def __delitem__(self, key):
-
+        """Remove the VM at the given numeric index from list."""
         del self._list[key]
 
     # -------------------------------------------------------------------------
     def append(self, vm):
-
+        """Append the given VM to the current list."""
         if not isinstance(vm, VsphereVm):
             raise TypeError(self.msg_no_vm.format(
                 t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
@@ -846,7 +843,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def insert(self, index, vm):
-
+        """Insert the given VM in current list at given index."""
         if not isinstance(vm, VsphereVm):
             raise TypeError(self.msg_no_vm.format(
                 t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
@@ -855,13 +852,12 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
     # -------------------------------------------------------------------------
     def clear(self):
-        "Remove all items from the VsphereEthernetcardList."
-
+        """Remove all items from the VsphereEthernetcardList."""
         self._list = []
 
 
 # =============================================================================
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     pass
 

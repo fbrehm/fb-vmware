@@ -25,14 +25,14 @@ import sys
 import threading
 import time
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 
 # =============================================================================
 class Spinner(object):
     """Displaying  on console a rotating or somehow other animated character."""
 
-        cycle_list = ['-', '/', '|', '\\']
+    cycle_list = ['-', '/', '|', '\\']
 
     # -------------------------------------------------------------------------
     def __init__(self, message, delay=0.1, cycle_list=None):

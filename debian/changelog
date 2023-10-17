@@ -1,3 +1,9 @@
+fb-vmware (0.6.2) all; urgency=medium
+
+  * Fixing GitHub workflow for creating packages for RL-8.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Tue, 17 Oct 2023 16:11:56 +0200
+
 fb-vmware (0.6.1) ALL; urgency=medium
 
   * Adding option to enable UUID for VM disks on creation a VM.

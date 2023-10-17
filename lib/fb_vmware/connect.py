@@ -51,7 +51,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '1.9.4'
+__version__ = '1.9.5'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'
@@ -1046,7 +1046,8 @@ class VsphereConnection(BaseVsphereHandler):
     def generate_vm_create_spec(
         self, name, datastore, disks=None, nw_interfaces=None, graphic_ram_mb=256,
             videao_ram_mb=32, boot_delay_secs=3, ram_mb=1024, num_cpus=1, ds_with_timestamp=False,
-            os_version=DEFAULT_OS_VERSION, cfg_version=DEFAULT_VM_CFG_VERSION):
+            os_version=DEFAULT_OS_VERSION, cfg_version=DEFAULT_VM_CFG_VERSION,
+            enable_disk_uuid=True):
         """Create a specification for creating a virtual machine."""
         LOG.debug(_('Generating create spec for VM {!r} ...').format(name))
 
@@ -1089,10 +1090,17 @@ class VsphereConnection(BaseVsphereHandler):
 
         # Some extra options and properties
         extra_opts = []
+
         created_opt = vim.option.OptionValue()
         created_opt.key = 'created'
         created_opt.value = int(time.time())
         extra_opts.append(created_opt)
+
+        if enable_disk_uuid:
+            enable_disk_uuid_option = vim.option.OptionValue()
+            enable_disk_uuid_option.key = 'disk.EnableUUID'
+            enable_disk_uuid_option.value = 'TRUE'
+            extra_opts.append(enable_disk_uuid_option)
 
         # Set waiting for 3 second in BIOS before booting
         boot_opts = vim.vm.BootOptions()

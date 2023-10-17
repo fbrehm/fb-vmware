@@ -353,6 +353,10 @@ jobs:
             echo
             sed -i -e 's/^enabled=.*/enabled=1/' /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
             echo
+            if [[ "${EL_VERSION}" == "8" ]] ; then
+              sed -i -e 's/^mirrorlist/# mirrorlist/' -e 's|^#?[ 	]*baseurl.*|baseurl=https://ftp.fau.de/centos/8-stream/PowerTools/x86_64/os/|' /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
+              echo
+            fi
             echo "Content of /etc/yum.repos.d/CentOS-Stream-PowerTools.repo:"
             cat /etc/yum.repos.d/CentOS-Stream-PowerTools.repo
             echo

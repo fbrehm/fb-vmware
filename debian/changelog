@@ -1,4 +1,4 @@
-fb-vmware (0.6.1) UNRELEASED; urgency=medium
+fb-vmware (0.6.1) ALL; urgency=medium
 
   * Adding option to enable UUID for VM disks on creation a VM.
 

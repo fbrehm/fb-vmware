@@ -38,10 +38,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python_version: [ '3.6', '3.7', '3.8', '3.9', '3.10', '3.11' ]
+        python_version: [ '3.6', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12' ]
     container: python:${{ matrix.python_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Show Environment
         run: python --version
       - uses: ./.github/actions/prepare-debian-container
@@ -57,12 +57,15 @@ jobs:
   linter:
     runs-on: ubuntu-latest
     name: Executing Linters
-    container: python:3.11
+    container: python:3.12
     needs:
       - test
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/prepare-debian-container
+      - name: Install and execute lsb-release
+        shell: bash
+        run: apt install lsb-release || true; echo; lsb_release -a
       - uses: ./.github/actions/install-pip-modules
       - name: Install shellcheck and yamllint
         shell: bash
@@ -90,6 +93,19 @@ jobs:
                   exit 5
               fi
           fi
+      - name: "Comparing package version in debian/changlog and in lib/fb_vmware/__init__.py."
+        shell: bash
+        run: |
+          MODULE_VERSION=$( cat lib/fb_vmware/__init__.py | grep -P '^__version__(\s|=)' | sed -e "s/^[^'\"]*['\"]//"  -e "s/['\"][ 	]*\$//" )
+          echo "Module version: '${MODULE_VERSION}'"
+          DEBIAN_PKG_VERSION=$( head -n 1 debian/changelog | sed -e 's/^[^(]*(//' -e 's/).*//' )
+          echo "Debian package version: '${DEBIAN_PKG_VERSION}'"
+          if [[ "${MODULE_VERSION}" == "${DEBIAN_PKG_VERSION}" ]] ; then
+              echo "Debian package version and module version '${DEBIAN_PKG_VERSION}' are matching."
+          else
+              echo "Debian package version '${DEBIAN_PKG_VERSION}' does not match module version '${MODULE_VERSION}'" >&2
+              exit 5
+          fi
       - name: Execute Flake 8
         shell: bash
         run: |
@@ -97,11 +113,16 @@ jobs:
           flake8 --disable-noqa --ignore F401 lib/fb_vmware/__init__.py
       - name: Execute Shellcheck
         shell: bash
-        run: >
-          shellcheck -x compile-xlate-msgs.sh update-env.sh xtract-xlate-msgs.sh
+        run: |
+          echo
+          shellscripts="compile-xlate-msgs.sh update-env.sh xtract-xlate-msgs.sh"
+          shellcheck --version
+          echo
+          echo -e "shellcheck -x ${shellscripts}"
+          shellcheck -x ${shellscripts}
       - name: Execute Yamllint
         shell: bash
-        run: yamllint -c .yamllint.yaml .gitlab-ci.yml
+        run: yamllint .gitlab-ci.yml .github
 
   ###########################
   build_debian_sources:
@@ -112,11 +133,11 @@ jobs:
     needs:
       - linter
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/add-fb-debian-repo
         with:
           vendor: Debian
-          distro: bullseye
+          distro: bookworm
       - uses: ./.github/actions/prepare-debian-container
       - uses: ./.github/actions/debian-install-buildenv
       - uses: ./.github/actions/setup-gpg
@@ -130,9 +151,9 @@ jobs:
         run: |
           PASSWORD_FILE_ABS=$( readlink --canonicalize-missing "${GPG_PASSWORD_FILE}" )
           export PKG_VERSION=$( ./get-debian-version )
-          DSC_FILE="fb-logging_${PKG_VERSION}.dsc"
-          BUILDINFO_FILE="fb-logging_${PKG_VERSION}_source.buildinfo"
-          CHANGES_FILE="fb-logging_${PKG_VERSION}_source.changes"
+          DSC_FILE="${PKG_NAME}_${PKG_VERSION}.dsc"
+          BUILDINFO_FILE="${PKG_NAME}_${PKG_VERSION}_source.buildinfo"
+          CHANGES_FILE="${PKG_NAME}_${PKG_VERSION}_source.changes"
           echo '#!/usr/bin/env bash' > "${HOME}/signing-hook-script.sh"
           echo 'echo' >>"${HOME}/signing-hook-script.sh"
           echo 'echo "This is the signing script."' >>"${HOME}/signing-hook-script.sh"
@@ -152,6 +173,9 @@ jobs:
           echo "echo" >>"${HOME}/signing-hook-script.sh"
           chmod +x --verbose "${HOME}/signing-hook-script.sh"
           echo
+          echo "Generated '${HOME}/signing-hook-script.sh':"
+          cat "${HOME}/signing-hook-script.sh"
+          echo
           gpg --list-secret-keys
           echo
           echo "y" | debuild --signing-hook="${HOME}/signing-hook-script.sh" -S -i -us -uc
@@ -160,7 +184,7 @@ jobs:
           mv -vi ../*.dsc ../*.tar.* ../*.build* ../*.changes debian/pkgs/src
           ls -lA --color=always debian/pkgs/*/*
       - name: 'Upload Source Package'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: debian_sources
           path: debian/pkgs/*/*
@@ -195,12 +219,12 @@ jobs:
             container: 'debian:bookworm'
             version_prefix: 'deb12'
             compat: '12'
-          - distributor: 'Ubuntu'
-            os_codename: 'bionic'
-            os_release: '18.04'
-            container: 'ubuntu:bionic'
-            version_prefix: 'ubuntu18.04'
-            compat: '11'
+          - distributor: 'Debian'
+            os_codename: 'trixie'
+            os_release: '13'
+            container: 'debian:trixie'
+            version_prefix: 'deb13'
+            compat: '13'
           - distributor: 'Ubuntu'
             os_codename: 'focal'
             os_release: '20.04'
@@ -213,6 +237,12 @@ jobs:
             container: 'ubuntu:jammy'
             version_prefix: 'ubuntu22.04'
             compat: '12'
+          - distributor: 'Ubuntu'
+            os_codename: 'noble'
+            os_release: '24.04'
+            container: 'ubuntu:noble'
+            version_prefix: 'ubuntu24.04'
+            compat: '12'
     env:
       COMPAT: ${{ matrix.compat }}
       DISTRIBUTOR: ${{ matrix.distributor }}
@@ -221,7 +251,7 @@ jobs:
       VERSION_PREFIX: ${{ matrix.version_prefix }}
     container: ${{ matrix.container }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Setting timezone
         if: ${{ matrix.distributor == 'Ubuntu' }}
         run: |
@@ -234,6 +264,13 @@ jobs:
           distro: ${{ matrix.os_codename }}
       - uses: ./.github/actions/prepare-debian-container
       - uses: ./.github/actions/debian-install-buildenv
+      - uses: ./.github/actions/setup-gpg
+        with:
+          public_key: ${{ secrets.GPG_PUBLIC_KEY }}
+          private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          key_password: ${{ secrets.GPG_KEY_PASSWORD }}
+          password_file: ${{ env.GPG_PASSWORD_FILE }}
+          key_id: ${{ env.GPG_KEY_ID }}
       - name: Updating Changelog
         run: |
           export PKG_VERSION=$( ./get-debian-version )
@@ -261,6 +298,12 @@ jobs:
           echo "ls -la *.deb" >>"${HOME}/signing-hook-script.sh"
           chmod +x --verbose "${HOME}/signing-hook-script.sh"
           echo
+          echo
+          echo "Generated '${HOME}/signing-hook-script.sh':"
+          cat "${HOME}/signing-hook-script.sh"
+          echo
+          gpg --list-secret-keys
+          echo
           echo "Setting debian/compat to ${COMPAT}"
           echo "${COMPAT}" > debian/compat
           echo "y" | debuild --signing-hook="${HOME}/signing-hook-script.sh" -b -i -us -uc
@@ -269,7 +312,7 @@ jobs:
           mv -vi ../*.deb ../*.build* debian/pkgs/${VERSION_PREFIX}
           ls -lA --color=always debian/pkgs/*/*
       - name: 'Upload Binary Package'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: debian_bin_pkgs_${{ matrix.version_prefix }}
           path: debian/pkgs/*/*
@@ -286,13 +329,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - el_version: '7'
-            yum: 'yum'
-            py_minor_version: '6'
-            py_version_dot: '3.6'
-            py_version_nodot: '36'
-            image: centos:7
-            epel_package: epel-release
           - el_version: '8'
             yum: 'dnf'
             py_minor_version: '8'
@@ -319,7 +355,7 @@ jobs:
       USED_LC: 'en_US.utf8'
       YUM: ${{ matrix.yum }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Checking locales
         shell: bash
         run: |
@@ -327,12 +363,7 @@ jobs:
           locale -a
           echo
           echo "Installing locales ..."
-          if [[ "${EL_VERSION}" == "7" ]] ; then
-            echo "${USED_LOCALE}.${USED_CHARSET}"
-            localedef --charmap UTF-8 --inputfile "${USED_LOCALE}" "${USED_LC}"
-          else
-            yum --assumeyes install langpacks-en glibc-all-langpacks
-          fi
+          yum --assumeyes install langpacks-en glibc-all-langpacks
           echo
           echo "All locales"
           locale -a
@@ -490,7 +521,7 @@ jobs:
           echo "Results:"
           find rpmdir/*RPMS -type f -print0 | xargs --null --no-run-if-empty ls -l -d --color=always
       - name: 'Upload RPM Packages'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: rpm_pkgs_el${{ matrix.el_version }}
           path: |
@@ -506,7 +537,7 @@ jobs:
     needs:
       - linter
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Show Environment
         run: python --version
       - uses: ./.github/actions/prepare-debian-container
@@ -522,7 +553,7 @@ jobs:
         shell: bash
         run: ls -l --color=always dist/
       - name: 'Upload Python Package'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python_pkgs
           path: dist/*
@@ -538,9 +569,9 @@ jobs:
       - 'build_debian_bin'
       - 'build_rpm'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Downloading all artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
       - name: Sorting all artifacts
@@ -586,7 +617,7 @@ jobs:
       - 'deploy_to_fbrepo'
     steps:
       - name: Sending message
-        uses: dawidd6/action-send-mail@v2
+        uses: dawidd6/action-send-mail@v3
         with:
           # mail server settings
           server_address: ${{ env.SMTP_SERVER_ADDRESS }}

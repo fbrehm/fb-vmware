@@ -63,9 +63,8 @@ python@@@py_version_dot@@@ setup.py install --prefix=%{_prefix} --root=%{buildro
 %defattr(-,root,root,-)
 %license LICENSE
 %doc LICENSE README.md requirements.txt debian/changelog
-%{_bindir}/get-vsphere-host-list
-%{_bindir}/get-vsphere-vm-info
-%{_bindir}/get-vsphere-vm-list
+%{_bindir}/*
+%{_datadir}/*
 %{python3_sitelib}/*
 
 %changelog

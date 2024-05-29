@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Show Environment
         run: python --version
-      - uses: fbrehm/prepare-debian-container@v0.3
+      - uses: fbrehm/prepare-debian-container@v1.0
       - uses: ./.github/actions/install-pip-modules
       - name: Install PyTest with pip
         run: |
@@ -62,7 +62,7 @@ jobs:
       - test
     steps:
       - uses: actions/checkout@v4
-      - uses: fbrehm/prepare-debian-container@v0.3
+      - uses: fbrehm/prepare-debian-container@v1.0
       - name: Install and execute lsb-release
         shell: bash
         run: apt install lsb-release || true; echo; lsb_release -a
@@ -138,7 +138,7 @@ jobs:
         with:
           vendor: Debian
           distro: bookworm
-      - uses: fbrehm/prepare-debian-container@v0.3
+      - uses: fbrehm/prepare-debian-container@v1.0
       - uses: ./.github/actions/debian-install-buildenv
       - uses: ./.github/actions/setup-gpg
         with:
@@ -264,7 +264,7 @@ jobs:
         with:
           vendor: ${{ matrix.distributor }}
           distro: ${{ matrix.os_codename }}
-      - uses: fbrehm/prepare-debian-container@v0.3
+      - uses: fbrehm/prepare-debian-container@v1.0
       - uses: ./.github/actions/debian-install-buildenv
       - uses: ./.github/actions/setup-gpg
         with:
@@ -542,7 +542,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Show Environment
         run: python --version
-      - uses: fbrehm/prepare-debian-container@v0.3
+      - uses: fbrehm/prepare-debian-container@v1.0
       - uses: ./.github/actions/install-pip-modules
       - uses: casperdcl/deploy-pypi@v2
         with:

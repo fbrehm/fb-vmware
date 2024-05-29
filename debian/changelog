@@ -1,4 +1,4 @@
-fb-vmware (1.0.1) UNRELEASED; urgency=medium
+fb-vmware (1.0.1) all; urgency=medium
 
   * Fixing search for locales dir in lib/fb_vmware/xlate.py
   * Fixing .github/workflows/packages.yaml

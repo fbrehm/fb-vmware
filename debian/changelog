@@ -1,3 +1,11 @@
+fb-vmware (1.0.1) all; urgency=medium
+
+  * Fixing search for locales dir in lib/fb_vmware/xlate.py
+  * Fixing .github/workflows/packages.yaml
+  * Using shared GitHub action
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 29 May 2024 13:27:21 +0200
+
 fb-vmware (1.0.0) all; urgency=medium
 
   * Updating .gitlab-ci.yml to the latest version of Digitas packaging

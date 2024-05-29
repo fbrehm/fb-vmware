@@ -1,4 +1,4 @@
-fb-vmware (1.0.0) UNRELEASED; urgency=medium
+fb-vmware (1.0.0) all; urgency=medium
 
   * Updating .gitlab-ci.yml to the latest version of Digitas packaging
     tools.

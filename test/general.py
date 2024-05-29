@@ -3,7 +3,7 @@
 """
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2022 Frank Brehm, Berlin
+@copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
 @summary: general used functions an objects used for unit tests on
           the VMWare/VSphere python modules

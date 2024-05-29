@@ -45,7 +45,7 @@ jobs:
       - name: Show Environment
         run: python --version
       # - uses: ./.github/actions/prepare-debian-container
-      - uses: fbrehm/prepare-debian-container@v0.1
+      - uses: fbrehm/prepare-debian-container@v0.2
       - uses: ./.github/actions/install-pip-modules
       - name: Install PyTest with pip
         run: |

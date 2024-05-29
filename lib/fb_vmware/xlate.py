@@ -35,7 +35,7 @@ DOMAIN = 'fb_vmware'
 
 LOG = logging.getLogger(__name__)
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 __me__ = Path(__file__).resolve()
 __module_dir__ = __me__.parent
@@ -47,12 +47,16 @@ if not LOCALE_DIR.is_dir():
     if not LOCALE_DIR.is_dir():
         LOCALE_DIR = None
 
+USED_LOCALE_DIR = None
+if LOCALE_DIR:
+    USED_LOCALE_DIR = str(LOCALE_DIR)
+
 DEFAULT_LOCALE_DEF = 'en_US'
 DEFAULT_LOCALE = babel.core.default_locale()
 if not DEFAULT_LOCALE:
     DEFAULT_LOCALE = DEFAULT_LOCALE_DEF
 
-__mo_file__ = gettext.find(DOMAIN, str(LOCALE_DIR))
+__mo_file__ = gettext.find(DOMAIN, USED_LOCALE_DIR)
 if __mo_file__:
     try:
         with open(__mo_file__, 'rb') as F:
@@ -102,7 +106,7 @@ if __name__ == '__main__':
     out_list = []
     out_list.append([_('Module directory:'), str(__module_dir__)])
     out_list.append([_('Base directory:'), str(__base_dir__)])
-    out_list.append([_('Locale directory:'), str(LOCALE_DIR)])
+    out_list.append([_('Locale directory:'), USED_LOCALE_DIR])
     out_list.append([_('Locale domain:'), DOMAIN])
     out_list.append([_('Found .mo-file:'), __mo_file__])
 

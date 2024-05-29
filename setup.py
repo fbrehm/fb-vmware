@@ -14,7 +14,6 @@ from __future__ import print_function
 import datetime
 import glob
 import os
-import pathlib
 import pprint
 import re
 import subprocess

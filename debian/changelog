@@ -1,9 +1,12 @@
-fb-vmware (0.6.3) UNRELEASED; urgency=medium
+fb-vmware (1.0.0) UNRELEASED; urgency=medium
 
   * Updating .gitlab-ci.yml to the latest version of Digitas packaging
     tools.
+  * Reworking .github/workflows/packages.yaml.
+  * Updating setup.cfg and setip.py
+  * Increasing copyright year to 2024.
 
- -- Frank Brehm <frank.brehm@pixelpark.com>  Tue, 07 May 2024 12:21:36 +0200
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 29 May 2024 07:28:58 +0200
 
 fb-vmware (0.6.2) all; urgency=medium
 

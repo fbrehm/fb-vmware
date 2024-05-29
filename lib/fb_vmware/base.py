@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2023 by Frank Brehm, Berlin
+@copyright: © 2024 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -35,7 +35,7 @@ from .errors import VSphereCannotConnectError
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '0.2.5'
+__version__ = '1.0.0'
 
 LOG = logging.getLogger(__name__)
 

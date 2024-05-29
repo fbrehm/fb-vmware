@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2023 by Frank Brehm, Berlin
+@copyright: © 2024 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.3.4'
+__version__ = '1.0.0'
 
 _ = XLATOR.gettext
 

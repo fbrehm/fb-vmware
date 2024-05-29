@@ -23,7 +23,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.4.1'
+__version__ = '1.0.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = 'host'

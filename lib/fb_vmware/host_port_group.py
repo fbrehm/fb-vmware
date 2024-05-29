@@ -28,7 +28,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.2.4'
+__version__ = '1.0.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

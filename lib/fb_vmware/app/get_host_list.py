@@ -26,7 +26,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '0.3.3'
+__version__ = '1.0.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

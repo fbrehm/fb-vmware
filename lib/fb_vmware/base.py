@@ -35,7 +35,7 @@ from .errors import VSphereCannotConnectError
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '0.2.5'
+__version__ = '1.0.0'
 
 LOG = logging.getLogger(__name__)
 

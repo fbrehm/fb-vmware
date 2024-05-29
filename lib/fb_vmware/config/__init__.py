@@ -29,7 +29,7 @@ from ..errors import WrongPortTypeError
 from ..errors import WrongPortValueError
 from ..xlate import XLATOR
 
-__version__ = '0.5.6'
+__version__ = '1.0.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

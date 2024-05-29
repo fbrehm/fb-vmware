@@ -35,7 +35,7 @@ from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.7.4'
+__version__ = '1.0.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

@@ -16,6 +16,7 @@ from __future__ import absolute_import, print_function
 import copy
 import gettext
 import logging
+import sys
 try:
     from pathlib import Path
 except ImportError:
@@ -35,28 +36,39 @@ DOMAIN = 'fb_vmware'
 
 LOG = logging.getLogger(__name__)
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 
 __me__ = Path(__file__).resolve()
 __module_dir__ = __me__.parent
 __lib_dir__ = __module_dir__.parent
 __base_dir__ = __lib_dir__.parent
 LOCALE_DIR = __base_dir__.joinpath('locale')
-if not LOCALE_DIR.is_dir():
-    LOCALE_DIR = __module_dir__.joinpath('locale')
-    if not LOCALE_DIR.is_dir():
-        LOCALE_DIR = None
-
-USED_LOCALE_DIR = None
-if LOCALE_DIR:
-    USED_LOCALE_DIR = str(LOCALE_DIR)
+if LOCALE_DIR.is_dir():
+    # Not installed, in development workdir
+    LOCALE_DIR = str(LOCALE_DIR)
+else:
+    # Somehow installed
+    if sys.prefix == sys.base_prefix:
+        # installed as a package
+        LOCALE_DIR = sys.prefix + '/share/locale'
+    else:
+        # Obviously in a virtual environment
+        LOCALE_DIR = __lib_dir__ / 'usr' / 'local' / 'share' / 'locale'
+        if LOCALE_DIR.is_dir():
+            LOCALE_DIR = str(LOCALE_DIR.resolve())
+        else:
+            LOCALE_DIR = __module_dir__ / 'locale'
+            if LOCALE_DIR.is_dir():
+                LOCALE_DIR = str(LOCALE_DIR)
+            else:
+                LOCALE_DIR = sys.prefix + '/share/locale'
 
 DEFAULT_LOCALE_DEF = 'en_US'
 DEFAULT_LOCALE = babel.core.default_locale()
 if not DEFAULT_LOCALE:
     DEFAULT_LOCALE = DEFAULT_LOCALE_DEF
 
-__mo_file__ = gettext.find(DOMAIN, USED_LOCALE_DIR)
+__mo_file__ = gettext.find(DOMAIN, LOCALE_DIR)
 if __mo_file__:
     try:
         with open(__mo_file__, 'rb') as F:
@@ -106,7 +118,7 @@ if __name__ == '__main__':
     out_list = []
     out_list.append([_('Module directory:'), str(__module_dir__)])
     out_list.append([_('Base directory:'), str(__base_dir__)])
-    out_list.append([_('Locale directory:'), USED_LOCALE_DIR])
+    out_list.append([_('Locale directory:'), LOCALE_DIR])
     out_list.append([_('Locale domain:'), DOMAIN])
     out_list.append([_('Found .mo-file:'), __mo_file__])
 

@@ -9,6 +9,7 @@ on:
       - 'dev/workflow'
     tags:
       - '**'
+  workflow_dispatch: {}
 
 jobs:
 

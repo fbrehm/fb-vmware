@@ -29,7 +29,7 @@ from pyVmomi import vim
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.4.3'
+__version__ = '1.4.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -97,37 +97,37 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def accessible(self):
-        """The connectivity status of this datastore."""
+        """Return the connectivity status of this datastore."""
         return self._accessible
 
     # -----------------------------------------------------------
     @property
     def capacity(self):
-        """Maximum capacity of this datastore, in bytes."""
+        """Return the maximum capacity of this datastore, in bytes."""
         return self._capacity
 
     # -----------------------------------------------------------
     @property
     def capacity_gb(self):
-        """Maximum capacity of this datastore, in GiBytes."""
+        """Return the maximum capacity of this datastore, in GiBytes."""
         return float(self.capacity) / 1024.0 / 1024.0 / 1024.0
 
     # -----------------------------------------------------------
     @property
     def free_space(self):
-        """Available space of this datastore, in bytes."""
+        """Return the available space of this datastore, in bytes."""
         return self._free_space
 
     # -----------------------------------------------------------
     @property
     def free_space_gb(self):
-        """Available space of this datastore, in GiBytes."""
+        """Return the vailable space of this datastore, in GiBytes."""
         return float(self._free_space) / 1024.0 / 1024.0 / 1024.0
 
     # -----------------------------------------------------------
     @property
     def maintenance_mode(self):
-        """The current maintenance mode state of the datastore."""
+        """Return the current maintenance mode state of the datastore."""
         return self._maintenance_mode
 
     # -----------------------------------------------------------
@@ -139,7 +139,7 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def fs_type(self):
-        """Type of file system volume, such as VMFS or NFS."""
+        """Return the type of file system volume, such as VMFS or NFS."""
         return self._fs_type
 
     # -----------------------------------------------------------
@@ -165,13 +165,13 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def url(self):
-        """The unique locator for the datastore."""
+        """Return he unique locator for the datastore."""
         return self._url
 
     # -----------------------------------------------------------
     @property
     def for_k8s(self):
-        """This datastore is intended to use for Kubernetes PV."""
+        """Return, whther this datastore is intended to use for Kubernetes PV."""
         return self._for_k8s
 
     @for_k8s.setter
@@ -181,13 +181,13 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def storage_type(self):
-        """Type of storage volume, such as SAS or SATA or SSD."""
+        """Return the type of storage volume, such as SAS or SATA or SSD."""
         return self._storage_type
 
     # -----------------------------------------------------------
     @property
     def calculated_usage(self):
-        """The calculated additional usage of this datastore, in GiBytes."""
+        """Return the calculated additional usage of this datastore, in GiBytes."""
         return self._calculated_usage
 
     @calculated_usage.setter

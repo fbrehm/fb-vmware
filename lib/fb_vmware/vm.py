@@ -36,7 +36,7 @@ from .obj import OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -96,7 +96,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """The name of the VSPhere from configuration, in which the VM should be existing."""
+        """Return the name of the VSPhere from config, in which the VM should be existing."""
         return self._vsphere
 
     @vsphere.setter
@@ -115,7 +115,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def cluster_name(self):
-        """The name of the compute resource, where this host is a member."""
+        """Return the name of the compute resource, where this host is a member."""
         return self._cluster_name
 
     @cluster_name.setter
@@ -132,7 +132,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def host(self):
-        """The host name, where the VM is configured."""
+        """Return the host name, where the VM is configured."""
         return self._host
 
     @host.setter
@@ -149,7 +149,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def path(self):
-        """The path of the VM in the VM folder structure."""
+        """Return the path of the VM in the VM folder structure."""
         return self._path
 
     @path.setter
@@ -176,7 +176,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def memory_mb(self):
-        """The memory (RAM) of the VM in MiB."""
+        """Return the memory (RAM) of the VM in MiB."""
         return self._memory_mb
 
     @memory_mb.setter
@@ -189,7 +189,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def memory_gb(self):
-        """The memory (RAM) of the VM in GiB."""
+        """Return the memory (RAM) of the VM in GiB."""
         if self.memory_mb is None:
             return None
         return float(self.memory_mb) / 1024.0
@@ -197,7 +197,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def num_cpu(self):
-        """The number of CPUs of the VM."""
+        """Return the number of CPUs of the VM."""
         return self._num_cpu
 
     @num_cpu.setter
@@ -210,7 +210,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def num_ethernet(self):
-        """The number of virtual ethernet network cards of the VM."""
+        """Return the number of virtual ethernet network cards of the VM."""
         return self._num_ethernet
 
     @num_ethernet.setter
@@ -223,7 +223,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def num_vdisk(self):
-        """The number of virtual disks of the VM."""
+        """Return the number of virtual disks of the VM."""
         return self._num_vdisk
 
     @num_vdisk.setter
@@ -236,7 +236,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def guest_fullname(self):
-        """The guest Operating system name."""
+        """Return the guest Operating system name."""
         return self._guest_fullname
 
     @guest_fullname.setter
@@ -253,7 +253,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def guest_id(self):
-        """The guest Operating system identifier (shortname)."""
+        """Return the guest Operating system identifier (shortname)."""
         return self._guest_id
 
     @guest_id.setter
@@ -270,7 +270,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def uuid(self):
-        """The Virtual machine BIOS identification."""
+        """Return the Virtual machine BIOS identification."""
         return self._uuid
 
     @uuid.setter
@@ -287,7 +287,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def instance_uuid(self):
-        """The VC-specific identifier of the virtual machine."""
+        """Return the VC-specific identifier of the virtual machine."""
         return self._instance_uuid
 
     @instance_uuid.setter
@@ -333,7 +333,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def config_path_storage(self):
-        """The name of the storage of the path of the configuration file."""
+        """Return the name of the storage of the path of the configuration file."""
         if self.config_path is None:
             return None
         match = self.re_vm_path_storage.match(self.config_path)
@@ -344,7 +344,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def config_path_relative(self):
-        """The relative path of the configuration file on storage."""
+        """Return the relative path of the configuration file on storage."""
         if self.config_path is None:
             return None
         match = self.re_vm_path_rel.match(self.config_path)
@@ -355,7 +355,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def config_version(self):
-        """The version string for this virtual machine."""
+        """Return the version string for this virtual machine."""
         return self._config_version
 
     @config_version.setter

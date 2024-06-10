@@ -28,7 +28,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -63,7 +63,7 @@ class VsphereHostPortgroup(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def name(self):
-        """The name of the port group."""
+        """Return the name of the port group."""
         return self._name
 
     @name.setter
@@ -80,7 +80,7 @@ class VsphereHostPortgroup(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def vlan_id(self):
-        """The VLAN ID for ports using this port group."""
+        """Return the VLAN ID for ports using this port group."""
         return self._vlan_id
 
     @vlan_id.setter
@@ -93,7 +93,7 @@ class VsphereHostPortgroup(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def vswitch_name(self):
-        """The identifier of the virtual switch on which this port group is located."""
+        """Return the identifier of the virtual switch on which this port group is located."""
         return self._vswitch_name
 
     @vswitch_name.setter
@@ -110,7 +110,7 @@ class VsphereHostPortgroup(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def hostname(self):
-        """The host name of the port group."""
+        """Return the host name of the port group."""
         return self._hostname
 
     @hostname.setter
@@ -258,7 +258,7 @@ class VsphereHostPortgroupList(FbBaseObject, MutableSequence):
     # -----------------------------------------------------------
     @property
     def hostname(self):
-        """The host name of the port group list."""
+        """Return the host name of the port group list."""
         return self._hostname
 
     @hostname.setter

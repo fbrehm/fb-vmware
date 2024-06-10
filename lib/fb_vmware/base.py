@@ -35,7 +35,7 @@ from .errors import VSphereCannotConnectError
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 LOG = logging.getLogger(__name__)
 
@@ -99,7 +99,7 @@ class BaseVsphereHandler(HandlingObject):
     # -----------------------------------------------------------
     @property
     def auto_close(self):
-        """Should an existing connection be closed on destroying the current object."""
+        """Return wether an existing connection should be closed on destroying the current object."""
         return getattr(self, '_auto_close', False)
 
     @auto_close.setter

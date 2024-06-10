@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.3.4'
+__version__ = '1.3.5'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -90,31 +90,31 @@ class VsphereNetwork(VsphereObject):
     # -----------------------------------------------------------
     @property
     def accessible(self):
-        """The connectivity status of this network."""
+        """Return the connectivity status of this network."""
         return self._accessible
 
     # -----------------------------------------------------------
     @property
     def ip_pool_id(self):
-        """Identifier of the associated IP pool."""
+        """Return the Identifier of the associated IP pool."""
         return self._ip_pool_id
 
     # -----------------------------------------------------------
     @property
     def ip_pool_name(self):
-        """Name of the associated IP pool."""
+        """Return the name of the associated IP pool."""
         return self._ip_pool_name
 
     # -----------------------------------------------------------
     @property
     def network(self):
-        """The ipaddress network object associated with this network."""
+        """Return the ipaddress network object associated with this network."""
         return self._network
 
     # -----------------------------------------------------------
     @property
     def gateway(self):
-        """The IP address of the getaeway inside this network."""
+        """Return the IP address of the getaeway inside this network."""
         if not self.network:
             return None
         return self.network.network_address + 1

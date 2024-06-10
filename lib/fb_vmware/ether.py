@@ -27,7 +27,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -97,7 +97,7 @@ class VsphereEthernetcard(FbBaseObject):
     @property
     def unit_nr(self):
         """
-        The unit number of this device on its controller.
+        Reurn the unit number of this device on its controller.
 
         This property is None if the controller property is None
         (for example, when the device is not attached to a specific controller object).
@@ -115,7 +115,7 @@ class VsphereEthernetcard(FbBaseObject):
     @property
     def key(self):
         """
-        A unique numeric key of the network device.
+        Return a unique numeric key of the network device.
 
         It distinguishes this device from other devices in the same virtual machine.
         """
@@ -149,7 +149,7 @@ class VsphereEthernetcard(FbBaseObject):
     @property
     def external_id(self):
         """
-        An external ID assigned to the virtual network adapter.
+        Return an external ID assigned to the virtual network adapter.
 
         It is assigned by external management plane or controller.
         """
@@ -169,7 +169,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def mac_address(self):
-        """The MAC address of this virtual ethernet card."""
+        """Return the MAC address of this virtual ethernet card."""
         return self._mac_address
 
     @mac_address.setter
@@ -186,7 +186,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def wake_on_lan(self):
-        """Indicates whether wake-on-LAN is enabled on this virtual network adapter."""
+        """Indicate, whether wake-on-LAN is enabled on this virtual network adapter."""
         return self._wake_on_lan
 
     @wake_on_lan.setter
@@ -196,7 +196,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def backing_device(self):
-        """The name of the backing device of this virtual network adapter."""
+        """Return the name of the backing device of this virtual network adapter."""
         return self._backing_device
 
     @backing_device.setter
@@ -213,7 +213,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def backing_type(self):
-        """The type of the backing device of this virtual network adapter."""
+        """Return the type of the backing device of this virtual network adapter."""
         return self._backing_type
 
     @backing_type.setter
@@ -230,7 +230,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def connected(self):
-        """Indicates whether the device is currently connected."""
+        """Indicate, whether the device is currently connected."""
         return self._connected
 
     @connected.setter
@@ -240,7 +240,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def connect_status(self):
-        """Indicates the current status of the connectable device."""
+        """Indicate the current status of the connectable device."""
         return self._connect_status
 
     @connect_status.setter
@@ -257,7 +257,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def connect_on_start(self):
-        """Specifies whether or not to connect the device when the virtual machine starts."""
+        """Specify, whether or not to connect the device when the virtual machine starts."""
         return self._connect_on_start
 
     @connect_on_start.setter
@@ -267,7 +267,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def allow_guest_control(self):
-        """Enables guest control over whether the connectable device is connected."""
+        """Enable guest control over whether the connectable device is connected."""
         return self._allow_guest_control
 
     @allow_guest_control.setter
@@ -277,7 +277,7 @@ class VsphereEthernetcard(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def ether_type(self):
-        """The type of this virtual network adapter."""
+        """Return the type of this virtual network adapter."""
         return self._ether_type
 
     @ether_type.setter

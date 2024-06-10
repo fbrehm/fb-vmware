@@ -23,7 +23,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.4.3'
+__version__ = '1.4.4'
 LOG = logging.getLogger(__name__)
 
 
@@ -76,19 +76,19 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def resource_pool_name(self):
-        """The name of the default resource pool of this cluster."""
+        """Return the name of the default resource pool of this cluster."""
         return self.name + '/Resources'
 
     # -----------------------------------------------------------
     @property
     def resource_pool_var(self):
-        """The variable name of the default resource pool used for terraform."""
+        """Return the variable name of the default resource pool used for terraform."""
         return 'pool_' + self.tf_name
 
     # -----------------------------------------------------------
     @property
     def cpu_cores(self):
-        """The number of physical CPU cores of the cluster."""
+        """Return the number of physical CPU cores of the cluster."""
         return self._cpu_cores
 
     @cpu_cores.setter
@@ -103,7 +103,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def cpu_threads(self):
-        """The aggregated number of CPU threads of the cluster."""
+        """Return the aggregated number of CPU threads of the cluster."""
         return self._cpu_threads
 
     @cpu_threads.setter
@@ -118,7 +118,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def hosts_effective(self):
-        """The total number of effective hosts of the cluster."""
+        """Return the total number of effective hosts of the cluster."""
         return self._hosts_effective
 
     @hosts_effective.setter
@@ -133,7 +133,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def hosts_total(self):
-        """The total number of hosts of the cluster."""
+        """Return the total number of hosts of the cluster."""
         return self._hosts_total
 
     @hosts_total.setter
@@ -148,7 +148,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_total(self):
-        """The aggregated memory resources of all hosts of the cluster in Bytes."""
+        """Return the aggregated memory resources of all hosts of the cluster in Bytes."""
         return self._mem_total
 
     @mem_total.setter
@@ -163,7 +163,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_mb_total(self):
-        """The aggregated memory resources of all hosts of the cluster in MiBytes."""
+        """Return the aggregated memory resources of all hosts of the cluster in MiBytes."""
         if self.mem_total is None:
             return None
         return self.mem_total / 1024 / 1024
@@ -171,7 +171,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_gb_total(self):
-        """The aggregated memory resources of all hosts of the cluster in GiBytes."""
+        """Return the aggregated memory resources of all hosts of the cluster in GiBytes."""
         if self.mem_total is None:
             return None
         return float(self.mem_total) / 1024.0 / 1024.0 / 1024.0
@@ -179,7 +179,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_mb_effective(self):
-        """The effective memory resources (in MB) available to run VMs of the cluster."""
+        """Return the effective memory resources (in MB) available to run VMs of the cluster."""
         return self._mem_mb_effective
 
     @mem_mb_effective.setter
@@ -194,7 +194,7 @@ class VsphereCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mem_gb_effective(self):
-        """The effective memory resources (in GiBytes) available to run VMs of the cluster."""
+        """Return the effective memory resources (in GiB) available to run VMs of the cluster."""
         if self.mem_mb_effective is None:
             return None
         return float(self.mem_mb_effective) / 1024.0

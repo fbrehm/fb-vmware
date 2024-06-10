@@ -112,6 +112,12 @@ class FbVMWareTestcase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
     @classmethod
+    def current_function_name(cls, level=0):
+        """Return the name of the function, from where this method was called."""
+        return sys._getframe(level + 1).f_code.co_name
+
+    # -------------------------------------------------------------------------
+    @classmethod
     def get_method_doc(cls):
         """Return the docstring of the method, from where this method was called."""
         func_name = cls.current_function_name(1)

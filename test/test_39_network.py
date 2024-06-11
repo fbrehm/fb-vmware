@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.network.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.network
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -28,40 +30,42 @@ LOG = logging.getLogger('test-network')
 
 # =============================================================================
 class TestVMNetwork(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereNetwork object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        if self.verbose >= 1:
+            print()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.network."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.network ...")
         import fb_vmware.network
-        from fb_vmware import VsphereNetwork                        # noqa
-        from fb_vmware import VsphereNetworkDict                    # noqa
+        from fb_vmware import VsphereNetwork
+        from fb_vmware import VsphereNetworkDict
 
-        LOG.debug("Version of fb_vmware.network: {!r}.".format(fb_vmware.network.__version__))
+        LOG.debug('Version of fb_vmware.network: {!r}.'.format(fb_vmware.network.__version__))
+        LOG.debug('Description of VsphereNetwork: ' + textwrap.dedent(VsphereNetwork.__doc__))
+        LOG.debug('Description of VsphereNetworkDict: ' + textwrap.dedent(VsphereNetworkDict.__doc__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereNetwork object ...")
+        """Test init of a VsphereNetwork object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereNetwork
         from fb_vmware.errors import VSphereNameError
 
-        with self.assertRaises(VSphereNameError)  as cm:
+        with self.assertRaises(VSphereNameError) as cm:
 
             network = VsphereNetwork(appname=self.appname)
-            LOG.debug("VsphereNetwork %s:\n{}".format(network))
+            LOG.debug('VsphereNetwork %s:\n{}'.format(network))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         net_name = '10.12.11.0_24'
 
@@ -71,8 +75,8 @@ class TestVMNetwork(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereNetwork %r: {!r}".format(network))
-        LOG.debug("VsphereNetwork %s:\n{}".format(network))
+        LOG.debug('VsphereNetwork %r: {!r}'.format(network))
+        LOG.debug('VsphereNetwork %s:\n{}'.format(network))
 
         self.assertIsInstance(network, VsphereNetwork)
         self.assertEqual(network.appname, self.appname)
@@ -81,10 +85,8 @@ class TestVMNetwork(FbVMWareTestcase):
 
     # -------------------------------------------------------------------------
     def test_init_from_summary(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init by calling VsphereNetwork.from_summary() ...")
+        """Test init by calling VsphereNetwork.from_summary()."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereNetwork
 
@@ -94,30 +96,30 @@ class TestVMNetwork(FbVMWareTestcase):
         data.summary = SimpleTestObject()
         data.configStatus = 'gray'
 
-        with self.assertRaises(TypeError)  as cm:
+        with self.assertRaises(TypeError) as cm:
 
             network = VsphereNetwork.from_summary(
                 data, appname=self.appname, verbose=self.verbose)
-            LOG.debug("VsphereNetwork %s:\n{}".format(network))
+            LOG.debug('VsphereNetwork %s:\n{}'.format(network))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
-        with self.assertRaises((TypeError, AssertionError))  as cm:
+        with self.assertRaises((TypeError, AssertionError)) as cm:
 
             network = VsphereNetwork.from_summary(
                 data, appname=self.appname, verbose=self.verbose, test_mode=True)
-            LOG.debug("VsphereNetwork %s:\n{}".format(network))
+            LOG.debug('VsphereNetwork %s:\n{}'.format(network))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         data.overallStatus = 'gray'
         data.summary.name = net_name
 
         network = VsphereNetwork.from_summary(
             data, appname=self.appname, verbose=self.verbose, test_mode=True)
-        LOG.debug("VsphereNetwork %s:\n{}".format(network))
+        LOG.debug('VsphereNetwork %s:\n{}'.format(network))
 
 
 # =============================================================================
@@ -128,7 +130,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

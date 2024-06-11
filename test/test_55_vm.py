@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.vm.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.vm
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -21,47 +23,50 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
-from general import SimpleTestObject
 
 LOG = logging.getLogger('test-vm')
 
 
 # =============================================================================
 class TestVsphereVM(FbVMWareTestcase):
+    """Testcase for unit tests on VsphereVm and VsphereVmList objects."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        if self.verbose >= 1:
+            print()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.vm."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.vm ...")
         import fb_vmware.vm
-        from fb_vmware import VsphereVm                              # noqa
-        from fb_vmware import VsphereVmList                          # noqa
+        from fb_vmware import VsphereVm
+        from fb_vmware import VsphereVmList
 
-        LOG.debug("Version of fb_vmware.vm: {!r}.".format(fb_vmware.vm.__version__))
+        LOG.debug('Version of fb_vmware.vm: {!r}.'.format(fb_vmware.vm.__version__))
+        doc = textwrap.dedent(VsphereVm.__doc__)
+        LOG.debug('Description of VsphereVm: ' + doc)
+        doc = textwrap.dedent(VsphereVmList.__doc__)
+        LOG.debug('Description of VsphereVmList: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereVm object ...")
+        """Test init of a VsphereVm object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereVm
         from fb_vmware.errors import VSphereNameError
 
-        with self.assertRaises((VSphereNameError, TypeError))  as cm:
+        with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             vm = VsphereVm(appname=self.appname)
-            LOG.debug("VsphereVm %s:\n{}".format(vm))
+            LOG.debug('VsphereVm %s:\n{}'.format(vm))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         vm_name = 'my-vmware-vm'
 
@@ -71,8 +76,8 @@ class TestVsphereVM(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereVm %r: {!r}".format(vm))
-        LOG.debug("VsphereVm %s:\n{}".format(vm))
+        LOG.debug('VsphereVm %r: {!r}'.format(vm))
+        LOG.debug('VsphereVm %s:\n{}'.format(vm))
 
         self.assertIsInstance(vm, VsphereVm)
         self.assertEqual(vm.appname, self.appname)
@@ -88,7 +93,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

@@ -35,8 +35,7 @@ class TestVMCluster(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVMCluster, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,7 +46,9 @@ class TestVMCluster(FbVMWareTestcase):
         from fb_vmware import VsphereCluster
 
         LOG.debug('Version of fb_vmware.cluster: {!r}.'.format(fb_vmware.cluster.__version__))
-        LOG.debug('Description of VsphereCluster: ' + textwrap.dedent(VsphereCluster.__doc__))
+
+        doc = textwrap.dedent(VsphereCluster.__doc__)
+        LOG.debug('Description of VsphereCluster: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

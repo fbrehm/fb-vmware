@@ -34,8 +34,7 @@ class TestVDataStoreCluster(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVDataStoreCluster, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,8 +46,12 @@ class TestVDataStoreCluster(FbVMWareTestcase):
         from fb_vmware import VsphereDsClusterDict
 
         LOG.debug('Version of fb_vmware.ds_cluster: {!r}.'.format(fb_vmware.ds_cluster.__version__))
-        LOG.debug('Description of VsphereDsCluster: ' + textwrap.dedent(VsphereDsCluster.__doc__))
-        LOG.debug('Description of VsphereDsClusterDict: ' + textwrap.dedent(VsphereDsClusterDict.__doc__))
+
+        doc = textwrap.dedent(VsphereDsCluster.__doc__)
+        LOG.debug('Description of VsphereDsCluster: ' + doc)
+
+        doc = textwrap.dedent(VsphereDsClusterDict.__doc__)
+        LOG.debug('Description of VsphereDsClusterDict: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

@@ -35,8 +35,7 @@ class TestVsphereConfig(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVsphereConfig, self).setUp()
 
         self.test_dir = Path(__file__).parent.resolve()
         self.base_dir = self.test_dir.parent

@@ -34,8 +34,7 @@ class TestVEthernet(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVEthernet, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,9 +46,12 @@ class TestVEthernet(FbVMWareTestcase):
         from fb_vmware import VsphereEthernetcardList
 
         LOG.debug('Version of fb_vmware.ether: {!r}.'.format(fb_vmware.ether.__version__))
-        LOG.debug('Description of VsphereEthernetcard: ' + textwrap.dedent(VsphereEthernetcard.__doc__))
-        LOG.debug(
-            'Description of VsphereEthernetcardList: ' + textwrap.dedent(VsphereEthernetcardList.__doc__))
+
+        doc = textwrap.dedent(VsphereEthernetcard.__doc__)
+        LOG.debug('Description of VsphereEthernetcard: ' + doc)
+
+        doc = textwrap.dedent(VsphereEthernetcardList.__doc__)
+        LOG.debug('Description of VsphereEthernetcardList: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

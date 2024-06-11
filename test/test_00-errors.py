@@ -34,8 +34,7 @@ class TestVMWareErrors(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVMWareErrors, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -46,7 +45,9 @@ class TestVMWareErrors(FbVMWareTestcase):
         from fb_vmware.errors import VSphereHandlerError
 
         LOG.debug('Version of fb_vmware.errors: {!r}.'.format(fb_vmware.errors.__version__))
-        LOG.debug('Description of VSphereHandlerError: ' + textwrap.dedent(VSphereHandlerError.__doc__))
+
+        doc = textwrap.dedent(VSphereHandlerError.__doc__)
+        LOG.debug('Description of VSphereHandlerError: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_vsphere_error(self):

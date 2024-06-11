@@ -34,8 +34,7 @@ class TestVController(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVController, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,7 +46,10 @@ class TestVController(FbVMWareTestcase):
         from fb_vmware import VsphereDiskControllerList
 
         LOG.debug('Version of fb_vmware.controller: {!r}.'.format(fb_vmware.controller.__version__))
-        LOG.debug('Description of VsphereDiskController: ' + textwrap.dedent(VsphereDiskController.__doc__))
+
+        doc = textwrap.dedent(VsphereDiskController.__doc__)
+        LOG.debug('Description of VsphereDiskController: ' + doc)
+
         doc = textwrap.dedent(VsphereDiskControllerList.__doc__)
         LOG.debug('Description of VsphereDiskControllerList: ' + doc)
 

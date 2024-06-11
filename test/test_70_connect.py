@@ -34,8 +34,7 @@ class TestVsphereConnection(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVsphereConnection, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -46,6 +45,7 @@ class TestVsphereConnection(FbVMWareTestcase):
         from fb_vmware import VsphereConnection
 
         LOG.debug('Version of fb_vmware.connect: {!r}.'.format(fb_vmware.connect.__version__))
+
         doc = textwrap.dedent(VsphereConnection.__doc__)
         LOG.debug('Description of VsphereConnection: ' + doc)
 

@@ -34,8 +34,7 @@ class TestVInterface(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVInterface, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -46,7 +45,9 @@ class TestVInterface(FbVMWareTestcase):
         from fb_vmware import VsphereVmInterface
 
         LOG.debug('Version of fb_vmware.iface: {!r}.'.format(fb_vmware.iface.__version__))
-        LOG.debug('Description of VsphereVmInterface: ' + textwrap.dedent(VsphereVmInterface.__doc__))
+
+        doc = textwrap.dedent(VsphereVmInterface.__doc__)
+        LOG.debug('Description of VsphereVmInterface: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

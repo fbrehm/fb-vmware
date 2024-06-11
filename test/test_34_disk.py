@@ -34,8 +34,7 @@ class TestVdisk(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVdisk, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,8 +46,12 @@ class TestVdisk(FbVMWareTestcase):
         from fb_vmware import VsphereDiskList
 
         LOG.debug('Version of fb_vmware.disk: {!r}.'.format(fb_vmware.disk.__version__))
-        LOG.debug('Description of VsphereDisk: ' + textwrap.dedent(VsphereDisk.__doc__))
-        LOG.debug('Description of VsphereDiskList: ' + textwrap.dedent(VsphereDiskList.__doc__))
+
+        doc = textwrap.dedent(VsphereDisk.__doc__)
+        LOG.debug('Description of VsphereDisk: ' + doc)
+
+        doc = textwrap.dedent(VsphereDiskList.__doc__)
+        LOG.debug('Description of VsphereDiskList: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

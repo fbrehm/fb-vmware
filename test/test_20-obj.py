@@ -34,8 +34,7 @@ class TestVMWareObject(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVMWareObject, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -46,7 +45,8 @@ class TestVMWareObject(FbVMWareTestcase):
         from fb_vmware import VsphereObject
 
         LOG.debug('Version of fb_vmware.obj: {!r}.'.format(fb_vmware.obj.__version__))
-        LOG.debug('Description of VsphereObject: ' + textwrap.dedent(VsphereObject.__doc__))
+        doc = textwrap.dedent(VsphereObject.__doc__)
+        LOG.debug('Description of VsphereObject: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

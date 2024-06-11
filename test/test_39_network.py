@@ -35,8 +35,7 @@ class TestVMNetwork(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVMNetwork, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -48,8 +47,12 @@ class TestVMNetwork(FbVMWareTestcase):
         from fb_vmware import VsphereNetworkDict
 
         LOG.debug('Version of fb_vmware.network: {!r}.'.format(fb_vmware.network.__version__))
-        LOG.debug('Description of VsphereNetwork: ' + textwrap.dedent(VsphereNetwork.__doc__))
-        LOG.debug('Description of VsphereNetworkDict: ' + textwrap.dedent(VsphereNetworkDict.__doc__))
+
+        doc = textwrap.dedent(VsphereNetwork.__doc__)
+        LOG.debug('Description of VsphereNetwork: ' + doc)
+
+        doc = textwrap.dedent(VsphereNetworkDict.__doc__)
+        LOG.debug('Description of VsphereNetworkDict: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):

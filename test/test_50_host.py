@@ -34,8 +34,7 @@ class TestVmwareHost(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVmwareHost, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -47,8 +46,10 @@ class TestVmwareHost(FbVMWareTestcase):
         from fb_vmware import VsphereHost
 
         LOG.debug('Version of fb_vmware.host: {!r}.'.format(fb_vmware.host.__version__))
+
         doc = textwrap.dedent(VsphereHostBiosInfo.__doc__)
         LOG.debug('Description of VsphereHostBiosInfo: ' + doc)
+
         doc = textwrap.dedent(VsphereHost.__doc__)
         LOG.debug('Description of VsphereHost: ' + doc)
 

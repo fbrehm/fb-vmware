@@ -34,8 +34,7 @@ class TestVHostPortGroup(FbVMWareTestcase):
     # -------------------------------------------------------------------------
     def setUp(self):
         """Execute this on seting up before calling each particular test method."""
-        if self.verbose >= 1:
-            print()
+        super(TestVHostPortGroup, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
@@ -48,8 +47,10 @@ class TestVHostPortGroup(FbVMWareTestcase):
 
         LOG.debug('Version of fb_vmware.host_port_group: {!r}.'.format(
             fb_vmware.host_port_group.__version__))
+
         doc = textwrap.dedent(VsphereHostPortgroup.__doc__)
         LOG.debug('Description of VsphereHostPortgroup: ' + doc)
+
         doc = textwrap.dedent(VsphereHostPortgroupList.__doc__)
         LOG.debug('Description of VsphereHostPortgroupList: ' + doc)
 

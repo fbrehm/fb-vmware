@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.about.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.about
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -28,28 +30,29 @@ LOG = logging.getLogger('test-aboutinfo')
 
 # =============================================================================
 class TestVMAboutInfo(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereAboutInfo object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        if self.verbose >= 1:
+            print()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.about."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.about ...")
         import fb_vmware.about
-        from fb_vmware import VsphereAboutInfo                     # noqa
+        from fb_vmware import VsphereAboutInfo
 
-        LOG.debug("Version of fb_vmware.about: {!r}.".format(fb_vmware.about.__version__))
+        LOG.debug('Version of fb_vmware.about: {!r}.'.format(fb_vmware.about.__version__))
+        LOG.debug('Description of VsphereAboutInfo: ' + textwrap.dedent(VsphereAboutInfo.__doc__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereAboutInfo object ...")
+        """Test init of a VsphereAboutInfo object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereAboutInfo
 
@@ -58,8 +61,8 @@ class TestVMAboutInfo(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereAboutInfo %r: {!r}".format(about_info))
-        LOG.debug("VsphereAboutInfo %s:\n{}".format(about_info))
+        LOG.debug('VsphereAboutInfo %r: {!r}'.format(about_info))
+        LOG.debug('VsphereAboutInfo %s:\n{}'.format(about_info))
 
         self.assertIsInstance(about_info, VsphereAboutInfo)
         self.assertEqual(about_info.appname, self.appname)
@@ -67,10 +70,8 @@ class TestVMAboutInfo(FbVMWareTestcase):
 
     # -------------------------------------------------------------------------
     def test_init_from_summary(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init by calling VsphereAboutInfo.from_summary() ...")
+        """Test init by calling VsphereAboutInfo.from_summary()."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereAboutInfo
 
@@ -94,23 +95,23 @@ class TestVMAboutInfo(FbVMWareTestcase):
         data.licenseProductVersion = lic_prodversion
         data.name = name
 
-        with self.assertRaises(TypeError)  as cm:
+        with self.assertRaises(TypeError) as cm:
 
             about_info = VsphereAboutInfo.from_summary(
                 data, appname=self.appname, verbose=self.verbose)
-            LOG.debug("VsphereAboutInfo %s:\n{}".format(about_info))
+            LOG.debug('VsphereAboutInfo %s:\n{}'.format(about_info))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
-        with self.assertRaises(AssertionError)  as cm:
+        with self.assertRaises(AssertionError) as cm:
 
             about_info = VsphereAboutInfo.from_summary(
                 data, appname=self.appname, verbose=self.verbose, test_mode=True)
-            LOG.debug("VsphereAboutInfo %s:\n{}".format(about_info))
+            LOG.debug('VsphereAboutInfo %s:\n{}'.format(about_info))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         data.version = os_version
         data.osType = os_type
@@ -118,7 +119,7 @@ class TestVMAboutInfo(FbVMWareTestcase):
 
         about_info = VsphereAboutInfo.from_summary(
             data, appname=self.appname, verbose=self.verbose, test_mode=True)
-        LOG.debug("VsphereAboutInfo %s:\n{}".format(about_info))
+        LOG.debug('VsphereAboutInfo %s:\n{}'.format(about_info))
 
 
 # =============================================================================
@@ -129,7 +130,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

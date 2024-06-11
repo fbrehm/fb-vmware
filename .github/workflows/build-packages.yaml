@@ -22,5 +22,7 @@ jobs:
     with:
       has_i18n: true
       libdir: lib/fb_vmware
+    secrets:
+      pypi_token: ${{ secrets.PYPI_TOKEN }}
 
 # vim: et tabstop=2 expandtab shiftwidth=2 softtabstop=2 list

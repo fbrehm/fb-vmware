@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.ds_cluster.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.ds_cluster
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -21,47 +23,48 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
-from general import SimpleTestObject
 
 LOG = logging.getLogger('test-ds-cluster')
 
 
 # =============================================================================
 class TestVDataStoreCluster(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereDsCluster object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        if self.verbose >= 1:
+            print()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.ds_cluster."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.ds_cluster ...")
         import fb_vmware.ds_cluster
-        from fb_vmware import VsphereDsCluster                       # noqa
-        from fb_vmware import VsphereDsClusterDict                   # noqa
+        from fb_vmware import VsphereDsCluster
+        from fb_vmware import VsphereDsClusterDict
 
-        LOG.debug("Version of fb_vmware.ds_cluster: {!r}.".format(fb_vmware.ds_cluster.__version__))
+        LOG.debug('Version of fb_vmware.ds_cluster: {!r}.'.format(fb_vmware.ds_cluster.__version__))
+        LOG.debug('Description of VsphereDsCluster: ' + textwrap.dedent(VsphereDsCluster.__doc__))
+        LOG.debug('Description of VsphereDsClusterDict: ' + textwrap.dedent(VsphereDsClusterDict.__doc__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereDsCluster object ...")
+        """Test init of a VsphereDsCluster object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereDsCluster
         from fb_vmware.errors import VSphereNameError
 
-        with self.assertRaises((VSphereNameError, TypeError))  as cm:
+        with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             dsc = VsphereDsCluster(appname=self.appname)
-            LOG.debug("VsphereDsCluster %s:\n{}".format(dcc))
+            LOG.debug('VsphereDsCluster %s:\n{}'.format(dsc))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         ds_cluster_name = 'my-datastore-cluster'
         capacity = int(500 * 1024 * 1024 * 1024)
@@ -75,8 +78,8 @@ class TestVDataStoreCluster(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereDsCluster %r: {!r}".format(dsc))
-        LOG.debug("VsphereDsCluster %s:\n{}".format(dsc))
+        LOG.debug('VsphereDsCluster %r: {!r}'.format(dsc))
+        LOG.debug('VsphereDsCluster %s:\n{}'.format(dsc))
 
         self.assertIsInstance(dsc, VsphereDsCluster)
         self.assertEqual(dsc.appname, self.appname)
@@ -92,7 +95,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

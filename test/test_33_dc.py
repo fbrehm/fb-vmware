@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.dc.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.dc
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -28,39 +30,40 @@ LOG = logging.getLogger('test-dc')
 
 # =============================================================================
 class TestVMDatacenter(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereDatacenter object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        if self.verbose >= 1:
+            print()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.dc."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.dc ...")
         import fb_vmware.dc
-        from fb_vmware import VsphereDatacenter                     # noqa
+        from fb_vmware import VsphereDatacenter
 
-        LOG.debug("Version of fb_vmware.dc: {!r}.".format(fb_vmware.dc.__version__))
+        LOG.debug('Version of fb_vmware.dc: {!r}.'.format(fb_vmware.dc.__version__))
+        LOG.debug('Description of VsphereDatacenter: ' + textwrap.dedent(VsphereDatacenter.__doc__))
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereDatacenter object ...")
+        """Test init of a VsphereDatacenter object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereDatacenter
         from fb_vmware.errors import VSphereNameError
 
-        with self.assertRaises(VSphereNameError)  as cm:
+        with self.assertRaises(VSphereNameError) as cm:
 
             dc = VsphereDatacenter(appname=self.appname)
-            LOG.debug("VsphereDatacenter %s:\n{}".format(dc))
+            LOG.debug('VsphereDatacenter %s:\n{}'.format(dc))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         dc_name = 'my-dc'
 
@@ -70,8 +73,8 @@ class TestVMDatacenter(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereDatacenter %r: {!r}".format(dc))
-        LOG.debug("VsphereDatacenter %s:\n{}".format(dc))
+        LOG.debug('VsphereDatacenter %r: {!r}'.format(dc))
+        LOG.debug('VsphereDatacenter %s:\n{}'.format(dc))
 
         self.assertIsInstance(dc, VsphereDatacenter)
         self.assertEqual(dc.appname, self.appname)
@@ -80,10 +83,8 @@ class TestVMDatacenter(FbVMWareTestcase):
 
     # -------------------------------------------------------------------------
     def test_init_from_summary(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init by calling VsphereDatacenter.from_summary() ...")
+        """Test init by calling VsphereDatacenter.from_summary()."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereDatacenter
         from fb_vmware.dc import DEFAULT_HOST_FOLDER, DEFAULT_VM_FOLDER
@@ -103,23 +104,23 @@ class TestVMDatacenter(FbVMWareTestcase):
 
         data.hostFolder = SimpleTestObject()
 
-        with self.assertRaises(TypeError)  as cm:
+        with self.assertRaises(TypeError) as cm:
 
             dc = VsphereDatacenter.from_summary(
                 data, appname=self.appname, verbose=self.verbose)
-            LOG.debug("VsphereDatacenter %s:\n{}".format(dc))
+            LOG.debug('VsphereDatacenter %s:\n{}'.format(dc))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
-        with self.assertRaises(AssertionError)  as cm:
+        with self.assertRaises(AssertionError) as cm:
 
             dc = VsphereDatacenter.from_summary(
                 data, appname=self.appname, verbose=self.verbose, test_mode=True)
-            LOG.debug("VsphereDatacenter %s:\n{}".format(dc))
+            LOG.debug('VsphereDatacenter %s:\n{}'.format(dc))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         data.overallStatus = 'gray'
 
@@ -130,7 +131,7 @@ class TestVMDatacenter(FbVMWareTestcase):
 
         dc = VsphereDatacenter.from_summary(
             data, appname=self.appname, verbose=self.verbose, test_mode=True)
-        LOG.debug("VsphereDatacenter %s:\n{}".format(dc))
+        LOG.debug('VsphereDatacenter %s:\n{}'.format(dc))
 
 
 # =============================================================================
@@ -141,7 +142,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

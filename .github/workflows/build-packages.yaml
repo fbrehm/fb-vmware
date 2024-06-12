@@ -22,6 +22,7 @@ jobs:
     with:
       has_i18n: true
       libdir: lib/fb_vmware
+      debian_versions: 'Debian-Bullseye Debian-Bookworm Debian-BlaBla Ubuntu-Focal Ubuntu-Jammy'
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
 

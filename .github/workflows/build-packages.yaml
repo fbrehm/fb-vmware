@@ -25,6 +25,7 @@ jobs:
       test_python_versions: '["3.8", "3.10", "3.11", "3.12"]'
       libdir: lib/fb_vmware
       debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
+      additional_debian_build_packages: 'python3-fb-logging python3-fb-tools python3-pyvmomi'
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
 

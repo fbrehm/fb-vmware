@@ -39,6 +39,8 @@ jobs:
   ###########################
   call-shared-workflow:
     name: "Calling shared build workflow"
+    needs:
+      - prepare-image
     uses: fbrehm/actions/.github/workflows/build-python-packages.yaml@develop
     with:
       has_i18n: true

@@ -30,6 +30,13 @@ env:
 jobs:
 
   ###########################
+  prepare-image:
+    name: "Preparing image for the first time."
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Null - Nada - Njet!"
+
+  ###########################
   call-shared-workflow:
     name: "Calling shared build workflow"
     uses: fbrehm/actions/.github/workflows/build-python-packages.yaml@develop

@@ -35,6 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Null - Nada - Njet!"
+    outputs:
+      password_file: ${{ env.GPG_PASSWORD_FILE }}
+      key_id: ${{ env.GPG_KEY_ID }}
 
   ###########################
   call-shared-workflow:
@@ -49,8 +52,8 @@ jobs:
       libdir: lib/fb_vmware
       debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
       additional_debian_build_packages: 'python3-fb-logging python3-fb-tools python3-pyvmomi'
-      password_file: ${{ env.GPG_PASSWORD_FILE }}
-      key_id: ${{ env.GPG_KEY_ID }}
+      password_file: ${{ needs.prepare-image.outputs.password_file }}
+      key_id: ${{ needs.prepare-image.outputs.key_id }}
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
 

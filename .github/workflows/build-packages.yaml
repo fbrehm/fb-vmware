@@ -56,6 +56,9 @@ jobs:
       key_id: ${{ needs.prepare-image.outputs.key_id }}
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
+      public_key: ${{ secrets.GPG_PUBLIC_KEY }}
+      private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+      key_password: ${{ secrets.GPG_KEY_PASSWORD }}
 
 
 # vim: et tabstop=2 expandtab shiftwidth=2 softtabstop=2 list

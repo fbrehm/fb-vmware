@@ -13,6 +13,19 @@ on:
   workflow_dispatch: {}
 
 ################################################################################
+env:
+  DEBFULLNAME: 'Frank Brehm'
+  DEBEMAIL: 'frank@brehm-online.com'
+  FB_REPO_IN_DIR: '/var/www/incoming'
+  GPG_KEY_ID: '87A8DBD6B796E12A'
+  GPG_PASSWORD_FILE: '.private/uhu.txt'
+  NOTIFY_ADDRESS: 'frank@brehm-online.com,frank.brehm@pixelpark.com'
+  SENDER_ADDRESS: 'Frank Brehm <frank@brehm-online.com>'
+  SMTP_SERVER_ADDRESS: 'mail.uhu-banane.net'
+  SMTP_SERVER_PORT: 587
+  USED_TIMEZONE: 'Europe/Berlin'
+
+################################################################################
 jobs:
 
   ###########################
@@ -26,6 +39,8 @@ jobs:
       libdir: lib/fb_vmware
       debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
       additional_debian_build_packages: 'python3-fb-logging python3-fb-tools python3-pyvmomi'
+      password_file: ${{ env.GPG_PASSWORD_FILE }}
+      key_id: ${{ env.GPG_KEY_ID }}
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
 

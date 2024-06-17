@@ -55,6 +55,7 @@ jobs:
       additional_debian_build_packages: 'python3-fb-logging python3-fb-tools python3-pyvmomi'
       password_file: ${{ needs.prepare-image.outputs.password_file }}
       key_id: ${{ needs.prepare-image.outputs.key_id }}
+      do_help2man: true
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
       public_key: ${{ secrets.GPG_PUBLIC_KEY }}

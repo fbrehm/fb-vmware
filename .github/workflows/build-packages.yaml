@@ -53,6 +53,7 @@ jobs:
       debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
       # el_versions: 'el-8 el-9'
       additional_debian_build_packages: 'python3-fb-logging python3-fb-tools python3-pyvmomi'
+      additional_rpm_build_packages: 'python3X-fb-logging python3X-fb-tools python3X-pyvmomi'
       password_file: ${{ needs.prepare-image.outputs.password_file }}
       key_id: ${{ needs.prepare-image.outputs.key_id }}
       do_help2man: true

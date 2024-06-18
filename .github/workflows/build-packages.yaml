@@ -52,8 +52,8 @@ jobs:
     uses: fbrehm/actions/.github/workflows/build-python-packages.yaml@develop
     with:
       has_i18n: true
-      # test_python_versions: '["3.8", "3.9", "3.10", "3.11", "3.12"]'
-      test_python_versions: '["3.8", "3.10", "3.11", "3.12"]'
+      test_python_versions: '["3.8", "3.9", "3.10", "3.11", "3.12"]'
+        # test_python_versions: '["3.8", "3.10", "3.11", "3.12"]'
       libdir: lib/fb_vmware
       debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
       # el_versions: 'el-8 el-9'

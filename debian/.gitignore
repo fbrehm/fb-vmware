@@ -4,3 +4,4 @@
 files
 fb-vmware
 python3-fb-vmware
+debhelper-build-stamp

@@ -65,6 +65,7 @@ python@@@py_version_dot@@@ setup.py install --prefix=%{_prefix} --root=%{buildro
 %doc LICENSE README.md requirements.txt debian/changelog
 %{_bindir}/*
 %{_datadir}/*
+%{_mandir}/*
 %{python3_sitelib}/*
 
 %changelog

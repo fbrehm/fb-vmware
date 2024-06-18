@@ -39,6 +39,10 @@ jobs:
       password_file: ${{ env.GPG_PASSWORD_FILE }}
       key_id: ${{ env.GPG_KEY_ID }}
       repo_dir: ${{ env.FB_REPO_IN_DIR }}
+      smtp_server_address: ${{ env.SMTP_SERVER_ADDRESS }}
+      smtp_server_port: ${{ env.SMTP_SERVER_PORT }}
+      smtp_sender_address: ${{ env.SENDER_ADDRESS }}
+      smtp_recipient_addresses: ${{ env.NOTIFY_ADDRESS }}
 
   ###########################
   call-shared-workflow:
@@ -59,6 +63,10 @@ jobs:
       key_id: ${{ needs.prepare-image.outputs.key_id }}
       do_help2man: true
       repo_dir: ${{ needs.prepare-image.outputs.repo_dir }}
+      smtp_server_address: ${{ needs.prepare-image.outputs.smtp_server_address }}
+      smtp_server_port: ${{ needs.prepare-image.outputs.smtp_server_port }}
+      smtp_sender_address: ${{ needs.prepare-image.outputs.smtp_sender_address }}
+      smtp_recipient_addresses: ${{ needs.prepare-image.outputs.smtp_recipient_addresses }}
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
       public_key: ${{ secrets.GPG_PUBLIC_KEY }}
@@ -67,6 +75,8 @@ jobs:
       repo_server: ${{ secrets.FB_REPO_SERVER }}
       repo_user: ${{ secrets.FB_REPO_USER }}
       ssh_private_key: ${{ secrets.FB_REPOIN_SSH_PRIVATE_KEY }}
+      smtp_user: ${{ secrets.EMAIL_USERNAME }}
+      smtp_password: ${{ secrets.EMAIL_PASSWORD }}
 
 
 # vim: et tabstop=2 expandtab shiftwidth=2 softtabstop=2 list

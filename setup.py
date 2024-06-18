@@ -60,6 +60,8 @@ PATHS = {
     '__local_locale_dir__': __local_locale_dir__,
 }
 
+__verbose__ = False
+
 # -----------------------------------
 def pp(obj):
     """Human friendly output of data structures."""
@@ -67,7 +69,8 @@ def pp(obj):
     return pprinter.pformat(obj)
 
 
-print('Paths:\n{}'.format(pp(PATHS)))
+if __verbose__:
+    print('Paths:\n{}'.format(pp(PATHS)))
 
 
 if __module_dir__.exists() and __init_py__.is_file():
@@ -209,7 +212,8 @@ def read_requirements():
         if module not in __requirements__:
             __requirements__.append(module)
 
-    print('Found required modules:\n{}\n'.format(pp(__requirements__)))
+    if __verbose__:
+        print('Found required modules:\n{}\n'.format(pp(__requirements__)))
 
 
 read_requirements()
@@ -229,7 +233,8 @@ def get_scripts():
         if script_rel not in __scripts__:
             __scripts__.append(script_rel)
 
-    print('Found scripts:\n{}\n'.format(pp(__scripts__)))
+    if __verbose__:
+        print('Found scripts:\n{}\n'.format(pp(__scripts__)))
 
 
 get_scripts()
@@ -256,7 +261,8 @@ if __local_usr_dir__.is_dir():
     for udir in usr_files.keys():
         __data_files__.append((udir, usr_files[udir]))
 
-print('Found data files:\n' + pp(__data_files__) + '\n')
+if __verbose__:
+    print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # -----------------------------------
 
@@ -270,7 +276,8 @@ def create_mo_files():
             subprocess.call(['msgfmt', '-o', str(mo_path), str(po_path)])
         mo_files.append(mo_path)
 
-    print('Found mo files:\n{}\n'.format(pp(mo_files)))
+    if __verbose__:
+        print('Found mo files:\n{}\n'.format(pp(mo_files)))
     return mo_files
 
 
@@ -286,7 +293,8 @@ for mo_file in __pkg_mo_paths__:
     mo_file_rel = str(mo_file).lstrip('/')
     __data_files__.append((str(ldir), [mo_file_rel]))
 
-print('Found data files:\n' + pp(__data_files__) + '\n')
+if __verbose__:
+    print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # -----------------------------------
 def create_man_pages():
@@ -302,7 +310,8 @@ def create_man_pages():
             continue
 
         if not man1_dir_rel.exists():
-            print('Creating {!r} ...'.format(str(man1_dir_rel)))
+            if __verbose__:
+                print('Creating {!r} ...'.format(str(man1_dir_rel)))
             man1_dir_rel.mkdir(mode=0o755, parents=True)
 
         man_file = man1_dir_rel / (script.name + '.1.gz')
@@ -311,7 +320,8 @@ def create_man_pages():
         cmd += ' --section 1'
         cmd += ' {!r}'.format(str(script_rel))
         cmd += ' | gzip -v9 > {!r}'.format(str(man_file))
-        print('Executing: {}'.format(cmd))
+        if __verbose__:
+            print('Executing: {}'.format(cmd))
 
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         if proc.returncode:
@@ -325,14 +335,15 @@ def create_man_pages():
     return man_pages
 
 
-__man_page_paths__ = create_man_pages()
-if __man_page_paths__:
-    __man_pages__ = []
-    for man_path in __man_page_paths__:
-        __man_pages__.append(str(man_path))
-    __data_files__.append((str(__man1_dir__), __man_pages__))
+# __man_page_paths__ = create_man_pages()
+# if __man_page_paths__:
+#     __man_pages__ = []
+#     for man_path in __man_page_paths__:
+#         __man_pages__.append(str(man_path))
+#     __data_files__.append((str(__man1_dir__), __man_pages__))
 
-print('Found data files:\n' + pp(__data_files__) + '\n')
+if __verbose__:
+    print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # sys.exit(0)
 

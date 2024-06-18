@@ -12,7 +12,6 @@
 from __future__ import print_function
 
 import datetime
-import glob
 import os
 import pprint
 import re
@@ -24,14 +23,14 @@ from pathlib import Path
 # own modules:
 __base_dir__ = Path(os.path.abspath(os.path.dirname(__file__)))
 __bin_dir__ = __base_dir__ / 'bin'
-__lib_dir__ = __base_dir__ /  'lib'
+__lib_dir__ = __base_dir__ / 'lib'
 __module_dir__ = __lib_dir__ / 'fb_vmware'
 __init_py__ = __module_dir__ / '__init__.py'
 __local_usr_dir__ = __base_dir__ / 'usr'
 __share_dir__ = Path(sys.base_prefix) / 'share'
 __local_share_dir__ = Path(str(__base_dir__) + str(__share_dir__)).relative_to(__base_dir__)
 __man_dir__ = Path('share/man')
-__local_man_dir__ = __local_share_dir__ / 'man' 
+__local_man_dir__ = __local_share_dir__ / 'man'
 __man1_dir__ = __man_dir__ / 'man1'
 __local_man1_dir__ = __local_man_dir__ / 'man1'
 __locale_dir__ = Path('share/locale')
@@ -67,7 +66,8 @@ def pp(obj):
     pprinter = pprint.PrettyPrinter(indent=4)
     return pprinter.pformat(obj)
 
-print("Paths:\n{}".format(pp(PATHS)))
+
+print('Paths:\n{}'.format(pp(PATHS)))
 
 
 if __module_dir__.exists() and __init_py__.is_file():
@@ -209,7 +209,7 @@ def read_requirements():
         if module not in __requirements__:
             __requirements__.append(module)
 
-    print("Found required modules:\n{}\n".format(pp(__requirements__)))
+    print('Found required modules:\n{}\n'.format(pp(__requirements__)))
 
 
 read_requirements()
@@ -229,7 +229,7 @@ def get_scripts():
         if script_rel not in __scripts__:
             __scripts__.append(script_rel)
 
-    print("Found scripts:\n{}\n".format(pp(__scripts__)))
+    print('Found scripts:\n{}\n'.format(pp(__scripts__)))
 
 
 get_scripts()
@@ -256,11 +256,9 @@ if __local_usr_dir__.is_dir():
     for udir in usr_files.keys():
         __data_files__.append((udir, usr_files[udir]))
 
-print("Found data files:\n" + pp(__data_files__) + "\n")
+print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # -----------------------------------
-
-__package_data__ = {}
 
 def create_mo_files():
     """Compile the translation files."""
@@ -272,16 +270,14 @@ def create_mo_files():
             subprocess.call(['msgfmt', '-o', str(mo_path), str(po_path)])
         mo_files.append(mo_path)
 
-    print("Found mo files:\n{}\n".format(pp(mo_files)))
+    print('Found mo files:\n{}\n'.format(pp(mo_files)))
     return mo_files
+
 
 __pkg_mo_paths__ = create_mo_files()
 __pkg_mo_files__ = []
 for mo_file in __pkg_mo_paths__:
     __pkg_mo_files__.append(str(mo_file))
-
-__package_data__[''] = __pkg_mo_files__
-print("Package_data:\n" + pp(__package_data__) + "\n")
 
 for mo_file in __pkg_mo_paths__:
     ltype = mo_file.parent.name
@@ -290,7 +286,7 @@ for mo_file in __pkg_mo_paths__:
     mo_file_rel = str(mo_file).lstrip('/')
     __data_files__.append((str(ldir), [mo_file_rel]))
 
-print("Found data files:\n" + pp(__data_files__) + "\n")
+print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # -----------------------------------
 def create_man_pages():
@@ -315,18 +311,19 @@ def create_man_pages():
         cmd += ' --section 1'
         cmd += ' {!r}'.format(str(script_rel))
         cmd += ' | gzip -v9 > {!r}'.format(str(man_file))
-        print("Executing: {}".format(cmd))
+        print('Executing: {}'.format(cmd))
 
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         if proc.returncode:
             msg = 'Got returncode {rc} on "help2man {f!r}".'.format(
-                    rc=proc.returncode, f=script_name)
+                rc=proc.returncode, f=str(script_rel))
             if proc.stderr:
                 msg += ' STDERR: ' + str(proc.stderr)
         else:
             man_pages.append(man_file)
 
     return man_pages
+
 
 __man_page_paths__ = create_man_pages()
 if __man_page_paths__:
@@ -335,7 +332,7 @@ if __man_page_paths__:
         __man_pages__.append(str(man_path))
     __data_files__.append((str(__man1_dir__), __man_pages__))
 
-print("Found data files:\n" + pp(__data_files__) + "\n")
+print('Found data files:\n' + pp(__data_files__) + '\n')
 
 # sys.exit(0)
 
@@ -357,7 +354,6 @@ setup(
     scripts=__scripts__,
     requires=__requirements__,
     package_dir={'': 'lib'},
-    # package_data=__package_data__,
     data_files=__data_files__,
     cmdclass={
         'compile_catalog': babel.compile_catalog,

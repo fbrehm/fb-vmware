@@ -38,6 +38,7 @@ jobs:
     outputs:
       password_file: ${{ env.GPG_PASSWORD_FILE }}
       key_id: ${{ env.GPG_KEY_ID }}
+      repo_dir: ${{ env.FB_REPO_IN_DIR }}
 
   ###########################
   call-shared-workflow:
@@ -62,6 +63,10 @@ jobs:
       public_key: ${{ secrets.GPG_PUBLIC_KEY }}
       private_key: ${{ secrets.GPG_PRIVATE_KEY }}
       key_password: ${{ secrets.GPG_KEY_PASSWORD }}
+      repo_server: ${{ secrets.FB_REPO_SERVER }}
+      repo_user: ${{ secrets.FB_REPO_USER }}
+      ssh_private_key: ${{ secrets.FB_REPOIN_SSH_PRIVATE_KEY }}
+      repo_dir: ${{ needs.prepare-image.outputs.repo_dir }}
 
 
 # vim: et tabstop=2 expandtab shiftwidth=2 softtabstop=2 list

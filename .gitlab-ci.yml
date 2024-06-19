@@ -3,7 +3,7 @@
 include:
   - project: 'python/packaging'
     # ref: v1.9
-    ref: 696a3c156b8407eb5a423b7ca6b928710519cb69
+    ref: 8c9ef93177680c14f13c30ad011dad0fa4091013
     file: 'gitlab/create-all.yaml'
 
 variables:

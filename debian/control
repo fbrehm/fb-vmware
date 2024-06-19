@@ -22,16 +22,6 @@ Vcs-Browser: https://github.com/fbrehm/fb-vmware
 Vcs-Git: https://github.com/fbrehm/fb-vmware.git
 X-Python3-Version: >= 3.6
 
-Package: fb-vmware
-Architecture: all
-Pre-Depends: ${misc:Pre-Depends}
-Depends: python3-fb-vmware (= ${binary:Version}),
-         ${misc:Depends},
-         ${python3:Depends}
-Description: A Python wrapper module around the pyvmomi module to simplify work and handling. 
- .
- This package includes the executable binaries.
-
 Package: python3-fb-vmware
 Architecture: all
 Depends: python3-six,

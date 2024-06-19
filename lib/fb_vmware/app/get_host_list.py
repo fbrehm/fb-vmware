@@ -26,7 +26,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -73,7 +73,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     @property
     def host_pattern(self):
-        """The regex search pattern for filtering the host list."""
+        """Return the regex search pattern for filtering the host list."""
         return self._host_pattern
 
     # -------------------------------------------------------------------------

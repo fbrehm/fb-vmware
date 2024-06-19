@@ -27,7 +27,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -104,7 +104,7 @@ class VsphereDiskController(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def ctrl_type(self):
-        """The type of this virtual disk controller."""
+        """Return the type of this virtual disk controller."""
         return self._ctrl_type
 
     @ctrl_type.setter
@@ -121,7 +121,7 @@ class VsphereDiskController(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def ctrl_type_name(self):
-        """The verbose name of the controller type."""
+        """Return the verbose name of the controller type."""
         if self.ctrl_type is None:
             return None
         if self.ctrl_type not in self.type_names:
@@ -154,7 +154,7 @@ class VsphereDiskController(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def scsi_ctrl_nr(self):
-        """The unit number of the SCSI controller."""
+        """Return the unit number of the SCSI controller."""
         return self._scsi_ctrl_nr
 
     @scsi_ctrl_nr.setter

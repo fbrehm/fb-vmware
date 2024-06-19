@@ -58,6 +58,10 @@ python@@@py_version_dot@@@ setup.py build
 cd ../%{builddir}
 echo "Buildroot: %{buildroot}"
 python@@@py_version_dot@@@ setup.py install --prefix=%{_prefix} --root=%{buildroot}
+if test -d usr/share/man ; then
+    mkdir -pv %{buildroot}%{_datadir}
+    cp -vR usr/share/man %{buildroot}%{_datadir}
+fi
 
 %files
 %defattr(-,root,root,-)

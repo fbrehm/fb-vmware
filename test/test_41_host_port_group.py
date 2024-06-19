@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.host_port_group.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.host_port_group
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -21,48 +23,51 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
-from general import SimpleTestObject
 
 LOG = logging.getLogger('test-host-port-group')
 
 
 # =============================================================================
 class TestVHostPortGroup(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereHostPortgroup object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        super(TestVHostPortGroup, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.host_port_group."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.host_port_group ...")
         import fb_vmware.host_port_group
-        from fb_vmware import VsphereHostPortgroup                   # noqa
-        from fb_vmware import VsphereHostPortgroupList               # noqa
+        from fb_vmware import VsphereHostPortgroup
+        from fb_vmware import VsphereHostPortgroupList
 
-        LOG.debug("Version of fb_vmware.host_port_group: {!r}.".format(
+        LOG.debug('Version of fb_vmware.host_port_group: {!r}.'.format(
             fb_vmware.host_port_group.__version__))
+
+        doc = textwrap.dedent(VsphereHostPortgroup.__doc__)
+        LOG.debug('Description of VsphereHostPortgroup: ' + doc)
+
+        doc = textwrap.dedent(VsphereHostPortgroupList.__doc__)
+        LOG.debug('Description of VsphereHostPortgroupList: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereHostPortgroup object ...")
+        """Test init of a VsphereHostPortgroup object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereHostPortgroup
-        from fb_vmware.errors import VSphereNameError
 
         group = VsphereHostPortgroup(
             appname=self.appname,
             verbose=1,
         )
 
-        LOG.debug("VsphereHostPortgroup %r: {!r}".format(group))
-        LOG.debug("VsphereHostPortgroup %s:\n{}".format(group))
+        LOG.debug('VsphereHostPortgroup %r: {!r}'.format(group))
+        LOG.debug('VsphereHostPortgroup %s:\n{}'.format(group))
 
         self.assertIsInstance(group, VsphereHostPortgroup)
         self.assertEqual(group.appname, self.appname)
@@ -77,7 +82,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.obj.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.obj
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -27,28 +29,29 @@ LOG = logging.getLogger('test-object')
 
 # =============================================================================
 class TestVMWareObject(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereObject."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        super(TestVMWareObject, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.obj."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.obj ...")
         import fb_vmware.obj
-        from fb_vmware import VsphereObject                     # noqa
+        from fb_vmware import VsphereObject
 
-        LOG.debug("Version of fb_vmware.obj: {!r}.".format(fb_vmware.obj.__version__))
+        LOG.debug('Version of fb_vmware.obj: {!r}.'.format(fb_vmware.obj.__version__))
+        doc = textwrap.dedent(VsphereObject.__doc__)
+        LOG.debug('Description of VsphereObject: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereObject object ...")
+        """Test init of a VsphereObject object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereObject, DEFAULT_OBJ_STATUS
         obj_type = 'testobject'
@@ -61,8 +64,8 @@ class TestVMWareObject(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereObject %r: {!r}".format(gen_obj))
-        LOG.debug("VsphereObject %s:\n{}".format(gen_obj))
+        LOG.debug('VsphereObject %r: {!r}'.format(gen_obj))
+        LOG.debug('VsphereObject %s:\n{}'.format(gen_obj))
 
         self.assertIsInstance(gen_obj, VsphereObject)
         self.assertEqual(gen_obj.verbose, 1)
@@ -80,7 +83,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

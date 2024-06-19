@@ -29,7 +29,7 @@ from ..errors import WrongPortTypeError
 from ..errors import WrongPortValueError
 from ..xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -167,7 +167,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def user(self):
-        """The user name to use to connect to the VSPhere server."""
+        """Return the user name to use to connect to the VSPhere server."""
         return self._user
 
     @user.setter
@@ -181,7 +181,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def password(self):
-        """The password of the DN used to connect to the LDAP server."""
+        """Return the password of the DN used to connect to the LDAP server."""
         return self._password
 
     @password.setter
@@ -194,7 +194,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def show_password(self):
-        """The password for using it in logging messages and in as_dict()."""
+        """Return the password for using it in logging messages and in as_dict()."""
         if self.password is None:
             return None
         if self.verbose > 4:
@@ -205,7 +205,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def schema(self):
-        """The schema as part of the URL to connect to the VSPhere server."""
+        """Return the schema as part of the URL to connect to the VSPhere server."""
         if self.use_https:
             return 'https'
         return 'http'
@@ -213,7 +213,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def url(self):
-        """The URL, which can be used to connect to the VSPhere server."""
+        """Return the URL, which can be used to connect to the VSPhere server."""
         if not self.host:
             return None
 
@@ -230,7 +230,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def full_url(self):
-        """The full URL, which can be used to connect to the VSPhere server."""
+        """Reurn the full URL, which can be used to connect to the VSPhere server."""
         if not self.host:
             return None
 

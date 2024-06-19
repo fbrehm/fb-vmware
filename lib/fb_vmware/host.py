@@ -35,7 +35,7 @@ from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -76,7 +76,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def bios_version(self):
-        """The BIOS name of the host."""
+        """Return the BIOS name of the host."""
         return self._bios_version
 
     @bios_version.setter
@@ -93,7 +93,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def fw_major(self):
-        """The major version of the firmware of the BIOS of the host."""
+        """Return the major version of the firmware of the BIOS of the host."""
         return self._fw_major
 
     @fw_major.setter
@@ -110,7 +110,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def fw_minor(self):
-        """The minor version of the firmware of the BIOS of the host."""
+        """Return the minor version of the firmware of the BIOS of the host."""
         return self._fw_minor
 
     @fw_minor.setter
@@ -127,7 +127,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def major(self):
-        """The major version of the BIOS of the host."""
+        """Return the major version of the BIOS of the host."""
         return self._major
 
     @major.setter
@@ -144,7 +144,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def minor(self):
-        """The minor version of the BIOS of the host."""
+        """Return the minor version of the BIOS of the host."""
         return self._minor
 
     @minor.setter
@@ -161,7 +161,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def release_date(self):
-        """The release date of the BIOS of the host."""
+        """Return the release date of the BIOS of the host."""
         return self._release_date
 
     @release_date.setter
@@ -181,7 +181,7 @@ class VsphereHostBiosInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def vendor(self):
-        """The vendor of the BIOS of the host."""
+        """Return the vendor of the BIOS of the host."""
         return self._vendor
 
     @vendor.setter
@@ -332,7 +332,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """The name of the VSPhere from configuration, of thr host."""
+        """Return the name of the VSPhere from configuration, of thr host."""
         return self._vsphere
 
     @vsphere.setter
@@ -351,7 +351,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def cluster_name(self):
-        """The name of the compute resource, where this host is a member."""
+        """Return the name of the compute resource, where this host is a member."""
         return self._cluster_name
 
     @cluster_name.setter
@@ -368,7 +368,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def mgmt_ip(self):
-        """The management IP address of the host."""
+        """Return the management IP address of the host."""
         return self._mgmt_ip
 
     @mgmt_ip.setter
@@ -389,7 +389,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def memory_mb(self):
-        """The RAM of the host in MiByte."""
+        """Return the RAM of the host in MiByte."""
         if self.memory is None:
             return None
         return int(self.memory / 1024 / 1024)
@@ -397,7 +397,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def memory_gb(self):
-        """The RAM of the host in GiByte."""
+        """Return the RAM of the host in GiByte."""
         if self.memory is None:
             return None
         return float(self.memory) / 1024.0 / 1024.0 / 1024.0
@@ -425,7 +425,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def reboot_required(self):
-        """Does the host needs a reboot."""
+        """Return, whether the host needs a reboot."""
         return self._reboot_required
 
     @reboot_required.setter
@@ -435,7 +435,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def online(self):
-        """Is this host generally online or not."""
+        """Return, whether this host generally online or not."""
         if self.power_state is None:
             return False
         if self.power_state.lower() in ('poweredoff', 'unknown'):
@@ -445,7 +445,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def boot_time(self):
-        """The time of the last reboot of the host."""
+        """Return the time of the last reboot of the host."""
         return self._boot_time
 
     @boot_time.setter

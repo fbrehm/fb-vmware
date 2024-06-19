@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.iface.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.iface
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -21,38 +23,38 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
-from general import SimpleTestObject
 
 LOG = logging.getLogger('test-iface')
 
 
 # =============================================================================
 class TestVInterface(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereVmInterface object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        super(TestVInterface, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.iface."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.iface ...")
         import fb_vmware.iface
-        from fb_vmware import VsphereVmInterface                     # noqa
+        from fb_vmware import VsphereVmInterface
 
-        LOG.debug("Version of fb_vmware.iface: {!r}.".format(fb_vmware.iface.__version__))
+        LOG.debug('Version of fb_vmware.iface: {!r}.'.format(fb_vmware.iface.__version__))
+
+        doc = textwrap.dedent(VsphereVmInterface.__doc__)
+        LOG.debug('Description of VsphereVmInterface: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereVmInterface object ...")
+        """Test nit of a VsphereVmInterface object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereVmInterface
-        from fb_vmware.errors import VSphereNameError
 
         iface_name = 'iface0'
         nw_name = '10.12.11.0_24'
@@ -64,8 +66,8 @@ class TestVInterface(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereVmInterface %r: {!r}".format(iface))
-        LOG.debug("VsphereVmInterface %s:\n{}".format(iface))
+        LOG.debug('VsphereVmInterface %r: {!r}'.format(iface))
+        LOG.debug('VsphereVmInterface %s:\n{}'.format(iface))
 
         self.assertIsInstance(iface, VsphereVmInterface)
         self.assertEqual(iface.appname, self.appname)
@@ -80,7 +82,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.datastore.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.datastore
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -21,47 +23,51 @@ libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
-from general import SimpleTestObject
 
 LOG = logging.getLogger('test-datastore')
 
 
 # =============================================================================
 class TestVDataStore(FbVMWareTestcase):
+    """Testcase for unit tests on a VsphereDatastore object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        super(TestVDataStore, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test import of fb_vmware.datastore."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.datastore ...")
         import fb_vmware.datastore
-        from fb_vmware import VsphereDatastore                       # noqa
-        from fb_vmware import VsphereDatastoreDict                   # noqa
+        from fb_vmware import VsphereDatastore
+        from fb_vmware import VsphereDatastoreDict
 
-        LOG.debug("Version of fb_vmware.datastore: {!r}.".format(fb_vmware.datastore.__version__))
+        LOG.debug('Version of fb_vmware.datastore: {!r}.'.format(fb_vmware.datastore.__version__))
+
+        doc = textwrap.dedent(VsphereDatastore.__doc__)
+        LOG.debug('Description of VsphereDatastore: ' + doc)
+
+        doc = textwrap.dedent(VsphereDatastoreDict.__doc__)
+        LOG.debug('Description of VsphereDatastoreDict: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a VsphereDatastore object ...")
+        """Test init of a VsphereDatastore object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereDatastore
         from fb_vmware.errors import VSphereNameError
 
-        with self.assertRaises((VSphereNameError, TypeError))  as cm:
+        with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             ds = VsphereDatastore(appname=self.appname)
-            LOG.debug("VsphereDatastore %s:\n{}".format(dc))
+            LOG.debug('VsphereDatastore %s:\n{}'.format(ds))
 
         e = cm.exception
-        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
 
         ds_name = 'my-datastore'
         capacity = int(100 * 1024 * 1024 * 1024)
@@ -75,8 +81,8 @@ class TestVDataStore(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug("VsphereDatastore %r: {!r}".format(ds))
-        LOG.debug("VsphereDatastore %s:\n{}".format(ds))
+        LOG.debug('VsphereDatastore %r: {!r}'.format(ds))
+        LOG.debug('VsphereDatastore %s:\n{}'.format(ds))
 
         self.assertIsInstance(ds, VsphereDatastore)
         self.assertEqual(ds.appname, self.appname)
@@ -92,7 +98,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

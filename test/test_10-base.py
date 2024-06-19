@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
+"""
+@summary: Test script (and module) for unit tests on module fb_vmware.base.
+
 @author: Frank Brehm
 @contact: frank@brehm-online.com
 @copyright: © 2024 Frank Brehm, Berlin
 @license: GPL3
-@summary: test script (and module) for unit tests on module fb_vmware.base
-'''
+"""
 
+import logging
 import os
 import sys
-import logging
+import textwrap
 
 try:
     import unittest2 as unittest
@@ -27,38 +29,40 @@ LOG = logging.getLogger('test-base')
 
 # =============================================================================
 class TestVMWareBase(FbVMWareTestcase):
+    """Testcase for unit tests on base object."""
 
     # -------------------------------------------------------------------------
     def setUp(self):
-        pass
+        """Execute this on seting up before calling each particular test method."""
+        super(TestVMWareBase, self).setUp()
 
     # -------------------------------------------------------------------------
     def test_import(self):
+        """Test importing of fb_vmware.base."""
+        LOG.info(self.get_method_doc())
 
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing import of fb_vmware.base ...")
         import fb_vmware.base
-        from fb_vmware import BaseVsphereHandler                # noqa
+        from fb_vmware import BaseVsphereHandler
 
-        LOG.debug("Version of fb_vmware.base: {!r}.".format(fb_vmware.base.__version__))
+        LOG.debug('Version of fb_vmware.base: {!r}.'.format(fb_vmware.base.__version__))
+
+        doc = textwrap.dedent(BaseVsphereHandler.__doc__)
+        LOG.debug('Description of BaseVsphereHandler: ' + doc)
 
     # -------------------------------------------------------------------------
     def test_init_base(self):
-
-        if self.verbose >= 1:
-            print()
-        LOG.info("Testing init of a BaseVsphereHandler object ...")
+        """Test init of a BaseVsphereHandler object."""
+        LOG.info(self.get_method_doc())
 
         from fb_vmware import BaseVsphereHandler
         from fb_vmware.config import VSPhereConfigInfo
 
         with self.assertRaises(TypeError) as cm:
             gen_handler = BaseVsphereHandler()
-            LOG.error("This should not be visible - version of BaseVsphereHandler: {!r}".format(
+            LOG.error('This should not be visible - version of BaseVsphereHandler: {!r}'.format(
                 gen_handler.version))
         e = cm.exception
-        LOG.debug("TypeError raised on instantiate a BaseVsphereHandler: %s", str(e))
+        LOG.debug('TypeError raised on instantiate a BaseVsphereHandler: %s', str(e))
 
         from fb_vmware import DEFAULT_MAX_SEARCH_DEPTH
         from fb_vmware import DEFAULT_VSPHERE_PORT, DEFAULT_TZ_NAME
@@ -82,8 +86,8 @@ class TestVMWareBase(FbVMWareTestcase):
             appname=self.appname,
             verbose=1,
         )
-        LOG.debug("TestVsphereHandler %r: {!r}".format(gen_handler))
-        LOG.debug("TestVsphereHandler %s:\n{}".format(gen_handler))
+        LOG.debug('TestVsphereHandler %r: {!r}'.format(gen_handler))
+        LOG.debug('TestVsphereHandler %s:\n{}'.format(gen_handler))
 
         self.assertIsInstance(gen_handler, BaseVsphereHandler)
         self.assertEqual(gen_handler.verbose, 1)
@@ -106,7 +110,7 @@ if __name__ == '__main__':
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info("Starting tests ...")
+    LOG.info('Starting tests ...')
 
     suite = unittest.TestSuite()
 

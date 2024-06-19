@@ -24,7 +24,7 @@ from .errors import VSphereNameError
 from .xlate import XLATOR
 
 
-__version__ = '1.2.3'
+__version__ = '1.2.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -67,13 +67,13 @@ class VsphereVmInterface(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def obj_type(self):
-        """The type of the VSphere object."""
+        """Return the type of the VSphere object."""
         return 'vsphere_vm_interface'
 
     # -----------------------------------------------------------
     @property
     def name(self):
-        """The name of the interface."""
+        """Return the name of the interface."""
         return self._name
 
     @name.setter
@@ -93,7 +93,7 @@ class VsphereVmInterface(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def network_name(self):
-        """The name of the network of the interface."""
+        """Return the name of the network of the interface."""
         return self._network_name
 
     @network_name.setter
@@ -111,7 +111,7 @@ class VsphereVmInterface(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def mac_address(self):
-        """The Mac-Address of the interface."""
+        """Return the Mac-Address of the interface."""
         return self._mac_address
 
     @mac_address.setter
@@ -132,7 +132,7 @@ class VsphereVmInterface(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def summary(self):
-        """The Mac-Address of the interface."""
+        """Return the Mac-Address of the interface."""
         return self._summary
 
     @summary.setter

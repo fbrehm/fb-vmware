@@ -23,7 +23,7 @@ from fb_tools.obj import FbBaseObject
 from .errors import VSphereNameError
 from .xlate import XLATOR
 
-__version__ = '1.3.3'
+__version__ = '1.3.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -74,7 +74,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def obj_type(self):
-        """The type of the VSphere object."""
+        """Return the type of the VSphere object."""
         return self._obj_type
 
     @obj_type.setter
@@ -141,7 +141,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def name_prefix(self):
-        """The prefix for the terraform name."""
+        """Return the prefix for the terraform name."""
         return self._name_prefix
 
     @name_prefix.setter
@@ -160,7 +160,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def name(self):
-        """The name of the object."""
+        """Return the name of the object."""
         return self._name
 
     @name.setter
@@ -178,7 +178,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def qual_name(self):
-        """The qualified name of the object, including object_type and name."""
+        """Return the qualified name of the object, including object_type and name."""
         if self.obj_type is None:
             if self.name is None:
                 return ''
@@ -191,7 +191,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def tf_name(self):
-        """The name of the bject how used in terraform."""
+        """Return the name of the bject how used in terraform."""
         if self.name is None:
             return None
         return self.name_prefix + '_' + RE_TF_NAME.sub('_', self.name.lower())
@@ -199,7 +199,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def var_name(self):
-        """The name of the variable used in terraform definitions."""
+        """Return the name of the variable used in terraform definitions."""
         return self.obj_type + '_' + RE_TF_NAME.sub('_', self.name.lower())
 
     # -------------------------------------------------------------------------

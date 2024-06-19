@@ -28,7 +28,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -80,7 +80,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def uuid(self):
-        """The UUID of the disk."""
+        """Return the UUID of the disk."""
         return self._uuid
 
     @uuid.setter
@@ -100,7 +100,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def file_name(self):
-        """The name of the backing device on the host system."""
+        """Return the name of the backing device on the host system."""
         return self._file_name
 
     @file_name.setter
@@ -117,7 +117,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def file_storage(self):
-        """The name of the storage of the backing device on the host system."""
+        """Return the name of the storage of the backing device on the host system."""
         if self.file_name is None:
             return None
         match = self.re_file_storage.match(self.file_name)
@@ -128,7 +128,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def file_rel(self):
-        """The relative path of the backing device on the host system."""
+        """Return the relative path of the backing device on the host system."""
         if self.file_name is None:
             return None
         match = self.re_file_rel.match(self.file_name)
@@ -140,7 +140,7 @@ class VsphereDisk(FbBaseObject):
     @property
     def unit_nr(self):
         """
-        The unit number of this device on its controller.
+        Return the unit number of this device on its controller.
 
         This property is None if the controller property is None
         (for example, when the device is not attached to a specific controller object).
@@ -157,7 +157,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def label(self):
-        """The display label of the disk."""
+        """Return the display label of the disk."""
         return self._label
 
     @label.setter
@@ -174,7 +174,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def summary(self):
-        """A summary description of the disk."""
+        """Return a summary description of the disk."""
         return self._summary
 
     @summary.setter
@@ -191,7 +191,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def key(self):
-        """A unique key that distinguishes this device from other devices in the same VM."""
+        """Return a unique key that distinguishes this device from other devices in the same VM."""
         return self._key
 
     @key.setter
@@ -204,7 +204,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def size(self):
-        """The size of the disk in Bytes."""
+        """Return the size of the disk in Bytes."""
         return self._size
 
     @size.setter
@@ -217,7 +217,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def size_kb(self):
-        """The size of the disk in KiBytes."""
+        """Return the size of the disk in KiBytes."""
         if self.size is None:
             return None
         return int(self.size / 1024)
@@ -225,7 +225,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def size_mb(self):
-        """The size of the disk in MiBytes."""
+        """Return the size of the disk in MiBytes."""
         if self.size is None:
             return None
         return int(self.size / 1024 / 1024)
@@ -233,7 +233,7 @@ class VsphereDisk(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def size_gb(self):
-        """The size of the disk in GiBytes as a float value."""
+        """Return the size of the disk in GiBytes as a float value."""
         if self.size_mb is None:
             return None
         return float(self.size_mb) / 1024.0

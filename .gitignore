@@ -70,6 +70,7 @@ docs/_build/
 
 # PyBuilder
 target/
+.pybuild/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -134,3 +135,4 @@ etc/*.ini
 rpmdir/*
 .rpm-version*
 local_version.py
+usr/

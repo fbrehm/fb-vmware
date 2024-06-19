@@ -27,7 +27,7 @@ from pyVmomi import vim
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.3.3'
+__version__ = '1.3.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -86,7 +86,7 @@ class VsphereDsCluster(VsphereObject):
     # -----------------------------------------------------------
     @property
     def calculated_usage(self):
-        """The calculated additional usage of this datastore cluster, in GiBytes."""
+        """Return the calculated additional usage of this datastore cluster, in GiBytes."""
         return self._calculated_usage
 
     @calculated_usage.setter

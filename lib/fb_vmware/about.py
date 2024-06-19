@@ -24,7 +24,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -58,7 +58,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def api_type(self):
-        """The API type of the about object."""
+        """Return the API type of the about object."""
         return self._api_type
 
     @api_type.setter
@@ -76,7 +76,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def api_version(self):
-        """The API version of the about object."""
+        """Return the API version of the about object."""
         return self._api_version
 
     @api_version.setter
@@ -94,7 +94,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def name(self):
-        """The name of the about object."""
+        """Return the name of the about object."""
         return self._name
 
     @name.setter
@@ -112,7 +112,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def full_name(self):
-        """The full name of the about object."""
+        """Return the full name of the about object."""
         return self._full_name
 
     @full_name.setter
@@ -130,7 +130,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def vendor(self):
-        """The vendor of the about object."""
+        """Return the vendor of the about object."""
         return self._vendor
 
     @vendor.setter
@@ -148,7 +148,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def os_version(self):
-        """The operating system version of the about object."""
+        """Return the operating system version of the about object."""
         return self._os_version
 
     @os_version.setter
@@ -166,7 +166,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def os_type(self):
-        """The operating system type of the underlying OS."""
+        """Return the operating system type of the underlying OS."""
         return self._os_type
 
     @os_type.setter
@@ -184,7 +184,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def instance_uuid(self):
-        """The globally unique identifier associated with this service instance."""
+        """Return the globally unique identifier associated with this service instance."""
         return self._instance_uuid
 
     @instance_uuid.setter
@@ -206,7 +206,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def lic_prodname(self):
-        """The The license product name."""
+        """Return the license product name."""
         return self._lic_prodname
 
     @lic_prodname.setter
@@ -224,7 +224,7 @@ class VsphereAboutInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def lic_prodversion(self):
-        """The The license product version."""
+        """Return the license product version."""
         return self._lic_prodversion
 
     @lic_prodversion.setter

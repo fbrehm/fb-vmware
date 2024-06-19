@@ -1,3 +1,12 @@
+fb-vmware (1.1.0) all; urgency=medium
+
+  * Deactivating GitHub workflow packages
+  * Refactoring setup.py.
+  * Applying flake8 rules to all Python sources.
+  * Adding GitHub workflow build-packages for using a shared workflow
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 19 Jun 2024 14:52:02 +0200
+
 fb-vmware (1.0.1) all; urgency=medium
 
   * Fixing search for locales dir in lib/fb_vmware/xlate.py

@@ -7,6 +7,12 @@ name: "Building OS packages with a shared workflow."
 on:
   push:
     branches:
+      - '**'
+      - '!dev-**'
+      - '!dev/**'
+      - '!hf**'
+      - '!old**'
+      - '!feature**'
       - 'dev/workflow'
     tags:
       - '**'

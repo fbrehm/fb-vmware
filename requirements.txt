@@ -1,6 +1,6 @@
 pyvmomi
-fb_tools
-fb_logging
+fb_logging>=1.0.0
+fb_tools>=2.6.0
 packaging
 requests
 six

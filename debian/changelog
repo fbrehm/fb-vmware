@@ -1,3 +1,10 @@
+fb-vmware (1.1.2) UNRELEASED; urgency=medium
+
+  * Updating dependencies to fb_tools.
+  * Setting shared Github workflow to branch main.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Mon, 01 Jul 2024 12:02:59 +0200
+
 fb-vmware (1.1.1) all; urgency=medium
 
   * Changing version of package builder in .gitlab-ci.yml to v2.0

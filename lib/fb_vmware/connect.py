@@ -273,7 +273,7 @@ class VsphereConnection(BaseVsphereHandler):
 
         if self.datastores:
             if self.verbose > 1:
-                if self.verbose > 3:
+                if self.verbose > 2:
                     LOG.debug(_('Found datastores:') + '\n' + pp(self.datastores.as_list()))
                 else:
                     LOG.debug(_('Found datastores:') + '\n' + pp(list(self.datastores.keys())))

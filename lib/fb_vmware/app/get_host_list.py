@@ -262,7 +262,7 @@ class GetHostsListApplication(BaseVmwareApplication):
             'maintenance')
 
         str_lengths = {}
-        for label in labels.keys():
+        for label in labels:
             str_lengths[label] = len(labels[label])
 
         max_len = 0

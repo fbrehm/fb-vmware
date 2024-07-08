@@ -11,25 +11,25 @@ from __future__ import absolute_import, print_function
 
 # Standard modules
 import logging
-import re
 import sys
 from operator import itemgetter
 
 # Third party modules
 from babel.numbers import format_decimal
 
-from fb_tools.argparse_actions import RegexOptionAction
+# from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
-from fb_tools.xlate import format_list
+# from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-from ..ds_cluster import VsphereDsCluster, VsphereDsClusterDict
+# from ..ds_cluster import VsphereDsCluster
+from ..ds_cluster import VsphereDsClusterDict
 from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

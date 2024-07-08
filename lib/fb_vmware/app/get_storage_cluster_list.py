@@ -13,8 +13,11 @@ from __future__ import absolute_import, print_function
 import logging
 import re
 import sys
+from operator import itemgetter
 
 # Third party modules
+from babel.numbers import format_decimal
+
 from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
 from fb_tools.xlate import format_list
@@ -26,7 +29,7 @@ from ..ds_cluster import VsphereDsCluster, VsphereDsClusterDict
 from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -43,6 +46,10 @@ class GetVmStorageClustersAppError(VmwareAppError):
 class GetStorageClusterListApp(BaseVmwareApplication):
     """Class for the application object."""
 
+    avail_sort_keys = (
+        'cluster_name', 'vsphere_name', 'capacity', 'free_space', 'usage', 'usage_pc')
+    default_sort_keys = ['vsphere_name', 'cluster_name']
+
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
@@ -54,6 +61,9 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             'VMWare VSphere and print it out.')
 
         self.st_clusters = []
+        self._print_total = True
+        self.totals = None
+        self.sort_keys = self.default_sort_keys
 
         super(GetStorageClusterListApp, self).__init__(
             appname=appname, verbose=verbose, version=version, base_dir=base_dir,
@@ -61,6 +71,28 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         )
 
         self.initialized = True
+
+    # -------------------------------------------------------------------------
+    @property
+    def print_total(self):
+        """Print out a line with the total capacity."""
+        return self._print_total
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True):
+        """
+        Transform the elements of the object into a dict.
+
+        @param short: don't include local properties in resulting dict.
+        @type short: bool
+
+        @return: structure as dict
+        @rtype:  dict
+        """
+        res = super(GetStorageClusterListApp, self).as_dict(short=short)
+        res['print_total'] = self.print_total
+
+        return res
 
     # -------------------------------------------------------------------------
     def _run(self):
@@ -123,6 +155,88 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         return ret
 
     # -------------------------------------------------------------------------
+    def _get_cluster_list(self, clusters):
+
+        cluster_list = []
+
+        total_capacity = 0.0
+        total_free = 0.0
+
+        for vsphere_name in clusters.keys():
+            for cluster_name in clusters[vsphere_name].keys():
+
+                cl = clusters[vsphere_name][cluster_name]
+                cluster = {}
+                cluster['is_total'] = False
+
+                cluster['cluster_name'] = cluster_name
+
+                cluster['vsphere_name'] = vsphere_name
+
+                cluster['capacity'] = cl.capacity_gb
+                cluster['capacity_gb'] = format_decimal(cl.capacity_gb, format='#,##0')
+                total_capacity += cl.capacity_gb
+
+                cluster['free_space'] = cl.free_space_gb
+                cluster['free_space_gb'] = format_decimal(cl.free_space_gb, format='#,##0')
+                total_free += cl.free_space_gb
+
+                used = cl.capacity_gb - cl.free_space_gb
+                cluster['usage'] = used
+                cluster['usage_gb'] = format_decimal(used, format='#,##0')
+
+                if cl.capacity_gb:
+                    usage_pc = used / cl.capacity_gb
+                    cluster['usage_pc'] = usage_pc
+                    cluster['usage_pc_out'] = format_decimal(usage_pc, format='0.0 %')
+                else:
+                    cluster['usage_pc_out'] = '- %'
+
+                cluster_list.append(cluster)
+
+        if self.print_total:
+            total_used = total_capacity - total_free
+            total_used_pc = None
+            total_used_pc_out = '- %'
+            if total_capacity:
+                total_used_pc = total_used / total_capacity
+                total_used_pc_out = format_decimal(total_used_pc, format='0.0 %')
+
+            self.totals = {
+                'cluster_name': _('Total:'),
+                'vsphere_name': '',
+                'is_total': True,
+                'capacity_gb': format_decimal(total_capacity, format='#,##0'),
+                'free_space_gb': format_decimal(total_free, format='#,##0'),
+                'usage_gb': format_decimal(total_used, format='#,##0'),
+                'usage_pc_out': total_used_pc_out,
+            }
+
+        return cluster_list
+
+    # -------------------------------------------------------------------------
+    def _get_cluster_fields_len(self, cluster_list, labels):
+
+        field_length = {}
+
+        for label in labels.keys():
+            field_length[label] = len(labels[label])
+
+        for cluster in cluster_list:
+            for label in labels.keys():
+                field = cluster[label]
+                if len(field) > field_length[label]:
+                    field_length[label] = len(field)
+
+        if self.totals:
+            for label in labels.keys():
+                field = self.totals[label]
+                if len(field) > field_length[label]:
+                    field_length[label] = len(field)
+
+        return field_length
+
+    # -------------------------------------------------------------------------
     def print_clusters(self, clusters):
         """Print on STDOUT all information about all datastore clusters."""
         labels = {
@@ -130,68 +244,67 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             'vsphere_name': 'VSPhere',
             'capacity_gb': _('Capacity in GB'),
             'free_space_gb': _('Free space in GB'),
-            'calculated_usage': _('Calculated usage in GB'),
-            'usage_pc': _('Usage in percent'),
+            'usage_gb': _('Calculated usage in GB'),
+            'usage_pc_out': _('Usage in percent'),
         }
+
         label_list = (
             'cluster_name', 'vsphere_name', 'capacity_gb',
-            'calculated_usage', 'usage_pc', 'free_space_gb')
+            'usage_gb', 'usage_pc_out', 'free_space_gb')
 
-        str_lengths = {}
-        for label in labels.keys():
-            str_lengths[label] = len(labels[label])
+        cluster_list = self._get_cluster_list(clusters)
+        field_length = self._get_cluster_fields_len(cluster_list, labels)
 
         max_len = 0
-        count = 0
+        count = len(cluster_list)
 
-        out = []
-
-        for vsphere_name in clusters.keys():
-            for cluster_name in clusters[vsphere_name].keys():
-
-                cl = clusters[vsphere_name][cluster_name]
-                cluster = {}
-
-                cluster['cluster_name'] = cluster_name
-                if len(cluster_name) > str_lengths['cluster_name']:
-                    str_lengths['cluster_name'] = len(cluster_name)
-
-                cluster['vsphere_name'] = vsphere_name
-                if len(vsphere_name) > str_lengths['vsphere_name']:
-                    str_lengths['vsphere_name'] = len(vsphere_name)
-
-                cap = '{:7.1f}'.format(cl.capacity_gb)
-                cluster['capacity_gb'] = cap
-                if len(cap) > str_lengths['capacity_gb']:
-                    str_lengths['capacity_gb'] = len(cap)
-
-                free = '{:7.1f}'.format(cl.free_space_gb)
-                cluster['free_space_gb'] = free
-                if len(free) > str_lengths['free_space_gb']:
-                    str_lengths['free_space_gb'] = len(free)
-
-                used = cl.capacity_gb - cl.free_space_gb
-                used_str = '{:7.1f}'.format(used)
-                cluster['calculated_usage'] = used_str
-                if len(used_str) > str_lengths['calculated_usage']:
-                    str_lengths['calculated_usage'] = len(used_str)
-
-                used_pc = '{:6.2f} %'.format(used / cl.capacity_gb * 100.0)
-                cluster['usage_pc'] = used_pc
-                if len(used_pc) > str_lengths['usage_pc']:
-                    str_lengths['usage_pc'] = len(used_pc)
-
-                out.append(cluster)
-
-        for label in labels:
+        for label in labels.keys():
             if max_len:
                 max_len += 2
-            max_len += str_lengths[label]
+            max_len += field_length[label]
 
         if self.verbose > 2:
-            LOG.debug('Label length:\n' + pp(str_lengths))
+            LOG.debug('Label length:\n' + pp(field_length))
             LOG.debug('Max line length: {} chars'.format(max_len))
-            LOG.debug('Datastore clusters:\n' + pp(out))
+            LOG.debug('Datastore clusters:\n' + pp(cluster_list))
+
+        tpl = ''
+        for label in label_list:
+            if tpl != '':
+                tpl += '  '
+            if label in ('cluster_name', 'vsphere_name'):
+                tpl += '{{{la}:<{le}}}'.format(la=label, le=field_length[label])
+            else:
+                tpl += '{{{la}:>{le}}}'.format(la=label, le=field_length[label])
+        if self.verbose > 1:
+            LOG.debug(_('Line template: {}').format(tpl))
+
+        cluster_list.sort(key=itemgetter(*self.sort_keys))
+
+        if not self.quiet:
+            print()
+            print(tpl.format(**labels))
+            print('-' * max_len)
+
+        for cluster in cluster_list:
+            print(tpl.format(**cluster))
+
+        if self.totals:
+            print('-' * max_len)
+            print(tpl.format(**self.totals))
+
+        if not self.quiet:
+            print()
+            if count:
+                msg = ngettext(
+                    'Found one VMWare storage cluster.',
+                    'Found {} VMWare storage clusters.'.format(count),
+                    count)
+            else:
+                msg = _('No VMWare storage clusters found.')
+
+            print(msg)
+            print()
 
 
 # =============================================================================

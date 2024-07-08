@@ -19,7 +19,7 @@ from babel.numbers import format_decimal
 
 # from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
-# from fb_tools.xlate import format_list
+from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
@@ -29,7 +29,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -93,6 +93,38 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         res['print_total'] = self.print_total
 
         return res
+
+    # -------------------------------------------------------------------------
+    def init_arg_parser(self):
+        """Public available method to initiate the argument parser."""
+        super(GetStorageClusterListApp, self).init_arg_parser()
+
+        output_options = self.arg_parser.add_argument_group(_('Output options'))
+
+        output_options.add_argument(
+            '-N', '--no-totals', action='store_true', dest='no_totals',
+            help=_("Don't print the totals of all storage clusters."),
+        )
+
+        output_options.add_argument(
+            '-S', '--sort', metavar='KEY', nargs='+', dest='sort_keys',
+            choices=self.avail_sort_keys, help=_(
+                'The keys for sorting the output. Available keys are: {avail}. '
+                'The default sorting keys are: {default}.').format(
+                avail=format_list(self.avail_sort_keys, do_repr=True),
+                default=format_list(self.default_sort_keys, do_repr=True))
+        )
+
+    # -------------------------------------------------------------------------
+    def perform_arg_parser(self):
+        """Evaluate command line parameters."""
+        super(GetStorageClusterListApp, self).perform_arg_parser()
+
+        if self.args.sort_keys:
+            self.sort_keys = self.args.sort_keys
+
+        if getattr(self.args, 'no_totals', False):
+            self._print_total = False
 
     # -------------------------------------------------------------------------
     def _run(self):
@@ -203,7 +235,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 total_used_pc_out = format_decimal(total_used_pc, format='0.0 %')
 
             self.totals = {
-                'cluster_name': _('Total:'),
+                'cluster_name': _('Total'),
                 'vsphere_name': '',
                 'is_total': True,
                 'capacity_gb': format_decimal(total_capacity, format='#,##0'),
@@ -211,6 +243,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 'usage_gb': format_decimal(total_used, format='#,##0'),
                 'usage_pc_out': total_used_pc_out,
             }
+            if not self.quiet:
+                self.totals['cluster_name'] += ':'
 
         return cluster_list
 
@@ -279,7 +313,14 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         if self.verbose > 1:
             LOG.debug(_('Line template: {}').format(tpl))
 
-        cluster_list.sort(key=itemgetter(*self.sort_keys))
+        if self.sort_keys:
+            LOG.debug('Sorting keys: ' + pp(self.sort_keys))
+            self.sort_keys.reverse()
+            for key in self.sort_keys:
+                if key in ('cluster_name', 'vsphere_name'):
+                    cluster_list.sort(key=itemgetter(key))
+                else:
+                    cluster_list.sort(key=itemgetter(key), reverse=True)
 
         if not self.quiet:
             print()
@@ -290,7 +331,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             print(tpl.format(**cluster))
 
         if self.totals:
-            print('-' * max_len)
+            if not self.quiet:
+                print('-' * max_len)
             print(tpl.format(**self.totals))
 
         if not self.quiet:

@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 _ = XLATOR.gettext
 
@@ -72,6 +72,23 @@ class VSphereExpectedError(VSphereHandlerError):
 
     pass
 
+
+# =============================================================================
+class VSphereDiskCtrlrTypeNotFoudError(VSphereExpectedError):
+    """Special error class, if a given DiskControllerType could not be found."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, type_name):
+        """Initialize the VSphereDiskCtrlrTypeNotFoudError object."""
+        self.type_name = type_name
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+        """Typecast into a string."""
+
+        msg = _("The given disk controller type {!r} could not be found.").format(self.type_name)
+
+        return msg
 
 # =============================================================================
 class VSphereNameError(VSphereExpectedError):

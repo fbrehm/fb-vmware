@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware 1.1.2\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2024-07-10 14:21+0200\n"
+"POT-Creation-Date: 2024-07-10 17:16+0200\n"
 "PO-Revision-Date: 2024-07-10 14:30+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -25,7 +25,7 @@ msgid ""
 "{a}"
 msgstr ""
 
-#: lib/fb_vmware/about.py:283 lib/fb_vmware/cluster.py:368 lib/fb_vmware/controller.py:266
+#: lib/fb_vmware/about.py:283 lib/fb_vmware/cluster.py:368 lib/fb_vmware/controller.py:292
 #: lib/fb_vmware/datastore.py:230 lib/fb_vmware/dc.py:183 lib/fb_vmware/disk.py:388
 #: lib/fb_vmware/ds_cluster.py:129 lib/fb_vmware/ether.py:510 lib/fb_vmware/host.py:247
 #: lib/fb_vmware/host.py:670 lib/fb_vmware/host_port_group.py:198 lib/fb_vmware/network.py:141
@@ -38,7 +38,7 @@ msgstr ""
 msgid "Parameter {t!r} must be a {e} object, a {v} object was given instead."
 msgstr ""
 
-#: lib/fb_vmware/about.py:304 lib/fb_vmware/cluster.py:304 lib/fb_vmware/controller.py:308
+#: lib/fb_vmware/about.py:304 lib/fb_vmware/cluster.py:304 lib/fb_vmware/controller.py:334
 #: lib/fb_vmware/datastore.py:270 lib/fb_vmware/dc.py:219 lib/fb_vmware/disk.py:419
 #: lib/fb_vmware/ds_cluster.py:155 lib/fb_vmware/ether.py:475 lib/fb_vmware/host.py:279
 #: lib/fb_vmware/host.py:588 lib/fb_vmware/host_port_group.py:222 lib/fb_vmware/network.py:173
@@ -46,7 +46,7 @@ msgstr ""
 msgid "Creating {} object from:"
 msgstr ""
 
-#: lib/fb_vmware/about.py:340 lib/fb_vmware/controller.py:313 lib/fb_vmware/disk.py:424
+#: lib/fb_vmware/about.py:340 lib/fb_vmware/controller.py:339 lib/fb_vmware/disk.py:424
 #: lib/fb_vmware/ether.py:480 lib/fb_vmware/host_port_group.py:227 lib/fb_vmware/vm.py:590
 msgid "Created {} object:"
 msgstr ""
@@ -404,7 +404,7 @@ msgstr "Connecting to VSPhere {!r} …"
 msgid "Disconnecting from VSPhere {!r}."
 msgstr "Disconnecting from VSPhere {!r}."
 
-#: lib/fb_vmware/cluster.py:261 lib/fb_vmware/controller.py:188 lib/fb_vmware/datastore.py:356
+#: lib/fb_vmware/cluster.py:261 lib/fb_vmware/controller.py:214 lib/fb_vmware/datastore.py:356
 #: lib/fb_vmware/dc.py:146 lib/fb_vmware/disk.py:275 lib/fb_vmware/ds_cluster.py:193
 #: lib/fb_vmware/ether.py:315 lib/fb_vmware/host.py:546 lib/fb_vmware/host_port_group.py:161
 #: lib/fb_vmware/network.py:212 lib/fb_vmware/obj.py:275 lib/fb_vmware/vm.py:469
@@ -451,466 +451,470 @@ msgstr ""
 msgid "Empty VSphere name found."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:119
+#: lib/fb_vmware/connect.py:120
 msgid "Trying to get some 'about' information from VSphere."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:134
+#: lib/fb_vmware/connect.py:135
 msgid "Got a {c} on requesting 'about' information from VSPhere {url}: {e}"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:144
+#: lib/fb_vmware/connect.py:145
 msgid "VSphere version: {!r}"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:146
+#: lib/fb_vmware/connect.py:147
 msgid "Found VSphere about-information:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:151
+#: lib/fb_vmware/connect.py:152
 msgid "Trying to get datacenter from VSphere ..."
 msgstr "Trying to get datacenter from VSphere …"
 
-#: lib/fb_vmware/connect.py:165
+#: lib/fb_vmware/connect.py:166
 msgid "Found VSphere datacenter {!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:167
+#: lib/fb_vmware/connect.py:168
 msgid "Info about datacenter:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:178
+#: lib/fb_vmware/connect.py:179
 msgid "Trying to get all clusters from VSphere ..."
 msgstr "rying to get all clusters from VSphere …"
 
-#: lib/fb_vmware/connect.py:202 lib/fb_vmware/connect.py:207
+#: lib/fb_vmware/connect.py:203 lib/fb_vmware/connect.py:208
 msgid "Found clusters:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:223 lib/fb_vmware/connect.py:491
+#: lib/fb_vmware/connect.py:224 lib/fb_vmware/connect.py:492
 msgid "Found standalone host"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:225 lib/fb_vmware/connect.py:493
+#: lib/fb_vmware/connect.py:226 lib/fb_vmware/connect.py:494
 msgid "Found cluster"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:226 lib/fb_vmware/connect.py:494
+#: lib/fb_vmware/connect.py:227 lib/fb_vmware/connect.py:495
 msgid "host"
 msgid_plural "hosts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:227 lib/fb_vmware/connect.py:495
+#: lib/fb_vmware/connect.py:228 lib/fb_vmware/connect.py:496
 msgid "CPU"
 msgid_plural "CPUs"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:228 lib/fb_vmware/connect.py:496
+#: lib/fb_vmware/connect.py:229 lib/fb_vmware/connect.py:497
 msgid "thread"
 msgid_plural "threads"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:229 lib/fb_vmware/connect.py:497
+#: lib/fb_vmware/connect.py:230 lib/fb_vmware/connect.py:498
 msgid "network"
 msgid_plural "networks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:230 lib/fb_vmware/connect.py:498
+#: lib/fb_vmware/connect.py:231 lib/fb_vmware/connect.py:499
 msgid "datastore"
 msgid_plural "datastores"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:231 lib/fb_vmware/connect.py:499
+#: lib/fb_vmware/connect.py:232 lib/fb_vmware/connect.py:500
 msgid ""
 "{on} {cl!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, {mem:0.1f} GiB Memory, {net} {nw_l} and {ds}"
 " {ds_l}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:254
+#: lib/fb_vmware/connect.py:255
 msgid "Trying to get all datastores from VSphere ..."
 msgstr "Trying to get all datastores from VSphere …"
 
-#: lib/fb_vmware/connect.py:277 lib/fb_vmware/connect.py:279
+#: lib/fb_vmware/connect.py:278 lib/fb_vmware/connect.py:280
 msgid "Found datastores:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:287
+#: lib/fb_vmware/connect.py:288
 msgid "Datastore mappings:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:302
+#: lib/fb_vmware/connect.py:303
 msgid "Datastore {!r} seems to be local."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:308
+#: lib/fb_vmware/connect.py:309
 msgid "Found datastore {ds!r} of type {t!r}, capacity {c:0.1f} GByte."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:317
+#: lib/fb_vmware/connect.py:318
 msgid "Trying to get all datastore clusters from VSphere ..."
 msgstr "Trying to get all datastore clusters from VSphere …"
 
-#: lib/fb_vmware/app/get_storage_cluster_list.py:183 lib/fb_vmware/connect.py:341
-#: lib/fb_vmware/connect.py:344
+#: lib/fb_vmware/app/get_storage_cluster_list.py:183 lib/fb_vmware/connect.py:342
+#: lib/fb_vmware/connect.py:345
 msgid "Found datastore clusters:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:346
+#: lib/fb_vmware/connect.py:347
 msgid "No VSphere datastore clusters found."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:352
+#: lib/fb_vmware/connect.py:353
 msgid "Datastore cluster mappings:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:358 lib/fb_vmware/connect.py:418
+#: lib/fb_vmware/connect.py:359 lib/fb_vmware/connect.py:419
 msgid "Found a {} child."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:376
+#: lib/fb_vmware/connect.py:377
 msgid "Trying to get all networks from VSphere ..."
 msgstr "Trying to get all networks from VSphere …"
 
-#: lib/fb_vmware/connect.py:398
+#: lib/fb_vmware/connect.py:399
 msgid "Found one VSphere network."
 msgid_plural "Found {n} VSphere networks."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:402 lib/fb_vmware/connect.py:404
+#: lib/fb_vmware/connect.py:403 lib/fb_vmware/connect.py:405
 msgid "Found VSphere networks:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:406
+#: lib/fb_vmware/connect.py:407
 msgid "No VSphere networks found."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:412
+#: lib/fb_vmware/connect.py:413
 msgid "Network mappings:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:438 lib/fb_vmware/connect.py:642
+#: lib/fb_vmware/connect.py:439 lib/fb_vmware/connect.py:643
 msgid "Parameter {p!r} => {r!r} seems not to be a regex object."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:441
+#: lib/fb_vmware/connect.py:442
 msgid "Trying to get all host systems from VSphere with name pattern {!r} ..."
 msgstr "Trying to get all host systems from VSphere with name pattern {!r} …"
 
-#: lib/fb_vmware/connect.py:445
+#: lib/fb_vmware/connect.py:446
 msgid "Trying to get all host systems from VSphere ..."
 msgstr "Trying to get all host systems from VSphere …"
 
-#: lib/fb_vmware/connect.py:472 lib/fb_vmware/connect.py:477
+#: lib/fb_vmware/connect.py:473 lib/fb_vmware/connect.py:478
 msgid "Found hosts:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:483
+#: lib/fb_vmware/connect.py:484
 msgid "Checking {o}-object in cluster {c!r} ..."
 msgstr "Checking {o}-object in cluster {c!r} …"
 
-#: lib/fb_vmware/connect.py:517
+#: lib/fb_vmware/connect.py:518
 msgid "Found host {h!r} in cluster {c!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:532
+#: lib/fb_vmware/connect.py:533
 msgid "Searching for VM {n!r} (pattern: {p!r}) in VSPhere {v!r} ..."
 msgstr "Searching for VM {n!r} (pattern: {p!r}) in VSPhere {v!r} …"
 
-#: lib/fb_vmware/connect.py:540
+#: lib/fb_vmware/connect.py:541
 msgid "VSphere VM {!r} not found."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:553 lib/fb_vmware/datastore.py:239 lib/fb_vmware/ds_cluster.py:138
+#: lib/fb_vmware/connect.py:554 lib/fb_vmware/datastore.py:239 lib/fb_vmware/ds_cluster.py:138
 #: lib/fb_vmware/iface.py:59 lib/fb_vmware/network.py:149
 msgid "Parameter {t!r} must be a {e}, {v!r} was given."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:646
+#: lib/fb_vmware/connect.py:647
 msgid "Parameter {p1!r} and {p2!r} may not be {w!r} at the same time."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:650
+#: lib/fb_vmware/connect.py:651
 msgid "Trying to get list of VMs with name pattern {!r} ..."
 msgstr "Trying to get list of VMs with name pattern {!r} …"
 
-#: lib/fb_vmware/connect.py:670
+#: lib/fb_vmware/connect.py:671
 msgid "Searching in path {!r} ..."
 msgstr "Searching in path {!r} …"
 
-#: lib/fb_vmware/connect.py:683
+#: lib/fb_vmware/connect.py:684
 msgid "Found one VM with pattern {p!r}."
 msgid_plural "Found {no} VMs with pattern {p!r}."
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:718
+#: lib/fb_vmware/connect.py:719
 msgid "Checking VM {!r} ..."
 msgstr "Checking VM {!r} …"
 
-#: lib/fb_vmware/connect.py:721
+#: lib/fb_vmware/connect.py:722
 msgid "Checking VM {!r} for being a template ..."
 msgstr "Checking VM {!r} for being a template …"
 
-#: lib/fb_vmware/connect.py:723
+#: lib/fb_vmware/connect.py:724
 msgid "Checking VM {!r} for being not a template ..."
 msgstr "Checking VM {!r} for being not a template …"
 
-#: lib/fb_vmware/connect.py:731
+#: lib/fb_vmware/connect.py:732
 msgid "Checking VM {!r} for pattern."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:734
+#: lib/fb_vmware/connect.py:735
 msgid "Found VM {!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:798
+#: lib/fb_vmware/connect.py:799
 msgid "VM {!r} is already powered on."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:801
+#: lib/fb_vmware/connect.py:802
 msgid "Powering on VM {!r} ..."
 msgstr "Powering on VM {!r} …"
 
-#: lib/fb_vmware/connect.py:805
+#: lib/fb_vmware/connect.py:806
 msgid "VM {!r} successful powered on."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:829
+#: lib/fb_vmware/connect.py:830
 msgid "VM {!r} is already powered off."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:832
+#: lib/fb_vmware/connect.py:833
 msgid "Powering off VM {!r} ..."
 msgstr "Powering off VM {!r} …"
 
-#: lib/fb_vmware/connect.py:836
+#: lib/fb_vmware/connect.py:837
 msgid "VM {!r} successful powered off."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:845
+#: lib/fb_vmware/connect.py:846
 msgid "Ensuring existence of VSphere VM folders:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:862
+#: lib/fb_vmware/connect.py:863
 msgid "Trying to get VM folder object for path {!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:887
+#: lib/fb_vmware/connect.py:888
 msgid "Checking single VM folder {i}: {f!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:898
+#: lib/fb_vmware/connect.py:899
 msgid "Found VM folder {n}, parent: {p}"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:916
+#: lib/fb_vmware/connect.py:917
 msgid "Ensuring existence of VSphere VM folder {!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:941
+#: lib/fb_vmware/connect.py:942
 msgid "VM Folder {!r} already exists."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:943
+#: lib/fb_vmware/connect.py:944
 msgid "Creating VM folder {!r} ..."
 msgstr "Creating VM folder {!r} …"
 
-#: lib/fb_vmware/connect.py:945
+#: lib/fb_vmware/connect.py:946
 msgid "Simulation mode, don't creating it."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:961
+#: lib/fb_vmware/connect.py:962
 msgid "Waiting for tasks to finish ..."
 msgstr "Waiting for tasks to finish …"
 
-#: lib/fb_vmware/connect.py:973
+#: lib/fb_vmware/connect.py:974
 msgid "Waiting at most {m} seconds for tasks {t} to finish ..."
 msgstr "Waiting at most {m} seconds for tasks {t} to finish …"
 
-#: lib/fb_vmware/connect.py:976
+#: lib/fb_vmware/connect.py:977
 msgid "Waiting for tasks {} to finish ..."
 msgstr "Waiting for tasks {} to finish …"
 
-#: lib/fb_vmware/connect.py:996
+#: lib/fb_vmware/connect.py:997
 msgid "Waiting ..."
 msgstr "Waiting …"
 
-#: lib/fb_vmware/connect.py:1030
+#: lib/fb_vmware/connect.py:1031
 msgid "Creating VM {!r} ..."
 msgstr "Creating VM {!r} …"
 
-#: lib/fb_vmware/connect.py:1033
+#: lib/fb_vmware/connect.py:1034
 msgid "Simulation mode - VM {!r} will not be created."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1052
+#: lib/fb_vmware/connect.py:1053
 msgid "Generating create spec for VM {!r} ..."
 msgstr "Generating create spec for VM {!r} …"
 
-#: lib/fb_vmware/connect.py:1060
+#: lib/fb_vmware/connect.py:1061
 msgid "Datastore path: {!r}"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1063
+#: lib/fb_vmware/connect.py:1064
 msgid "VM path name: {!r}"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1120
+#: lib/fb_vmware/connect.py:1121
 msgid "Generated VM config:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1129
+#: lib/fb_vmware/connect.py:1130
 msgid "Given disksize {!r} must be greater than zero."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1142
+#: lib/fb_vmware/connect.py:1143
 msgid "There may be created at most 6 disks, but {} were given."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1156
+#: lib/fb_vmware/connect.py:1157
 msgid "Generating spec for SCSI controller and one disk: {d}"
 msgid_plural "Generating spec for SCSI controller and {n} disks: {d}"
 msgstr[0] ""
 msgstr[1] ""
 
-#: lib/fb_vmware/connect.py:1159
+#: lib/fb_vmware/connect.py:1160
 msgid "Generating spec for SCSI controller without disks."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1184
+#: lib/fb_vmware/connect.py:1167
+msgid "Using a {name!r} disk controller ({desc})."
+msgstr ""
+
+#: lib/fb_vmware/connect.py:1190
 msgid "Adding spec for disk {n!r} with {gb} GiB => {kb} KiByte."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1219
+#: lib/fb_vmware/connect.py:1225
 msgid "Invalid Interface description {!r} given."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1230
+#: lib/fb_vmware/connect.py:1236
 msgid "Defined interface:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1234
+#: lib/fb_vmware/connect.py:1240
 msgid "Adding spec for network interface {d!r} (Network {n!r}, MAC: {m!r}, summary: {s!r})."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1286
+#: lib/fb_vmware/connect.py:1292
 msgid "Purging VM {!r} ..."
 msgstr "Purging VM {!r} …"
 
-#: lib/fb_vmware/connect.py:1290
+#: lib/fb_vmware/connect.py:1296
 msgid "VM {!r} successful removed."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1321
+#: lib/fb_vmware/connect.py:1327
 msgid "Did not found virtual ethernet device No. {no} (found {count} devices)."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1340
+#: lib/fb_vmware/connect.py:1346
 msgid "Changes of MAC address:"
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1344
+#: lib/fb_vmware/connect.py:1350
 msgid "Successful changed MAC address of VM {v!r} to {m!r}."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1359
+#: lib/fb_vmware/connect.py:1365
 msgid "Trying to detect all field names of custom field definitions."
 msgstr ""
 
-#: lib/fb_vmware/connect.py:1376
+#: lib/fb_vmware/connect.py:1382
 msgid "Got a {c} on requesting custom field names from VSPhere {url}: {e}"
 msgstr "Got a {c} on requesting custom field names from VSPhere {url}: {e}"
 
-#: lib/fb_vmware/connect.py:1382
+#: lib/fb_vmware/connect.py:1388
 msgid "Got custom field names from VSPhere {}:"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:57
+#: lib/fb_vmware/controller.py:58
 msgid "Virtual IDE controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:58
+#: lib/fb_vmware/controller.py:59
 msgid "Virtual VNME controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:59
+#: lib/fb_vmware/controller.py:60
 msgid "Virtual PCI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:60
+#: lib/fb_vmware/controller.py:61
 msgid "Virtual controller for keyboards and mice"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:61
+#: lib/fb_vmware/controller.py:62
 msgid "Virtual AHCI SATA controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:62
+#: lib/fb_vmware/controller.py:63
 msgid "Virtual SATA controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:63
+#: lib/fb_vmware/controller.py:64
 msgid "Virtual paravirtualized SCSI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:64
+#: lib/fb_vmware/controller.py:65
 msgid "Virtual BusLogic SCSI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:65
+#: lib/fb_vmware/controller.py:66
 msgid "Virtual LSI SCSI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:66
+#: lib/fb_vmware/controller.py:67
 msgid "Virtual LSI Logic SAS SCSI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:67
+#: lib/fb_vmware/controller.py:68
 msgid "Virtual SCSI controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:68
+#: lib/fb_vmware/controller.py:69
 msgid "Virtual Super IO Controller for floppy drives, parallel ports, and serial ports"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:70
+#: lib/fb_vmware/controller.py:71
 msgid "Virtual USB controller (USB 1.1 and 2.0)"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:71
+#: lib/fb_vmware/controller.py:72
 msgid "Virtual USB Extensible Host Controller Interface (USB 3.0)"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:72
+#: lib/fb_vmware/controller.py:73
 msgid "Unknown virtual controller"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:275 lib/fb_vmware/ether.py:424 lib/fb_vmware/host.py:255
+#: lib/fb_vmware/controller.py:301 lib/fb_vmware/ether.py:424 lib/fb_vmware/host.py:255
 #: lib/fb_vmware/host.py:568 lib/fb_vmware/host_port_group.py:206 lib/fb_vmware/vm.py:493
 msgid "Parameter {t!r} must be a {e}, {v!r} ({vt}) was given."
 msgstr ""
 
-#: lib/fb_vmware/controller.py:297
+#: lib/fb_vmware/controller.py:323
 msgid "Checking class of controller: {!r}"
 msgstr ""
 
-#: lib/fb_vmware/controller.py:322 lib/fb_vmware/disk.py:433 lib/fb_vmware/ether.py:521
+#: lib/fb_vmware/controller.py:348 lib/fb_vmware/disk.py:433 lib/fb_vmware/ether.py:521
 #: lib/fb_vmware/host_port_group.py:236 lib/fb_vmware/vm.py:651
 msgid "Invalid type {t!r} as an item of a {c}, only {o} objects are allowed."
 msgstr ""
 
-#: lib/fb_vmware/controller.py:389 lib/fb_vmware/disk.py:500 lib/fb_vmware/ether.py:588
+#: lib/fb_vmware/controller.py:415 lib/fb_vmware/disk.py:500 lib/fb_vmware/ether.py:588
 #: lib/fb_vmware/host.py:792 lib/fb_vmware/host_port_group.py:324 lib/fb_vmware/vm.py:718
 msgid "{m} takes at most {max} arguments ({n} given)."
 msgstr ""
 
-#: lib/fb_vmware/controller.py:428
+#: lib/fb_vmware/controller.py:454
 msgid "Controller is not in controller list."
 msgstr ""
 
@@ -959,51 +963,55 @@ msgstr ""
 msgid "No VSphere datastores found."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:90
+#: lib/fb_vmware/errors.py:88
+msgid "The given disk controller type {!r} could not be found."
+msgstr ""
+
+#: lib/fb_vmware/errors.py:106
 msgid "Invalid name {n!r} for a {o} VSphere object."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:93
+#: lib/fb_vmware/errors.py:109
 msgid "Invalid name {!r} for a VSphere object."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:110
+#: lib/fb_vmware/errors.py:126
 msgid "The VSphere datacenter {!r} is not existing."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:126
+#: lib/fb_vmware/errors.py:142
 msgid "The VSphere Virtual machine {!r} was not found."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:145
+#: lib/fb_vmware/errors.py:161
 msgid "No SAN based datastore found with at least {m:0.0f} MiB == {g:0.1f} GiB available space found."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:163
+#: lib/fb_vmware/errors.py:179
 msgid "The network {!r} is not existing."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:179
+#: lib/fb_vmware/errors.py:195
 msgid "Could not connect to the vSphere {!r}."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:195
+#: lib/fb_vmware/errors.py:211
 msgid "Got a {c} on connecting to vSphere {url!r}:"
 msgstr "Got a {c} on connecting to vSphere {url!r}:"
 
-#: lib/fb_vmware/errors.py:219
+#: lib/fb_vmware/errors.py:235
 msgid "Timeout on creating VM {vm!r} after {to:0.1f} seconds."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:222
+#: lib/fb_vmware/errors.py:238
 msgid "Timeout on creating VM {!r}."
 msgstr ""
 
-#: lib/fb_vmware/errors.py:239
+#: lib/fb_vmware/errors.py:255
 msgid "Invalid type of {!r} for a port of a VSPhere server"
 msgstr ""
 
-#: lib/fb_vmware/errors.py:264
+#: lib/fb_vmware/errors.py:280
 msgid ""
 "Invalid port number {port!r} for the VSphere server, PORT must be greater than zero and less or "
 "equal to {max}."

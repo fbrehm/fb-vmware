@@ -1164,7 +1164,7 @@ class VsphereConnection(BaseVsphereHandler):
         # Creating SCSI Controller
         (ctrl_class, ctrl_desc, ctrl_name) = VsphereDiskController.get_disk_controller_class(
             disk_ctrl_type)
-        LOG.debug(_('Using a {name!r} diskk controller ({desc}).').format(
+        LOG.debug(_('Using a {name!r} disk controller ({desc}).').format(
             name=ctrl_name, desc=ctrl_desc))
 
         scsi_ctr_spec = vim.vm.device.VirtualDeviceSpec()

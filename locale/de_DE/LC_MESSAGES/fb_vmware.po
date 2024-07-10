@@ -1,14 +1,14 @@
 # German (Germany) translations for fb_vmware.
-# Copyright (C) 2023 Frank Brehm, Berlin
+# Copyright (C) 2024 Frank Brehm, Berlin
 # This file is distributed under the same license as the fb_vmware project.
-# Frank Brehm <frank@brehm-online.com>, 2023.
+# Frank Brehm <frank.brehm@pixelpark.com>, 2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 0.5.7\n"
+"Project-Id-Version: fb_vmware 1.1.2\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2023-07-13 17:15+0200\n"
-"PO-Revision-Date: 2023-07-13 17:20+0200\n"
+"POT-Creation-Date: 2024-07-10 14:21+0200\n"
+"PO-Revision-Date: 2024-07-10 14:30+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -16,9 +16,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.12.1\n"
+"Generated-By: Babel 2.15.0\n"
 
-#: bin/get-vsphere-host-list:65 bin/get-vsphere-vm-info:65 bin/get-vsphere-vm-list:65
+#: bin/get-vsphere-host-list:65 bin/get-vsphere-storage-cluster-list:65 bin/get-vsphere-vm-info:65
+#: bin/get-vsphere-vm-list:65
 msgid ""
 "{c}-Object:\n"
 "{a}"
@@ -126,11 +127,13 @@ msgstr "Filtern der Ausgabeliste nach Hosts, die online sind."
 msgid "Filter output for offline hosts and templates."
 msgstr "Filtern der Ausgabeliste nach Hosts, die offline sind.."
 
-#: lib/fb_vmware/app/get_host_list.py:122 lib/fb_vmware/app/get_vm_list.py:176
+#: lib/fb_vmware/app/get_host_list.py:122 lib/fb_vmware/app/get_storage_cluster_list.py:102
+#: lib/fb_vmware/app/get_vm_list.py:176
 msgid "Output options"
 msgstr "Ausgabeoptionen"
 
-#: lib/fb_vmware/app/get_host_list.py:126 lib/fb_vmware/app/get_vm_list.py:185
+#: lib/fb_vmware/app/get_host_list.py:126 lib/fb_vmware/app/get_storage_cluster_list.py:111
+#: lib/fb_vmware/app/get_vm_list.py:185
 msgid ""
 "The keys for sorting the output. Available keys are: {avail}. The default sorting keys are: "
 "{default}."
@@ -146,8 +149,8 @@ msgstr "Regulärer Ausdruck als Filter: {!r}"
 msgid "Got a {c} for pattern {p!r}: {e}"
 msgstr "Ein {c} für das Suchmuster {p!r} erhalten: {e}"
 
-#: lib/fb_vmware/app/get_host_list.py:154 lib/fb_vmware/app/get_vm_info.py:82
-#: lib/fb_vmware/app/get_vm_list.py:242
+#: lib/fb_vmware/app/get_host_list.py:154 lib/fb_vmware/app/get_storage_cluster_list.py:132
+#: lib/fb_vmware/app/get_vm_info.py:82 lib/fb_vmware/app/get_vm_list.py:242
 msgid "Starting {a!r}, version {v!r} ..."
 msgstr "Starte {a!r}, Version {v!r} …"
 
@@ -207,7 +210,8 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
-#: lib/fb_vmware/app/get_host_list.py:307 lib/fb_vmware/app/get_vm_list.py:345
+#: lib/fb_vmware/app/get_host_list.py:307 lib/fb_vmware/app/get_storage_cluster_list.py:314
+#: lib/fb_vmware/app/get_vm_list.py:345
 msgid "Line template: {}"
 msgstr "Zeilenvorlage: {}"
 
@@ -220,6 +224,48 @@ msgid "Found one VMWare host."
 msgid_plural "Found {} VMWare hosts."
 msgstr[0] "Fand einen VMWare Host."
 msgstr[1] "Fand {} VMWare Hosts."
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:59
+msgid "Tries to get a list of all datastore clusters in VMWare VSphere and print it out."
+msgstr "Versucht eine Liste aller Datastore-Cluster in VMWare VSphere zu erhalten und gibt diese aus."
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:106
+msgid "Don't print the totals of all storage clusters."
+msgstr "Die Gesamt-Zahlen aller Datastore-Cluster nicht ausgeben."
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:175
+msgid "Getting all VSPhere storage clusters ..."
+msgstr "Ermittele alle VSPhere Datastore-Cluster …"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:238 lib/fb_vmware/app/get_vm_info.py:213
+msgid "Total"
+msgstr "Insgesamt"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:279
+msgid "Capacity in GB"
+msgstr "Kapazität in GiB"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:280
+msgid "Free space in GB"
+msgstr "Freier Platz in GiB"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:281
+msgid "Calculated usage in GB"
+msgstr "Berechnete Verwendung in GiB"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:282
+msgid "Usage in percent"
+msgstr "Verwendung in Prozent"
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:343
+msgid "Found one VMWare storage cluster."
+msgid_plural "Found {} VMWare storage clusters."
+msgstr[0] "Fand einen VMWare Datastore-Cluster."
+msgstr[1] "Fand {} VMWare Datastore-Clusters."
+
+#: lib/fb_vmware/app/get_storage_cluster_list.py:346
+msgid "No VMWare storage clusters found."
+msgstr "Keine  VMWare Storage-Cluster gefunden."
 
 #: lib/fb_vmware/app/get_vm_info.py:48
 msgid "Tries to get information about the given virtual machines in VMWare VSphere and print it out."
@@ -249,10 +295,6 @@ msgid "Disk"
 msgid_plural "Disks"
 msgstr[0] "Platte"
 msgstr[1] "Platten"
-
-#: lib/fb_vmware/app/get_vm_info.py:213
-msgid "Total"
-msgstr "Insgesamt"
 
 #: lib/fb_vmware/app/get_vm_info.py:244
 msgid "Custom Value"
@@ -527,7 +569,8 @@ msgstr "Fand Datastore {ds!r} vom Typ {t!r} mit einer Kapazität von {c:0.1f} Gi
 msgid "Trying to get all datastore clusters from VSphere ..."
 msgstr "Versuche alle Datastore-Cluster von VSPhere zu erhalten …"
 
-#: lib/fb_vmware/connect.py:341 lib/fb_vmware/connect.py:344
+#: lib/fb_vmware/app/get_storage_cluster_list.py:183 lib/fb_vmware/connect.py:341
+#: lib/fb_vmware/connect.py:344
 msgid "Found datastore clusters:"
 msgstr "Gefundene Datastore-Cluster:"
 
@@ -720,87 +763,87 @@ msgstr "Erstelle VM {!r} …"
 msgid "Simulation mode - VM {!r} will not be created."
 msgstr "Simulations-Modus - die VM {!r} wird nicht erstellt."
 
-#: lib/fb_vmware/connect.py:1051
+#: lib/fb_vmware/connect.py:1052
 msgid "Generating create spec for VM {!r} ..."
 msgstr "Generiere Erstellungs-Spec für VM {!r} …"
 
-#: lib/fb_vmware/connect.py:1059
+#: lib/fb_vmware/connect.py:1060
 msgid "Datastore path: {!r}"
 msgstr "Datastore-Pfad: {!r}"
 
-#: lib/fb_vmware/connect.py:1062
+#: lib/fb_vmware/connect.py:1063
 msgid "VM path name: {!r}"
 msgstr "VM-Pfadname: {!r}"
 
-#: lib/fb_vmware/connect.py:1112
+#: lib/fb_vmware/connect.py:1120
 msgid "Generated VM config:"
 msgstr "Generierte VM-Konfiguration:"
 
-#: lib/fb_vmware/connect.py:1121
+#: lib/fb_vmware/connect.py:1129
 msgid "Given disksize {!r} must be greater than zero."
 msgstr "Die gegebene Plattengröße muss größer als Null sein."
 
-#: lib/fb_vmware/connect.py:1134
+#: lib/fb_vmware/connect.py:1142
 msgid "There may be created at most 6 disks, but {} were given."
 msgstr "Es können höchstens 6 Platten erstellt werden, aber {} wurden übergeben."
 
-#: lib/fb_vmware/connect.py:1148
+#: lib/fb_vmware/connect.py:1156
 msgid "Generating spec for SCSI controller and one disk: {d}"
 msgid_plural "Generating spec for SCSI controller and {n} disks: {d}"
 msgstr[0] "Generiere Spec für SCSI-Controller und eine Disk: {d}"
 msgstr[1] "Generiere Spec für SCSI-Controller und {n} Disks: {d}"
 
-#: lib/fb_vmware/connect.py:1151
+#: lib/fb_vmware/connect.py:1159
 msgid "Generating spec for SCSI controller without disks."
 msgstr "Generiere Spec für SCSI-Controller ohne Disks."
 
-#: lib/fb_vmware/connect.py:1176
+#: lib/fb_vmware/connect.py:1184
 msgid "Adding spec for disk {n!r} with {gb} GiB => {kb} KiByte."
 msgstr "Füge Spec für Disk {n!r} mit {gb} GiB => {kb} KiByte hinzu."
 
-#: lib/fb_vmware/connect.py:1211
+#: lib/fb_vmware/connect.py:1219
 msgid "Invalid Interface description {!r} given."
 msgstr "Ungültige Interface-Beschreibung {!r} übergeben."
 
-#: lib/fb_vmware/connect.py:1222
+#: lib/fb_vmware/connect.py:1230
 msgid "Defined interface:"
 msgstr "Definierte Netzwerkschnittstelle:"
 
-#: lib/fb_vmware/connect.py:1226
+#: lib/fb_vmware/connect.py:1234
 msgid "Adding spec for network interface {d!r} (Network {n!r}, MAC: {m!r}, summary: {s!r})."
 msgstr ""
 "Füge Spec für Netzwerkschnittstelle {d!r} (Netzwerk {n!r}, MAC: {m!r}, Zusammenfassung: {s!r}) "
 "hinzu."
 
-#: lib/fb_vmware/connect.py:1278
+#: lib/fb_vmware/connect.py:1286
 msgid "Purging VM {!r} ..."
 msgstr "Lösche VM {!r} vollständig …"
 
-#: lib/fb_vmware/connect.py:1282
+#: lib/fb_vmware/connect.py:1290
 msgid "VM {!r} successful removed."
 msgstr "VM {!r} wurde erfolgreich gelöscht."
 
-#: lib/fb_vmware/connect.py:1313
+#: lib/fb_vmware/connect.py:1321
 msgid "Did not found virtual ethernet device No. {no} (found {count} devices)."
 msgstr "Virtuelles Ethernet-Device Nummer {no} wurde nicht gefunden (es wurden {count} Devices gefunden)."
 
-#: lib/fb_vmware/connect.py:1332
+#: lib/fb_vmware/connect.py:1340
 msgid "Changes of MAC address:"
 msgstr "Ändern von MAC-Adresse:"
 
-#: lib/fb_vmware/connect.py:1336
+#: lib/fb_vmware/connect.py:1344
 msgid "Successful changed MAC address of VM {v!r} to {m!r}."
 msgstr "Erfolgreich MAC-Adresse der VM {v!r} auf {m!r} geändert."
 
-#: lib/fb_vmware/connect.py:1351
+#: lib/fb_vmware/connect.py:1359
 msgid "Trying to detect all field names of custom field definitions."
 msgstr "Versuche alle Namen von benutzerdefinierten Felddefinitionen zu ermitteln."
 
-#: lib/fb_vmware/connect.py:1368
+#: lib/fb_vmware/connect.py:1376
 msgid "Got a {c} on requesting custom field names from VSPhere {url}: {e}"
 msgstr "Habe einen {c} beim Ermitteln benutzerdefinierter Feldnamen von VSphere {url} erhalten: {e}"
 
-#: lib/fb_vmware/connect.py:1374
+#: lib/fb_vmware/connect.py:1382
 msgid "Got custom field names from VSPhere {}:"
 msgstr "Erhaltene benutzerdefinierte Feldnamenvon VSphere {}:"
 
@@ -1082,23 +1125,23 @@ msgstr "Da ist irgendwas falsch mit der VM {n!r} in Cluster {c!r} und Pfad {p!r}
 msgid "VM is not in VM list."
 msgstr "Die VM ist nicht in der Liste der Virtuellen Maschinen."
 
-#: lib/fb_vmware/xlate.py:103
+#: lib/fb_vmware/xlate.py:119
 msgid "Module directory:"
 msgstr "Modul-Verzeichnis:"
 
-#: lib/fb_vmware/xlate.py:104
+#: lib/fb_vmware/xlate.py:120
 msgid "Base directory:"
 msgstr "Basis-Verzeichnis:"
 
-#: lib/fb_vmware/xlate.py:105
+#: lib/fb_vmware/xlate.py:121
 msgid "Locale directory:"
 msgstr "Verzeichnis für Locales:"
 
-#: lib/fb_vmware/xlate.py:106
+#: lib/fb_vmware/xlate.py:122
 msgid "Locale domain:"
 msgstr "Locale-Domäne:"
 
-#: lib/fb_vmware/xlate.py:107
+#: lib/fb_vmware/xlate.py:123
 msgid "Found .mo-file:"
 msgstr "Gefundene .mo-Datei:"
 

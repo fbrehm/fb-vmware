@@ -1,4 +1,4 @@
-fb-vmware (1.2.0) UNRELEASED; urgency=medium
+fb-vmware (1.2.0) all; urgency=medium
 
   * Adding bin/get-vsphere-storage-cluster-list with application class
     module lib/fb_vmware/app/get_storage_cluster_list.py.

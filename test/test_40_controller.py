@@ -92,7 +92,6 @@ class TestVController(FbVMWareTestcase):
         LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
         self.assertIs(cls, vim.vm.device.VirtualLsiLogicController)
 
-
         with self.assertRaises(VSphereDiskCtrlrTypeNotFoudError) as cm:
 
             (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class('uhu')

@@ -37,6 +37,7 @@ from .about import VsphereAboutInfo
 from .base import BaseVsphereHandler, DEFAULT_TZ_NAME
 from .cluster import VsphereCluster
 from .config import DEFAULT_VSPHERE_CLUSTER
+from .controller import VsphereDiskController
 from .datastore import VsphereDatastore, VsphereDatastoreDict
 from .dc import VsphereDatacenter
 from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict
@@ -51,11 +52,11 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '1.9.5'
+__version__ = '1.10.0'
 LOG = logging.getLogger(__name__)
 
-DEFAULT_OS_VERSION = 'oracleLinux8_64Guest'
-DEFAULT_VM_CFG_VERSION = 'vmx-14'
+DEFAULT_OS_VERSION = 'rhel9_64Guest'
+DEFAULT_VM_CFG_VERSION = 'vmx-19'
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
@@ -273,7 +274,7 @@ class VsphereConnection(BaseVsphereHandler):
 
         if self.datastores:
             if self.verbose > 1:
-                if self.verbose > 3:
+                if self.verbose > 2:
                     LOG.debug(_('Found datastores:') + '\n' + pp(self.datastores.as_list()))
                 else:
                     LOG.debug(_('Found datastores:') + '\n' + pp(list(self.datastores.keys())))
@@ -1047,7 +1048,7 @@ class VsphereConnection(BaseVsphereHandler):
         self, name, datastore, disks=None, nw_interfaces=None, graphic_ram_mb=256,
             videao_ram_mb=32, boot_delay_secs=3, ram_mb=1024, num_cpus=1, ds_with_timestamp=False,
             os_version=DEFAULT_OS_VERSION, cfg_version=DEFAULT_VM_CFG_VERSION,
-            enable_disk_uuid=True):
+            enable_disk_uuid=True, disk_ctrl_type=None):
         """Create a specification for creating a virtual machine."""
         LOG.debug(_('Generating create spec for VM {!r} ...').format(name))
 
@@ -1069,7 +1070,7 @@ class VsphereConnection(BaseVsphereHandler):
         # Device definitions
         dev_changes = []
 
-        dev_changes += self.generate_disk_spec(datastore_path, disks)
+        dev_changes += self.generate_disk_spec(datastore_path, disks, disk_ctrl_type)
         dev_changes += self.generate_if_create_spec(nw_interfaces)
 
         # Graphic Card
@@ -1122,7 +1123,7 @@ class VsphereConnection(BaseVsphereHandler):
         return config
 
     # -------------------------------------------------------------------------
-    def generate_disk_spec(self, datastore_path, disks=None):
+    def generate_disk_spec(self, datastore_path, disks=None, disk_ctrl_type=None):
         """Create a specification for creating a virtual disk."""
         disk_sizes2create = []
         if disks:
@@ -1161,9 +1162,14 @@ class VsphereConnection(BaseVsphereHandler):
         dev_changes = []
 
         # Creating SCSI Controller
+        (ctrl_class, ctrl_desc, ctrl_name) = VsphereDiskController.get_disk_controller_class(
+            disk_ctrl_type)
+        LOG.debug(_('Using a {name!r} disk controller ({desc}).').format(
+            name=ctrl_name, desc=ctrl_desc))
+
         scsi_ctr_spec = vim.vm.device.VirtualDeviceSpec()
         scsi_ctr_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
-        scsi_ctr_spec.device = vim.vm.device.VirtualLsiLogicController()
+        scsi_ctr_spec.device = ctrl_class()
         scsi_ctr_spec.device.key = 0
         scsi_ctr_spec.device.unitNumber = 1
         scsi_ctr_spec.device.sharedBus = 'noSharing'

@@ -1,3 +1,15 @@
+fb-vmware (1.2.0) UNRELEASED; urgency=medium
+
+  * Adding bin/get-vsphere-storage-cluster-list with application class
+    module lib/fb_vmware/app/get_storage_cluster_list.py.
+  * Adding error class VSphereDiskCtrlrTypeNotFoudError.
+  * Adding classmethod
+    VSphereDiskCtrlrTypeNotFoudError.get_disk_controller_class()
+  * Adding possibility to use another SCSI controller type for a VM to
+    create.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 10 Jul 2024 17:21:07 +0200
+
 fb-vmware (1.1.2) all; urgency=medium
 
   * Updating dependencies to fb_tools.

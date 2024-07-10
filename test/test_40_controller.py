@@ -72,6 +72,34 @@ class TestVController(FbVMWareTestcase):
         self.assertEqual(controller.appname, self.appname)
         self.assertEqual(controller.verbose, 1)
 
+    # -------------------------------------------------------------------------
+    def test_get_controller_class(self):
+        """Test classmethod VsphereDiskController.get_disk_controller_class."""
+        LOG.info(self.get_method_doc())
+
+        from pyVmomi import vim
+        from fb_vmware import VsphereDiskController
+        from fb_vmware.errors import VSphereDiskCtrlrTypeNotFoudError
+
+        LOG.debug('Test VsphereDiskController.get_disk_controller_class().')
+        (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class()
+        LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+        self.assertIs(cls, vim.vm.device.ParaVirtualSCSIController)
+        self.assertEqual(type_name, VsphereDiskController.default_conroller_type)
+
+        LOG.debug("Test VsphereDiskController.get_disk_controller_class('lsi_logic').")
+        (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class('lsi_logic')
+        LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+        self.assertIs(cls, vim.vm.device.VirtualLsiLogicController)
+
+        with self.assertRaises(VSphereDiskCtrlrTypeNotFoudError) as cm:
+
+            (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class('uhu')
+            LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+
+        e = cm.exception
+        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+
 
 # =============================================================================
 if __name__ == '__main__':
@@ -87,7 +115,7 @@ if __name__ == '__main__':
 
     suite.addTest(TestVController('test_import', verbose))
     suite.addTest(TestVController('test_init_object', verbose))
-    # suite.addTest(TestVController('test_init_from_summary', verbose))
+    suite.addTest(TestVController('test_get_controller_class', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

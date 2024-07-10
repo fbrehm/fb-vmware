@@ -25,9 +25,10 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereDiskCtrlrTypeNotFoudError
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -71,6 +72,31 @@ class VsphereDiskController(FbBaseObject):
         'usb_xhci': _('Virtual USB Extensible Host Controller Interface (USB 3.0)'),
         'unknown': _('Unknown virtual controller'),
     }
+
+    default_conroller_type = 'para_virt_scsi'
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def get_disk_controller_class(cls, type_name=None):
+        """Search the PyVmomi class for the DiskController by the given type name."""
+        if not type_name:
+            type_name = cls.default_conroller_type
+
+        ctrl_class = None
+
+        for pair in cls.ctrl_types:
+            if pair[1] == type_name:
+                ctrl_class = pair[0]
+                break
+
+        if not ctrl_class:
+            raise VSphereDiskCtrlrTypeNotFoudError(type_name)
+
+        desc = type_name
+        if type_name in cls.type_names:
+            desc = cls.type_names[type_name]
+
+        return (ctrl_class, desc, type_name)
 
     # -------------------------------------------------------------------------
     def __init__(

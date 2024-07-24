@@ -29,7 +29,7 @@ from ..errors import WrongPortTypeError
 from ..errors import WrongPortValueError
 from ..xlate import XLATOR
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -178,8 +178,6 @@ class VSPhereConfigInfo(FbBaseObject):
     def user(self, value):
         if value is None or str(value).strip() == '':
             self._user = None
-            # msg = _('An empty user name for connecting to a VSPhere datacenter is not allowed.')
-            # LOG.warn(msg)
             return
         self._user = str(value).strip()
 

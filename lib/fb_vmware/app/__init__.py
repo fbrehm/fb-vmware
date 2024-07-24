@@ -11,7 +11,6 @@ from __future__ import absolute_import, print_function
 
 # Standard modules
 import copy
-import getpass
 import logging
 import random
 
@@ -31,7 +30,7 @@ from ..connect import VsphereConnection
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone('Europe/Berlin')
 
@@ -201,6 +200,7 @@ class BaseVmwareApplication(FbConfigApplication):
         randomizer = random.SystemRandom()
 
         return randomizer.choice(list(fb_tools.spinner.CycleList.keys()))
+
 
 # =============================================================================
 if __name__ == '__main__':

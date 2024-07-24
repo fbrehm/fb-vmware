@@ -215,7 +215,7 @@ class BaseVsphereHandler(HandlingObject):
 
         if not self.connect_info.user:
             prompt = _('Please enter the user name for logging in to {}:').format(
-                    self.connect_info.url)
+                self.connect_info.url)
             prompt = self.colored(prompt, 'cyan') + ' '
             try:
                 user = input(prompt)

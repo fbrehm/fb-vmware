@@ -24,6 +24,7 @@ from fb_tools.xlate import format_list
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
+from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
@@ -245,6 +246,9 @@ class GetVmListApplication(BaseVmwareApplication):
         ret = 0
         try:
             ret = self.get_all_vms()
+        except VSphereExpectedError as e:
+            LOG.error(str(e))
+            self.exit(6)
         finally:
             self.cleaning_up()
 

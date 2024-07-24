@@ -27,9 +27,10 @@ from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 # from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
+from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -146,7 +147,11 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         storage_clusters = []
 
         vsphere = self.vsphere[vsphere_name]
-        vsphere.get_ds_clusters()
+        try:
+            vsphere.get_ds_clusters()
+        except VSphereExpectedError as e:
+            LOG.error(str(e))
+            self.exit(6)
 
         for cluster in vsphere.ds_clusters:
             storage_clusters.append(vsphere.ds_clusters[cluster])

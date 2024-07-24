@@ -29,7 +29,7 @@ from ..errors import WrongPortTypeError
 from ..errors import WrongPortValueError
 from ..xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -37,7 +37,7 @@ _ = XLATOR.gettext
 DEFAULT_CONFIG_DIR = 'pixelpark'
 
 DEFAULT_VSPHERE_PORT = 443
-DEFAULT_VSPHERE_USER = 'Administrator@vsphere.local'
+DEFAULT_VSPHERE_USER = None
 DEFAULT_VSPHERE_DC = 'vmcc'
 DEFAULT_VSPHERE_CLUSTER = 'vmcc-l105-01'
 
@@ -62,13 +62,15 @@ class VSPhereConfigInfo(FbBaseObject):
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None,
             host=None, use_https=True, port=DEFAULT_VSPHERE_PORT, dc=DEFAULT_VSPHERE_DC,
-            user=DEFAULT_VSPHERE_USER, password=None, initialized=False):
+            user=DEFAULT_VSPHERE_USER, configured_password=None, password=None,
+            initialized=False):
         """Initialize the VSPhereConfigInfo object."""
         self._host = None
         self._port = DEFAULT_VSPHERE_PORT
         self._use_https = True
         self._dc = DEFAULT_VSPHERE_DC
         self._user = DEFAULT_VSPHERE_USER
+        self._configured_password = None
         self._password = None
 
         super(VSPhereConfigInfo, self).__init__(
@@ -80,6 +82,7 @@ class VSPhereConfigInfo(FbBaseObject):
         self.use_https = use_https
         self.dc = dc
         self.user = user
+        self.configured_password = configured_password
         self.password = password
 
         if initialized:
@@ -98,15 +101,16 @@ class VSPhereConfigInfo(FbBaseObject):
         """
         res = super(VSPhereConfigInfo, self).as_dict(short=short)
 
-        res['host'] = self.host
-        res['use_https'] = self.use_https
-        res['port'] = self.port
+        res['configured_password'] = self.show_configured_password
         res['dc'] = self.dc
-        res['user'] = self.user
+        res['full_url'] = self.full_url
+        res['host'] = self.host
         res['password'] = self.show_password
+        res['port'] = self.port
         res['schema'] = self.schema
         res['url'] = self.url
-        res['full_url'] = self.full_url
+        res['use_https'] = self.use_https
+        res['user'] = self.user
 
         return res
 
@@ -173,15 +177,18 @@ class VSPhereConfigInfo(FbBaseObject):
     @user.setter
     def user(self, value):
         if value is None or str(value).strip() == '':
-            msg = _('An empty user name for connecting to a VSPhere datacenter is not allowed.')
-            LOG.warn(msg)
+            self._user = None
+            # msg = _('An empty user name for connecting to a VSPhere datacenter is not allowed.')
+            # LOG.warn(msg)
             return
         self._user = str(value).strip()
 
     # -----------------------------------------------------------
     @property
     def password(self):
-        """Return the password of the DN used to connect to the LDAP server."""
+        """Return the password of the user used to connect to the LDAP server."""
+        if self._password is None:
+            return self._configured_password
         return self._password
 
     @password.setter
@@ -193,12 +200,36 @@ class VSPhereConfigInfo(FbBaseObject):
 
     # -----------------------------------------------------------
     @property
+    def configured_password(self):
+        """Return the password of the user, how cames from configuration."""
+        return self._configured_password
+
+    @configured_password.setter
+    def configured_password(self, value):
+        if value is None or str(value).strip() == '':
+            self._configured_password = None
+            return
+        self._configured_password = str(value).strip()
+
+    # -----------------------------------------------------------
+    @property
     def show_password(self):
         """Return the password for using it in logging messages and in as_dict()."""
         if self.password is None:
             return None
         if self.verbose > 4:
             return self.password
+        else:
+            return '******'
+
+    # -----------------------------------------------------------
+    @property
+    def show_configured_password(self):
+        """Return the configured password for using it in logging messages and in as_dict()."""
+        if self.configured_password is None:
+            return None
+        if self.verbose > 4:
+            return self.configured_password
         else:
             return '******'
 
@@ -279,7 +310,7 @@ class VSPhereConfigInfo(FbBaseObject):
                     info.user = value
                     continue
                 if key.lower() == 'password':
-                    info.password = value
+                    info.configured_password = value
                     continue
 
                 msg = _(
@@ -315,6 +346,7 @@ class VSPhereConfigInfo(FbBaseObject):
         fields.append('port={!r}'.format(self.port))
         fields.append('dc={!r}'.format(self.dc))
         fields.append('user={!r}'.format(self.user))
+        fields.append('configured_password={!r}'.format(self.configured_password))
         fields.append('password={!r}'.format(self.password))
         fields.append('verbose={!r}'.format(self.verbose))
         fields.append('base_dir={!r}'.format(self.base_dir))

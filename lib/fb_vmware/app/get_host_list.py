@@ -24,9 +24,10 @@ from fb_tools.xlate import format_list
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
+from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.1.0'
+__version__ = '1.2.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -157,6 +158,9 @@ class GetHostsListApplication(BaseVmwareApplication):
         ret = 0
         try:
             ret = self.get_all_hosts()
+        except VSphereExpectedError as e:
+            LOG.error(str(e))
+            self.exit(6)
         finally:
             self.cleaning_up()
 

@@ -18,16 +18,16 @@ from operator import attrgetter, itemgetter
 # Third party modules
 from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp, to_bool
+from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-from ..spinner import Spinner
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = '1.6.5'
+__version__ = '1.7.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -263,7 +263,8 @@ class GetVmListApplication(BaseVmwareApplication):
                 all_vms += self.get_vms(vsphere_name, re_name)
         elif not self.quiet:
             spin_prompt = _('Getting all VSPhere VMs ...') + ' '
-            with Spinner(spin_prompt):
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
                 for vsphere_name in self.vsphere:
                     all_vms += self.get_vms(vsphere_name, re_name)
             sys.stdout.write(' ' * len(spin_prompt))

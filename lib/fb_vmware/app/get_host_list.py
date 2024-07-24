@@ -18,15 +18,15 @@ from operator import itemgetter
 # Third party modules
 from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
+from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-from ..spinner import Spinner
 from ..xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -173,7 +173,8 @@ class GetHostsListApplication(BaseVmwareApplication):
                 all_hosts += self.get_hosts(vsphere_name)
         elif not self.quiet:
             spin_prompt = _('Getting all VSPhere hosts ...') + ' '
-            with Spinner(spin_prompt):
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
                 for vsphere_name in self.vsphere:
                     all_hosts += self.get_hosts(vsphere_name)
             sys.stdout.write(' ' * len(spin_prompt))

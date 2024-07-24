@@ -13,8 +13,10 @@ from __future__ import absolute_import, print_function
 import copy
 import getpass
 import logging
+import random
 
 # Third party modules
+import fb_tools.spinner
 from fb_tools.cfg_app import FbConfigApplication
 from fb_tools.common import pp
 from fb_tools.errors import FbAppError
@@ -29,7 +31,7 @@ from ..connect import VsphereConnection
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone('Europe/Berlin')
 
@@ -197,6 +199,13 @@ class BaseVmwareApplication(FbConfigApplication):
             self.vsphere[vsphere_name].disconnect()
             del self.vsphere[vsphere_name]
 
+    # -------------------------------------------------------------------------
+    @classmethod
+    def get_random_spinner_name(cls):
+        """Return a randon spinner name from fb_tools.spinner.CycleList."""
+        randomizer = random.SystemRandom()
+
+        return randomizer.choice(list(fb_tools.spinner.CycleList.keys()))
 
 # =============================================================================
 if __name__ == '__main__':

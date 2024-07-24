@@ -38,7 +38,7 @@ from .errors import VSphereUnsufficientCredentials
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 LOG = logging.getLogger(__name__)
 
@@ -185,6 +185,12 @@ class BaseVsphereHandler(HandlingObject):
     def connect(self):
         """Connect to the the configured VSPhere instance."""
         LOG.debug(_('Connecting to vSphere {!r} ...').format(self.connect_info.full_url))
+
+        if not self.connect_info.user:
+            raise VSphereUnsufficientCredentials()
+
+        if not self.connect_info.password:
+            raise VSphereUnsufficientCredentials(self.connect_info.user)
 
         try:
             if self.connect_info.use_https:

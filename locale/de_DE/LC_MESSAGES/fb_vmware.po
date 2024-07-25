@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware 1.3.0\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2024-07-24 18:22+0200\n"
-"PO-Revision-Date: 2024-07-24 18:25+0200\n"
+"POT-Creation-Date: 2024-07-25 17:19+0200\n"
+"PO-Revision-Date: 2024-07-25 17:20+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
 "Language-Team: Frank Brehm <frank@brehm-online.com>\n"
@@ -408,23 +408,23 @@ msgstr "Das als {w} übergebene {c}-Objekt ist nicht initialisiert."
 msgid "Connecting to vSphere {!r} ..."
 msgstr "Verbinden zu vSphere {!r} …"
 
-#: lib/fb_vmware/base.py:217
+#: lib/fb_vmware/base.py:223
 msgid "Please enter the user name for logging in to {}:"
 msgstr "Bitte den Nutzernamen für den Login nach {} eingeben:"
 
-#: lib/fb_vmware/base.py:223
+#: lib/fb_vmware/base.py:229
 msgid "Got a {}"
 msgstr "Bekam ein {}"
 
-#: lib/fb_vmware/base.py:238
+#: lib/fb_vmware/base.py:244
 msgid "Please enter the password for {user!r} for logging in to {url}:"
 msgstr "Geben Sie das Passwort für {user!r} zu Login auf auf {url} ein:"
 
-#: lib/fb_vmware/base.py:243
+#: lib/fb_vmware/base.py:249
 msgid "Please repeat the password for {user!r} for logging in to {url}:"
 msgstr "Bitte wiederholen Sie das Passwort für {user!r} zu Login auf auf {url}:"
 
-#: lib/fb_vmware/base.py:259
+#: lib/fb_vmware/base.py:266
 msgid "Disconnecting from VSPhere {!r}."
 msgstr "Trenne Verbindung zu VSPhere {!r}."
 
@@ -1149,23 +1149,27 @@ msgstr "Da ist irgendwas falsch mit der VM {n!r} in Cluster {c!r} und Pfad {p!r}
 msgid "VM is not in VM list."
 msgstr "Die VM ist nicht in der Liste der Virtuellen Maschinen."
 
-#: lib/fb_vmware/xlate.py:119
+#: lib/fb_vmware/xlate.py:123
 msgid "Module directory:"
 msgstr "Modul-Verzeichnis:"
 
-#: lib/fb_vmware/xlate.py:120
+#: lib/fb_vmware/xlate.py:124
+msgid "Lib directory:"
+msgstr "Lib-Verzeichnis:"
+
+#: lib/fb_vmware/xlate.py:125
 msgid "Base directory:"
 msgstr "Basis-Verzeichnis:"
 
-#: lib/fb_vmware/xlate.py:121
+#: lib/fb_vmware/xlate.py:126
 msgid "Locale directory:"
 msgstr "Verzeichnis für Locales:"
 
-#: lib/fb_vmware/xlate.py:122
+#: lib/fb_vmware/xlate.py:127
 msgid "Locale domain:"
 msgstr "Locale-Domäne:"
 
-#: lib/fb_vmware/xlate.py:123
+#: lib/fb_vmware/xlate.py:128
 msgid "Found .mo-file:"
 msgstr "Gefundene .mo-Datei:"
 

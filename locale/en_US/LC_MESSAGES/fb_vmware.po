@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware 1.3.0\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2024-07-24 18:22+0200\n"
+"POT-Creation-Date: 2024-07-25 17:19+0200\n"
 "PO-Revision-Date: 2024-07-24 18:30+0200\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -396,23 +396,23 @@ msgstr ""
 msgid "Connecting to vSphere {!r} ..."
 msgstr "Connecting to VSPhere {!r} â€¦"
 
-#: lib/fb_vmware/base.py:217
+#: lib/fb_vmware/base.py:223
 msgid "Please enter the user name for logging in to {}:"
 msgstr ""
 
-#: lib/fb_vmware/base.py:223
+#: lib/fb_vmware/base.py:229
 msgid "Got a {}"
 msgstr ""
 
-#: lib/fb_vmware/base.py:238
+#: lib/fb_vmware/base.py:244
 msgid "Please enter the password for {user!r} for logging in to {url}:"
 msgstr ""
 
-#: lib/fb_vmware/base.py:243
+#: lib/fb_vmware/base.py:249
 msgid "Please repeat the password for {user!r} for logging in to {url}:"
 msgstr ""
 
-#: lib/fb_vmware/base.py:259
+#: lib/fb_vmware/base.py:266
 msgid "Disconnecting from VSPhere {!r}."
 msgstr "Disconnecting from VSPhere {!r}."
 
@@ -1129,23 +1129,27 @@ msgstr "There is something wrong with VM {n!r} in cluster {c!r} and path {p!r} â
 msgid "VM is not in VM list."
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:119
+#: lib/fb_vmware/xlate.py:123
 msgid "Module directory:"
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:120
+#: lib/fb_vmware/xlate.py:124
+msgid "Lib directory:"
+msgstr ""
+
+#: lib/fb_vmware/xlate.py:125
 msgid "Base directory:"
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:121
+#: lib/fb_vmware/xlate.py:126
 msgid "Locale directory:"
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:122
+#: lib/fb_vmware/xlate.py:127
 msgid "Locale domain:"
 msgstr ""
 
-#: lib/fb_vmware/xlate.py:123
+#: lib/fb_vmware/xlate.py:128
 msgid "Found .mo-file:"
 msgstr ""
 

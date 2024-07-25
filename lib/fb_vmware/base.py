@@ -38,7 +38,7 @@ from .errors import VSphereUnsufficientCredentials
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 LOG = logging.getLogger(__name__)
 
@@ -217,7 +217,7 @@ class BaseVsphereHandler(HandlingObject):
             raise VSphereCannotConnectError(self.connect_info.url)
 
     # -------------------------------------------------------------------------
-    def _check_credentials(self):
+    def _check_credentials(self, repeated_password=False):
 
         if not self.connect_info.user:
             prompt = _('Please enter the user name for logging in to {}:').format(
@@ -251,7 +251,8 @@ class BaseVsphereHandler(HandlingObject):
                 user=self.connect_info.user, url=self.connect_info.url)
             second_prompt = self.colored(second_prompt, 'cyan') + ' '
 
-            password = self.get_password(first_prompt, second_prompt, may_empty=False, repeat=True)
+            password = self.get_password(
+                first_prompt, second_prompt, may_empty=False, repeat=repeated_password)
 
             if not password:
                 raise VSphereUnsufficientCredentials(self.connect_info.user)

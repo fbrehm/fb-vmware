@@ -57,7 +57,7 @@ else:
     else:
         # Obviously in a virtual environment
         __base_dir__ = Path(sys.prefix)
-        LOCALE_DIR = __base_dir__  / 'share' / 'locale'
+        LOCALE_DIR = __base_dir__ / 'share' / 'locale'
         if LOCALE_DIR.is_dir():
             LOCALE_DIR = str(LOCALE_DIR.resolve())
         else:

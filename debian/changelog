@@ -1,4 +1,4 @@
-fb-vmware (1.3.0) UNRELEASED; urgency=medium
+fb-vmware (1.3.0) all; urgency=medium
 
   * Changing the used spinner by this from pp_tools and removing the no
     more used spinner module.

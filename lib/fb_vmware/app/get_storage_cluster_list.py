@@ -19,6 +19,7 @@ from babel.numbers import format_decimal
 
 # from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
+from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 # Own modules
@@ -26,10 +27,10 @@ from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 # from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
-from ..spinner import Spinner
+from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '0.2.2'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -146,7 +147,11 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         storage_clusters = []
 
         vsphere = self.vsphere[vsphere_name]
-        vsphere.get_ds_clusters()
+        try:
+            vsphere.get_ds_clusters()
+        except VSphereExpectedError as e:
+            LOG.error(str(e))
+            self.exit(6)
 
         for cluster in vsphere.ds_clusters:
             storage_clusters.append(vsphere.ds_clusters[cluster])
@@ -173,7 +178,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
         else:
             spin_prompt = _('Getting all VSPhere storage clusters ...')
-            with Spinner(spin_prompt):
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
                 _get_all_storage_clusters()
             sys.stdout.write(' ' * len(spin_prompt))
             sys.stdout.write('\r')

@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.1.1'
+__version__ = '1.2.0'
 
 _ = XLATOR.gettext
 
@@ -72,6 +72,27 @@ class VSphereExpectedError(VSphereHandlerError):
 
     pass
 
+
+# =============================================================================
+class VSphereUnsufficientCredentials(VSphereExpectedError):
+    """Special error class, if there are no sufficient credentials to connect to Vsphere."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, user=None):
+        """Initialize the VSphereUnsufficientCredentials object."""
+        self.user = user
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+        """Typecast into a string."""
+        if self.user:
+            msg = _(
+                'Invalid credentials to connect to Vsphere as user {!r}: '
+                'no password given.').format(self.user)
+        else:
+            msg = _('Invalid credentials to connect to Vsphere: no user given.')
+
+        return msg
 
 # =============================================================================
 class VSphereDiskCtrlrTypeNotFoudError(VSphereExpectedError):
@@ -210,7 +231,10 @@ class VSphereVimFault(VSphereExpectedError):
         """Typecast into a string."""
         msg = _('Got a {c} on connecting to vSphere {url!r}:').format(
             c=self.fault.__class__.__name__, url=self.url)
-        msg += ' ' + self.fault.msg
+        if hasattr(self.fault, 'msg'):
+            msg += ' ' + self.fault.msg
+        else:
+            msg += ' ' + str(self.fault)
         return msg
 
 

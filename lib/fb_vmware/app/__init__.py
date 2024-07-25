@@ -11,10 +11,11 @@ from __future__ import absolute_import, print_function
 
 # Standard modules
 import copy
-import getpass
 import logging
+import random
 
 # Third party modules
+import fb_tools.spinner
 from fb_tools.cfg_app import FbConfigApplication
 from fb_tools.common import pp
 from fb_tools.errors import FbAppError
@@ -29,7 +30,7 @@ from ..connect import VsphereConnection
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.0.0'
+__version__ = '1.2.1'
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone('Europe/Berlin')
 
@@ -125,14 +126,6 @@ class BaseVmwareApplication(FbConfigApplication):
             for vs_name in self.cfg.vsphere.keys():
                 self.do_vspheres.append(vs_name)
 
-        for vsphere_name in self.cfg.vsphere.keys():
-            vsphere_data = self.cfg.vsphere[vsphere_name]
-            if vsphere_data.password is None or vsphere_data.password == '':
-                prompt = (
-                    _('Enter password for {n} VSPhere user {u!r} on host {h!r}:').format(
-                        n=vsphere_name, u=vsphere_data.user, h=vsphere_data.host)) + ' '
-                vsphere_data.password = getpass.getpass(prompt=prompt)
-
         self.init_vsphere_handlers()
 
     # -------------------------------------------------------------------------
@@ -186,6 +179,8 @@ class BaseVmwareApplication(FbConfigApplication):
             msg += '\n' + str(vsphere_data)
             LOG.error(msg)
 
+        vsphere._check_credentials()
+
     # -------------------------------------------------------------------------
     def cleaning_up(self):
         """Close all VSPhere connections and remove all VSphere handlers."""
@@ -193,9 +188,18 @@ class BaseVmwareApplication(FbConfigApplication):
             LOG.debug(_('Cleaning up ...'))
 
         for vsphere_name in self.do_vspheres:
-            LOG.debug(_('Closing VSPhere object {!r} ...').format(vsphere_name))
-            self.vsphere[vsphere_name].disconnect()
-            del self.vsphere[vsphere_name]
+            if vsphere_name in self.vsphere:
+                LOG.debug(_('Closing VSPhere object {!r} ...').format(vsphere_name))
+                self.vsphere[vsphere_name].disconnect()
+                del self.vsphere[vsphere_name]
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def get_random_spinner_name(cls):
+        """Return a randon spinner name from fb_tools.spinner.CycleList."""
+        randomizer = random.SystemRandom()
+
+        return randomizer.choice(list(fb_tools.spinner.CycleList.keys()))
 
 
 # =============================================================================

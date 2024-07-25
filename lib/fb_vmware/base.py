@@ -13,6 +13,7 @@ from __future__ import absolute_import
 import logging
 import ssl
 from abc import ABCMeta, abstractmethod
+from socket import gaierror
 
 # Third party modules
 from fb_tools.common import to_bool
@@ -32,10 +33,12 @@ from .config import DEFAULT_VSPHERE_CLUSTER
 from .config import VSPhereConfigInfo
 from .errors import BaseVSphereHandlerError
 from .errors import VSphereCannotConnectError
+from .errors import VSphereExpectedError
+from .errors import VSphereUnsufficientCredentials
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = '1.1.2'
 
 LOG = logging.getLogger(__name__)
 
@@ -183,6 +186,12 @@ class BaseVsphereHandler(HandlingObject):
         """Connect to the the configured VSPhere instance."""
         LOG.debug(_('Connecting to vSphere {!r} ...').format(self.connect_info.full_url))
 
+        if not self.connect_info.user:
+            raise VSphereUnsufficientCredentials()
+
+        if not self.connect_info.password:
+            raise VSphereUnsufficientCredentials(self.connect_info.user)
+
         try:
             if self.connect_info.use_https:
 
@@ -201,11 +210,54 @@ class BaseVsphereHandler(HandlingObject):
                     protocol='http', host=self.connect_info.host, port=self.connect_info.port,
                     user=self.connect_info.user, pwd=self.connect_info.password)
 
-        except vim.fault.VimFault as e:
+        except (gaierror, vim.fault.VimFault, vim.fault.InvalidLogin) as e:
             raise VSphereVimFault(e, self.connect_info.full_url)
 
         if not self.service_instance:
             raise VSphereCannotConnectError(self.connect_info.url)
+
+    # -------------------------------------------------------------------------
+    def _check_credentials(self, repeated_password=False):
+
+        if not self.connect_info.user:
+            prompt = _('Please enter the user name for logging in to {}:').format(
+                self.connect_info.url)
+            prompt = self.colored(prompt, 'cyan') + ' '
+            try:
+                user = input(prompt)
+            except (KeyboardInterrupt, EOFError) as e:
+                msg = _('Got a {}').format(e.__class__.__name__)
+                if str(e):
+                    msg += ': ' + str(e)
+                else:
+                    msg += '.'
+                raise VSphereExpectedError(msg)
+            if not user:
+                raise VSphereUnsufficientCredentials()
+            user = user.strip()
+            if not user:
+                raise VSphereUnsufficientCredentials()
+
+            self.connect_info.user = user
+
+        if not self.connect_info.password:
+            first_prompt = _(
+                'Please enter the password for {user!r} for logging in to {url}:').format(
+                user=self.connect_info.user, url=self.connect_info.url)
+            first_prompt = self.colored(first_prompt, 'cyan') + ' '
+
+            second_prompt = _(
+                'Please repeat the password for {user!r} for logging in to {url}:').format(
+                user=self.connect_info.user, url=self.connect_info.url)
+            second_prompt = self.colored(second_prompt, 'cyan') + ' '
+
+            password = self.get_password(
+                first_prompt, second_prompt, may_empty=False, repeat=repeated_password)
+
+            if not password:
+                raise VSphereUnsufficientCredentials(self.connect_info.user)
+
+            self.connect_info.password = password
 
     # -------------------------------------------------------------------------
     def disconnect(self):

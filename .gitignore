@@ -132,6 +132,7 @@ dmypy.json
 *.bak
 tmp/
 etc/*.ini
+etc/*.yaml
 rpmdir/*
 .rpm-version*
 local_version.py

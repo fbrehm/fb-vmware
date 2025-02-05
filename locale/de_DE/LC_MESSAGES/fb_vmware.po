@@ -1,7 +1,7 @@
 # German (Germany) translations for fb_vmware.
-# Copyright (C) 2024 Frank Brehm, Berlin
+# Copyright (C) 2025 Frank Brehm, Berlin
 # This file is distributed under the same license as the fb_vmware project.
-# Frank Brehm <frank.brehm@pixelpark.com>, 2024.
+# Frank Brehm <frank.brehm@pixelpark.com>, 2025.
 #
 msgid ""
 msgstr ""

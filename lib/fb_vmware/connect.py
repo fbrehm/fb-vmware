@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2024 by Frank Brehm, Berlin
+@copyright: © 2025 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 
@@ -52,7 +52,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '1.10.0'
+__version__ = '1.10.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -736,6 +736,8 @@ class VsphereConnection(BaseVsphereHandler):
                 if name_only:
                     vm_list.append((vm_name, cur_path))
                 elif as_obj:
+                    if self.verbose > 1:
+                        LOG.debug(f'Get VM {vm_name!r} as an object.')
                     vm = VsphereVm.from_summary(
                         child, cur_path, vsphere=vsphere_name,
                         appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)

@@ -27,7 +27,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -426,6 +426,24 @@ class VsphereEthernetcard(FbBaseObject):
                     v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
 
+        if verbose > 2:
+            LOG.debug("Given ethernet card data:\n" + pp(data))
+
+        eth_class = data.__class__.__name__
+        bclass = data.backing.__class__.__name__
+        bdev = '[unknown]'
+        if hasattr(data.backing, 'deviceName'):
+            bdev = data.backing.deviceName
+        elif isinstance(
+                data.backing,
+                vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo):
+            bdev = 'Switch {}'.format(data.backing.port.switchUuid)
+            if hasattr(data.backing.port, 'portKey'):
+                bdev += ', port key {}'.format(data.backing.port.portKey)
+        if verbose > 1:
+            LOG.debug(
+                f'Got ethernet device type {eth_class} - backing device {bdev!r} ({bclass}).')
+
         params = {
             'appname': appname,
             'verbose': verbose,
@@ -437,8 +455,8 @@ class VsphereEthernetcard(FbBaseObject):
             'external_id': data.externalId,
             'mac_address': data.macAddress,
             'wake_on_lan': data.wakeOnLanEnabled,
-            'backing_device': data.backing.deviceName,
-            'backing_type': data.backing.__class__.__name__,
+            'backing_device': bdev,
+            'backing_type': bclass,
             'connected': data.connectable.connected,
             'connect_status': data.connectable.status,
             'connect_on_start': data.connectable.startConnected,

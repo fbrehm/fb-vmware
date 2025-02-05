@@ -27,7 +27,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -427,7 +427,7 @@ class VsphereEthernetcard(FbBaseObject):
                 raise TypeError(msg)
 
         if verbose > 2:
-            LOG.debug("Given ethernet card data:\n" + pp(data))
+            LOG.debug('Given ethernet card data:\n' + pp(data))
 
         eth_class = data.__class__.__name__
         bclass = data.backing.__class__.__name__
@@ -466,28 +466,7 @@ class VsphereEthernetcard(FbBaseObject):
         if data.deviceInfo:
             params['label'] = data.deviceInfo.label
 
-        if verbose > 2:
-            LOG.debug(_('Checking class of ethernet card: {!r}').format(data.__class__.__name__))
-
-        try:
-            if isinstance(data, vim.vm.device.VirtualE1000e):
-                params['ether_type'] = 'e1000e'
-            elif isinstance(data, vim.vm.device.VirtualE1000):
-                params['ether_type'] = 'e1000'
-            elif isinstance(data, vim.vm.device.VirtualPCNet32):
-                params['ether_type'] = 'pcnet32'
-            elif isinstance(data, vim.vm.device.VirtualSriovEthernetCard):
-                params['ether_type'] = 'sriov'
-            elif isinstance(data, vim.vm.device.VirtualVmxnet2):
-                params['ether_type'] = 'vmxnet2'
-            elif isinstance(data, vim.vm.device.VirtualVmxnet3Vrdma):
-                params['ether_type'] = 'vmxnet3_rdma'
-            elif isinstance(data, vim.vm.device.VirtualVmxnet3):
-                params['ether_type'] = 'vmxnet3'
-            elif isinstance(data, vim.vm.device.VirtualVmxnet):
-                params['ether_type'] = 'vmxnet'
-        except Exception:
-            pass
+        params['ether_type'] = cls._get_ethertype(data, verbose)
 
         if verbose > 2:
             LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
@@ -498,6 +477,35 @@ class VsphereEthernetcard(FbBaseObject):
             LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(card.as_dict()))
 
         return card
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def _get_ethertype(cls, data, verbose=0):
+
+        if verbose > 2:
+            LOG.debug(_('Checking class of ethernet card: {!r}').format(data.__class__.__name__))
+
+        try:
+            if isinstance(data, vim.vm.device.VirtualE1000e):
+                return 'e1000e'
+            elif isinstance(data, vim.vm.device.VirtualE1000):
+                return 'e1000'
+            elif isinstance(data, vim.vm.device.VirtualPCNet32):
+                return 'pcnet32'
+            elif isinstance(data, vim.vm.device.VirtualSriovEthernetCard):
+                return 'sriov'
+            elif isinstance(data, vim.vm.device.VirtualVmxnet2):
+                return 'vmxnet2'
+            elif isinstance(data, vim.vm.device.VirtualVmxnet3Vrdma):
+                return 'vmxnet3_rdma'
+            elif isinstance(data, vim.vm.device.VirtualVmxnet3):
+                return 'vmxnet3'
+            elif isinstance(data, vim.vm.device.VirtualVmxnet):
+                return 'vmxnet'
+        except Exception:
+            pass
+
+        return 'unknown'
 
     # -------------------------------------------------------------------------
     @classmethod

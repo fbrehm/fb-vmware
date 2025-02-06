@@ -1,3 +1,9 @@
+fb-vmware (1.4.1) UNRELEASED; urgency=medium
+
+  * Changing debug behaviour in lib/fb_vmware/ether.py
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 06 Feb 2025 10:27:57 +0100
+
 fb-vmware (1.4.0) all; urgency=medium
 
   * Extending .gitignore

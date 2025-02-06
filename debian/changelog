@@ -1,4 +1,4 @@
-fb-vmware (1.4.1) UNRELEASED; urgency=medium
+fb-vmware (1.4.1) all; urgency=medium
 
   * Changing debug behaviour in lib/fb_vmware/ether.py
 

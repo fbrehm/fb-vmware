@@ -27,7 +27,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -426,7 +426,7 @@ class VsphereEthernetcard(FbBaseObject):
                     v=data, vt=data.__class__.__name__)
                 raise TypeError(msg)
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug('Given ethernet card data:\n' + pp(data))
 
         eth_class = data.__class__.__name__
@@ -440,7 +440,7 @@ class VsphereEthernetcard(FbBaseObject):
             bdev = 'Switch {}'.format(data.backing.port.switchUuid)
             if hasattr(data.backing.port, 'portKey'):
                 bdev += ', port key {}'.format(data.backing.port.portKey)
-        if verbose > 1:
+        if verbose > 2:
             LOG.debug(
                 f'Got ethernet device type {eth_class} - backing device {bdev!r} ({bclass}).')
 
@@ -468,12 +468,12 @@ class VsphereEthernetcard(FbBaseObject):
 
         params['ether_type'] = cls._get_ethertype(data, verbose)
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
 
         card = cls(**params)
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(card.as_dict()))
 
         return card

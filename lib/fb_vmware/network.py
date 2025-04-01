@@ -31,10 +31,14 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.3.5'
+__version__ = '1.4.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
+NETWORK = 'network'
+DV_PORTGROUP = 'dv_portgroup'
+OPAQUE_NETWORK = 'opaque_network'
 
 
 # =============================================================================
@@ -48,17 +52,36 @@ class VsphereNetwork(VsphereObject):
     def __init__(
         self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
             name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS,
-            accessible=True, ip_pool_id=None, ip_pool_name=None):
+            accessible=True, ip_pool_id=None, ip_pool_name=None, nw_type='network'):
         """Initialize a VsphereNetwork object."""
         self.repr_fields = (
             'name', 'obj_type', 'status', 'config_status', 'accessible',
-            'ip_pool_id', 'ip_pool_name', 'appname', 'verbose')
+            'ip_pool_id', 'ip_pool_name', 'nw_type', 'appname', 'verbose')
 
         self._accessible = bool(accessible)
         self._ip_pool_id = ip_pool_id
         self._ip_pool_name = ip_pool_name
+        self._nw_type = nw_type
 
         self._network = None
+
+        self.key = None
+        self.port_keys = None
+
+        self.dvpg_auto_expand = None
+        self.dvpg_backing_type = None
+        self.dvpg_config_version = None
+        self.dvpg_description = None
+        self.dvpg_key = None
+        self.dvpg_ls_uuid = None
+        self.dvpg_name = None
+        self.dvpg_num_ports = None
+        self.dvpg_portname_format = None
+        self.dvpg_segment_id = None
+        self.dvpg_transport_zone_name = None
+        self.dvpg_transport_zone_uuid = None
+        self.dvpg_type = None
+        self.dvpg_uplink = None
 
         super(VsphereNetwork, self).__init__(
             name=name, obj_type='vsphere_network', name_prefix='net', status=status,
@@ -107,6 +130,12 @@ class VsphereNetwork(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def nw_type(self):
+        """Return the type of this network."""
+        return self._nw_type
+
+    # -----------------------------------------------------------
+    @property
     def network(self):
         """Return the ipaddress network object associated with this network."""
         return self._network
@@ -150,6 +179,12 @@ class VsphereNetwork(VsphereObject):
                     t='data', e='vim.Network', v=data)
                 raise TypeError(msg)
 
+        nw_type = NETWORK
+        if isinstance(data, vim.dvs.DistributedVirtualPortgroup):
+            nw_type = DV_PORTGROUP
+        elif isinstance(data, vim.OpaqueNetwork):
+            nw_type = OPAQUE_NETWORK
+
         params = {
             'appname': appname,
             'verbose': verbose,
@@ -158,6 +193,7 @@ class VsphereNetwork(VsphereObject):
             'name': data.summary.name,
             'status': data.overallStatus,
             'config_status': data.configStatus,
+            'nw_type': nw_type,
         }
 
         if hasattr(data.summary, 'accessible'):
@@ -169,10 +205,49 @@ class VsphereNetwork(VsphereObject):
         if hasattr(data.summary, 'ipPoolName'):
             params['ip_pool_name'] = data.summary.ipPoolName
 
-        if verbose > 3:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+        if verbose > 2:
+            if verbose > 3:
+                LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            else:
+                LOG.debug(_('Creating {cls} object {name!r} as a {t!r}.').format(
+                    cls=cls.__name__, name=data.summary.name, t=nw_type))
 
         net = cls(**params)
+
+        if hasattr(data, 'key'):
+            net.key = data.key
+
+        if hasattr(data, 'portKeys'):
+            net.port_keys = []
+            for key in data.portKeys:
+                net.port_keys.append(key)
+
+        if hasattr(data, 'config'):
+            if hasattr(data.config, 'autoExpand'):
+                net.dvpg_auto_expand = data.config.autoExpand
+            if hasattr(data.config, 'backingType'):
+                net.dvpg_backing_type = data.config.backingType
+            if hasattr(data.config, 'configVersion'):
+                net.dvpg_config_version = data.config.configVersion
+            if hasattr(data.config, 'description'):
+                net.dvpg_description = data.config.description
+            if hasattr(data.config, 'key'):
+                net.dvpg_key = data.config.key
+            if hasattr(data.config, 'logicalSwitchUuid'):
+                net.dvpg_ls_uuid = data.config.logicalSwitchUuid
+            if hasattr(data.config, 'name'):
+                net.dvpg_name = data.config.name
+            if hasattr(data.config, 'numPorts'):
+                net.dvpg_num_ports = data.config.numPorts
+            if hasattr(data.config, 'transportZoneName'):
+                net.dvpg_transport_zone_name = data.config.transportZoneName
+            if hasattr(data.config, 'transportZoneUuid'):
+                net.dvpg_transport_zone_uuid = data.config.transportZoneUuid
+            if hasattr(data.config, 'type'):
+                net.dvpg_type = data.config.type
+            if hasattr(data.config, 'uplink'):
+                net.dvpg_uplink = data.config.uplink
+
         return net
 
     # -------------------------------------------------------------------------
@@ -191,6 +266,7 @@ class VsphereNetwork(VsphereObject):
         res['accessible'] = self.accessible
         res['ip_pool_id'] = self.ip_pool_id
         res['ip_pool_name'] = self.ip_pool_name
+        res['nw_type'] = self.nw_type
         res['network'] = self.network
         res['gateway'] = self.gateway
 
@@ -256,6 +332,9 @@ class VsphereNetworkDict(MutableMapping, FbGenericBaseObject):
         net_name = net.name
         if net_name != key:
             raise KeyError(self.msg_key_not_name.format(k=key, n=net_name))
+
+        if net_name in self._map and self._map[net_name].nw_type == DV_PORTGROUP:
+            return
 
         self._map[net_name] = net
 

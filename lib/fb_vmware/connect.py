@@ -41,6 +41,7 @@ from .controller import VsphereDiskController
 from .datastore import VsphereDatastore, VsphereDatastoreDict
 from .dc import VsphereDatacenter
 from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict
+from .dvs import VsphereDVS
 from .errors import TimeoutCreateVmError
 from .errors import VSphereDatacenterNotFoundError
 from .errors import VSphereExpectedError
@@ -52,7 +53,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '1.10.1'
+__version__ = '2.0.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -91,6 +92,7 @@ class VsphereConnection(BaseVsphereHandler):
         self.networks = VsphereNetworkDict()
         self.about = None
         self.dc_obj = None
+        self.dvs = {}
 
         self.ds_mapping = {}
         self.ds_cluster_mapping = {}
@@ -424,7 +426,12 @@ class VsphereConnection(BaseVsphereHandler):
             for sub_child in child.childEntity:
                 self._get_networks(sub_child, depth + 1)
 
-        if isinstance(child, vim.Network):
+        if isinstance(child, vim.DistributedVirtualSwitch):
+            dvs = VsphereDVS.from_summary(
+                child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
+            uuid = dvs.uuid
+            self.dvs[uuid] = dvs
+        elif isinstance(child, vim.Network):
             ds = VsphereNetwork.from_summary(
                 child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
             self.networks.append(ds)

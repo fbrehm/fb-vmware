@@ -31,13 +31,13 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 
 # =============================================================================
-class VsphereVDS(VsphereObject):
+class VsphereDVS(VsphereObject):
     """Wrapper class for a VSphere Distributed Virtual Switch (vim.DistributedVirtualSwitch)."""
 
     properties = [
@@ -107,14 +107,14 @@ class VsphereVDS(VsphereObject):
     # -------------------------------------------------------------------------
     def __init__(
             self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS, **kwargs)
-        """Initialize a VsphereVDS object."""
+            name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS, **kwargs):
+        """Initialize a VsphereDVS object."""
         self.repr_fields = ['name'] + self.properties + ['appname', 'verbose']
 
         for prop in self.properties:
             setattr(self, '_' + prop, None)
 
-        super(VsphereVDS, self).__init__(
+        super(VsphereDVS, self).__init__(
             name=name, obj_type='vsphere_vds', name_prefix='vds', status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
@@ -125,7 +125,7 @@ class VsphereVDS(VsphereObject):
         for argname in kwargs:
             if argname not in self.properties:
                 msg = 'Invalid Argument {arg!r} on {what} given.'.format(
-                    arg=argname, what='VsphereVDS.init()')
+                    arg=argname, what='VsphereDVS.init()')
                 raise AttributeError(msg)
             if kwargs[argname] is not None:
                 setattr(self, '_' + argname, kwargs[argname])
@@ -253,7 +253,7 @@ class VsphereVDS(VsphereObject):
         @return: structure as dict
         @rtype:  dict
         """
-        res = super(VsphereVDS, self).as_dict(short=short)
+        res = super(VsphereDVS, self).as_dict(short=short)
 
         for prop in self.properties:
             res[prop] = getattr(self, prop)
@@ -266,7 +266,7 @@ class VsphereVDS(VsphereObject):
         if self.verbose > 4:
             LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
 
-        if not isinstance(other, VsphereVDS):
+        if not isinstance(other, VsphereDVS):
             return False
 
         if self.uuid != other.uuid:
@@ -277,17 +277,17 @@ class VsphereVDS(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
-        """Create a new VsphereVDS object based on the data given from pyvmomi."""
+        """Create a new VsphereDVS object based on the data given from pyvmomi."""
         if test_mode:
 
             failing_fields = []
 
-            for field in self.necessary_fields:
+            for field in cls.necessary_fields:
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
             if hasattr(data, 'config'):
-                for field in self.necessary_config_fields:
+                for field in cls.necessary_config_fields:
                     if not hasattr(data.config, field):
                         failing_fields.append('config.' + field)
                 if not hasattr(data.config, 'name'):
@@ -318,38 +318,38 @@ class VsphereVDS(VsphereObject):
             'initialized': True,
         }
 
-        for prop in self.prop_source:
-            prop_src = self.prop_source[prop]
-            value = getattr(data, prop_src, None):
+        for prop in cls.prop_source:
+            prop_src = cls.prop_source[prop]
+            value = getattr(data, prop_src, None)
             if value is not None:
                 params[prop] = value
 
-        for prop in self.prop_source_config:
-            prop_src = self.prop_source_config[prop]
-            value = getattr(data.config, prop_src, None):
+        for prop in cls.prop_source_config:
+            prop_src = cls.prop_source_config[prop]
+            value = getattr(data.config, prop_src, None)
             if value is not None:
                 params[prop] = value
 
-        for prop in self.prop_source_contact:
-            prop_src = self.prop_source_contact[prop]
-            value = getattr(data.config.contact, prop_src, None):
+        for prop in cls.prop_source_contact:
+            prop_src = cls.prop_source_contact[prop]
+            value = getattr(data.config.contact, prop_src, None)
             if value is not None:
                 params[prop] = value
 
-        for prop in self.prop_source_product:
-            prop_src = self.prop_source_product[prop]
-            value = getattr(data.config.productInfo, prop_src, None):
+        for prop in cls.prop_source_product:
+            prop_src = cls.prop_source_product[prop]
+            value = getattr(data.config.productInfo, prop_src, None)
             if value is not None:
                 params[prop] = value
 
-        for prop in self.prop_source_summary:
-            prop_src = self.prop_source_config[prop]
-            value = getattr(data.summary, prop_src, None):
+        for prop in cls.prop_source_summary:
+            prop_src = cls.prop_source_summary[prop]
+            value = getattr(data.summary, prop_src, None)
             if value is not None:
                 params[prop] = value
 
         if verbose > 1:
-            if verbose > 3:
+            if verbose > 2:
                 LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
             else:
                 LOG.debug(_('Creating {cls} object {name!r}.').format(

@@ -432,9 +432,14 @@ class VsphereConnection(BaseVsphereHandler):
             uuid = dvs.uuid
             self.dvs[uuid] = dvs
         elif isinstance(child, vim.Network):
-            ds = VsphereNetwork.from_summary(
-                child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
-            self.networks.append(ds)
+            if isinstance(child, vim.dvs.DistributedVirtualPortgroup):
+                LOG.debug("Evaluating DV Port Group later ...")
+            elif isinstance(child, vim.OpaqueNetwork):
+                LOG.debug("Evaluating Opaque Network later ...")
+            else:
+                network = VsphereNetwork.from_summary(
+                    child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
+                self.networks.append(network)
 
         return
 

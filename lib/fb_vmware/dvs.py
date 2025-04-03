@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -104,27 +104,25 @@ class VsphereDVS(VsphereObject):
         'numStandalonePorts',
     ]
 
+    repr_fields = ['name'] + properties + ['appname', 'verbose']
+
     # -------------------------------------------------------------------------
     def __init__(
             self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS, **kwargs):
+            name=None, obj_type='vsphere_vds', name_prefix='vds', status=DEFAULT_OBJ_STATUS,
+            config_status=DEFAULT_OBJ_STATUS, **kwargs):
         """Initialize a VsphereDVS object."""
-        self.repr_fields = ['name'] + self.properties + ['appname', 'verbose']
-
         for prop in self.properties:
             setattr(self, '_' + prop, None)
 
         super(VsphereDVS, self).__init__(
-            name=name, obj_type='vsphere_vds', name_prefix='vds', status=status,
+            name=name, obj_type=obj_type, name_prefix=name_prefix, status=status,
             config_status=config_status, appname=appname, verbose=verbose,
             version=version, base_dir=base_dir)
 
-        if name is not None:
-            self.name = name
-
         for argname in kwargs:
             if argname not in self.properties:
-                msg = 'Invalid Argument {arg!r} on {what} given.'.format(
+                msg = _('Invalid Argument {arg!r} on {what} given.').format(
                     arg=argname, what='VsphereDVS.init()')
                 raise AttributeError(msg)
             if kwargs[argname] is not None:

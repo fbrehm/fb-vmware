@@ -25,7 +25,7 @@ from ..network import VsphereNetworkDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -149,14 +149,23 @@ class GetNetworkListApp(BaseVmwareApplication):
             msg = _('Found Distributed Virtual Switches:') + '\n' + pp(dvs)
             LOG.debug(msg)
 
-        if self.verbose > 3:
+        if self.verbose > 2:
             networks = {}
-            # LOG.debug(_('Found networks:') + '\n' + pp(all_networks))
-            for vsphere_name in self.vsphere:
-                networks[vsphere_name] = all_networks[vsphere_name].as_dict()
+            if self.verbose > 3:
+                # LOG.debug(_('Found networks:') + '\n' + pp(all_networks))
+                for vsphere_name in self.vsphere:
+                    networks[vsphere_name] = all_networks[vsphere_name].as_dict()
+            else:
+                for vsphere_name in self.vsphere:
+                    networks[vsphere_name] = []
+                    if len(all_networks[vsphere_name]):
+                        key = all_networks[vsphere_name].keys()[0]
+                        net = all_networks[vsphere_name][key]
+                        networks[vsphere_name] = [net.as_dict()]
 
             msg = _('Found Virtual Networks:') + pp(networks)
             LOG.debug(msg)
+
 
         # self.print_clusters(all_storage_clusters)
 

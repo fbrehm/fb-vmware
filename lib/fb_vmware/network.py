@@ -29,9 +29,10 @@ from pyVmomi import vim
 # Own modules
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
+from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -304,274 +305,61 @@ class VsphereNetwork(VsphereObject):
 
 
 # =============================================================================
-class VsphereNetworkDict(MutableMapping, FbGenericBaseObject):
-    """
-    A dictionary containing VsphereNetwork objects.
+class VsphereNetworkDict(TypedDict):
+    """A dictionary containing VsphereNetwork objects."""
 
-    It works like a dict.
-    """
+    value_class = VsphereNetwork
 
     msg_invalid_net_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
         'VsphereNetwork')
     msg_key_not_name = _('The key {k!r} must be equal to the network name {n!r}.')
-    msg_none_type_error = _('None type as key is not allowed.')
-    msg_empty_key_error = _('Empty key {!r} is not allowed.')
-    msg_no_net_dict = _('Object {{!r}} is not a {} object.').format('VsphereNetworkDict')
 
     # -------------------------------------------------------------------------
-    def __init__(self, *args, **kwargs):
-        """Initialize a VsphereNetworkDict object."""
-        self._map = {}
+    def check_key_by_item(self, key, item):
+        """Checks the key by the given item."""
+        if not isinstance(item, VsphereNetwork):
+            raise TypeError(self.msg_invalid_net_type.format(item.__class__.__name__))
 
-        for arg in args:
-            self.append(arg)
-
-    # -------------------------------------------------------------------------
-    def _set_item(self, key, net):
-        """
-        Set the given Network to the given key.
-
-        The key must be identic to the name of the network.
-        """
-        if not isinstance(net, VsphereNetwork):
-            raise TypeError(self.msg_invalid_net_type.format(net.__class__.__name__))
-
-        net_name = net.name
+        net_name = item.name
         if net_name != key:
             raise KeyError(self.msg_key_not_name.format(k=key, n=net_name))
 
-        if net_name in self._map and self._map[net_name].nw_type == DV_PORTGROUP:
-            return
-
-        self._map[net_name] = net
+        return True
 
     # -------------------------------------------------------------------------
-    def append(self, net):
-        """Set the given network in the current dict with its name as key."""
-        if not isinstance(net, VsphereNetwork):
-            raise TypeError(self.msg_invalid_net_type.format(net.__class__.__name__))
-        self._set_item(net.name, net)
+    def get_key_from_item(self, item):
+        """Return the network name as a key from the item."""
+        if not isinstance(item, VsphereNetwork):
+            raise TypeError(self.msg_invalid_net_type.format(item.__class__.__name__))
+
+        return item.name
 
     # -------------------------------------------------------------------------
-    def _get_item(self, key):
+    def compare(self, x, y):
+        """Comparing two items, used with functools for sorting. Maybe overridden."""
+        net_x = self[x]
+        net_y = self[y]
 
-        if key is None:
-            raise TypeError(self.msg_none_type_error)
-
-        net_name = str(key).strip()
-        if net_name == '':
-            raise ValueError(self.msg_empty_key_error.format(key))
-
-        return self._map[net_name]
-
-    # -------------------------------------------------------------------------
-    def get(self, key):
-        """Get the network from dict by its name."""
-        return self._get_item(key)
-
-    # -------------------------------------------------------------------------
-    def _del_item(self, key, strict=True):
-
-        if key is None:
-            raise TypeError(self.msg_none_type_error)
-
-        net_name = str(key).strip()
-        if net_name == '':
-            raise ValueError(self.msg_empty_key_error.format(key))
-
-        if not strict and net_name not in self._map:
-            return
-
-        del self._map[net_name]
-
-    # -------------------------------------------------------------------------
-    # The next five methods are requirements of the ABC.
-    def __setitem__(self, key, value):
-        """Set the given network in the current dict by key."""
-        self._set_item(key, value)
-
-    # -------------------------------------------------------------------------
-    def __getitem__(self, key):
-        """Get the network from dict by the key."""
-        return self._get_item(key)
-
-    # -------------------------------------------------------------------------
-    def __delitem__(self, key):
-        """Remove the network from dict by the key."""
-        self._del_item(key)
-
-    # -------------------------------------------------------------------------
-    def __iter__(self):
-        """Iterate through network names as keys."""
-        for net_name in self.keys():
-            yield net_name
-
-    # -------------------------------------------------------------------------
-    def __len__(self):
-        """Return the number of networks in current dict."""
-        return len(self._map)
-
-    # -------------------------------------------------------------------------
-    # The next methods aren't required, but nice for different purposes:
-    def __str__(self):
-        """Return simple dict representation of the mapping."""
-        return str(self._map)
-
-    # -------------------------------------------------------------------------
-    def __repr__(self):
-        """Transform into a string for reproduction."""
-        return '{}, {}({})'.format(
-            super(VsphereNetworkDict, self).__repr__(),
-            self.__class__.__name__,
-            self._map)
-
-    # -------------------------------------------------------------------------
-    def __contains__(self, key):
-        """Return whether the given network name is contained in current dict as a key."""
-        if key is None:
-            raise TypeError(self.msg_none_type_error)
-
-        net_name = str(key).strip()
-        if net_name == '':
-            raise ValueError(self.msg_empty_key_error.format(key))
-
-        return net_name in self._map
-
-    # -------------------------------------------------------------------------
-    def keys(self):
-        """Return all network names of this dict in a sorted manner."""
-        def netsort(x, y):
-            net_x = self[x]
-            net_y = self[y]
-            if net_x.network is None and net_y.network is None:
-                return (
-                    (net_x.name.lower() > net_y.name.lower()) - (
-                        net_x.name.lower() < net_y.name.lower()))
-            if net_x.network is None:
+        if net_x.network is None and net_y.network is None:
+            if net_x.name.lower() > net_y.name.lower():
                 return -1
-            if net_y.network is None:
-                return 1
-            if net_x.network < net_y.network:
-                return -1
-            if net_x.network > net_y.network:
+            if net_x.name.lower() > net_y.name.lower():
                 return 1
             return 0
 
-        return sorted(self._map.keys(), key=functools.cmp_to_key(netsort))
+        if net_x.network is None:
+            return -1
 
-    # -------------------------------------------------------------------------
-    def items(self):
-        """Return tuples (network name + object as tuple) of this dict in a sorted manner."""
-        item_list = []
+        if net_y.network is None:
+            return 1
 
-        for net_name in self.keys():
-            item_list.append((net_name, self._map[net_name]))
+        if net_x.network < net_y.network:
+            return -1
 
-        return item_list
+        if net_x.network > net_y.network:
+            return 1
 
-    # -------------------------------------------------------------------------
-    def values(self):
-        """Return all network objects of this dict."""
-        value_list = []
-        for net_name in self.keys():
-            value_list.append(self._map[net_name])
-        return value_list
-
-    # -------------------------------------------------------------------------
-    def __eq__(self, other):
-        """Magic method for using it as the '=='-operator."""
-        if not isinstance(other, VsphereNetworkDict):
-            raise TypeError(self.msg_no_net_dict.format(other))
-
-        return self._map == other._map
-
-    # -------------------------------------------------------------------------
-    def __ne__(self, other):
-        """Magic method for using it as the '!='-operator."""
-        if not isinstance(other, VsphereNetworkDict):
-            raise TypeError(self.msg_no_net_dict.format(other))
-
-        return self._map != other._map
-
-    # -------------------------------------------------------------------------
-    def pop(self, key, *args):
-        """Get the network by its name and remove it in dict."""
-        if key is None:
-            raise TypeError(self.msg_none_type_error)
-
-        net_name = str(key).strip()
-        if net_name == '':
-            raise ValueError(self.msg_empty_key_error.format(key))
-
-        return self._map.pop(net_name, *args)
-
-    # -------------------------------------------------------------------------
-    def popitem(self):
-        """Remove and return a arbitrary (network name and object) pair from the dictionary."""
-        if not len(self._map):
-            return None
-
-        net_name = self.keys()[0]
-        net = self._map[net_name]
-        del self._map[net_name]
-        return (net_name, net)
-
-    # -------------------------------------------------------------------------
-    def clear(self):
-        """Remove all items from the dictionary."""
-        self._map = {}
-
-    # -------------------------------------------------------------------------
-    def setdefault(self, key, default):
-        """
-        Return the network, if the key is in dict.
-
-        If not, insert key with a value of default and return default.
-        """
-        if key is None:
-            raise TypeError(self.msg_none_type_error)
-
-        net_name = str(key).strip()
-        if net_name == '':
-            raise ValueError(self.msg_empty_key_error.format(key))
-
-        if not isinstance(default, VsphereNetwork):
-            raise TypeError(self.msg_invalid_net_type.format(default.__class__.__name__))
-
-        if net_name in self._map:
-            return self._map[net_name]
-
-        self._set_item(net_name, default)
-        return default
-
-    # -------------------------------------------------------------------------
-    def update(self, other):
-        """Update the dict with the key/value pairs from other, overwriting existing keys."""
-        if isinstance(other, VsphereNetworkDict) or isinstance(other, dict):
-            for net_name in other.keys():
-                self._set_item(net_name, other[net_name])
-            return
-
-        for tokens in other:
-            key = tokens[0]
-            value = tokens[1]
-            self._set_item(key, value)
-
-    # -------------------------------------------------------------------------
-    def as_dict(self, short=True):
-        """Transform the elements of the object into a dict."""
-        res = {}
-        for net_name in self._map:
-            res[net_name] = self._map[net_name].as_dict(short)
-        return res
-
-    # -------------------------------------------------------------------------
-    def as_list(self, short=True):
-        """Return a list with all networks transformed to a dict."""
-        res = []
-        for net_name in self.keys():
-            res.append(self._map[net_name].as_dict(short))
-        return res
+        return 0
 
     # -------------------------------------------------------------------------
     def get_network_for_ip(self, *ips):

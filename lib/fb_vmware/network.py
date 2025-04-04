@@ -33,7 +33,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -66,6 +66,9 @@ class VsphereNetwork(VsphereObject):
         'ip_pool_id': 'ipPoolId',
         'ip_pool_name': 'ipPoolName',
     }
+
+    obj_desc_singular = _('Virtual Network')
+    obj_desc_plural = _('Virtual Networks')
 
     necessary_net_fields = ['summary', 'overallStatus', 'configStatus']
     necessary_net_summary_fields = ['name']
@@ -114,7 +117,7 @@ class VsphereNetwork(VsphereObject):
             if self.warn_unassigned_net:
                 LOG.warning(msg)
             else:
-                LOG.info(msg)
+                LOG.debug(msg)
 
         if initialized is not None:
             self.initialized = initialized
@@ -367,6 +370,10 @@ class VsphereNetworkDict(TypedDict):
         The name of the first matching network for the first IP address, which will
         have a match, will be returned.
         """
+        if len(self) < 1:
+            LOG.debug(_('Empty {what}.').format(self.__class__.__name__))
+            return None
+
         for ip in ips:
             if not ip:
                 continue
@@ -376,14 +383,18 @@ class VsphereNetworkDict(TypedDict):
             for net_name in self.keys():
                 net = self[net_name]
                 if net.network and ipa in net.network:
-                    LOG.debug(_('Found network {n!r} for IP {i}.').format(
-                        n=net_name, i=ip))
+                    desc = net.obj_desc_singular
+                    LOG.debug(_('Found {d} {n!r} for IP {i}.').format(
+                        d=desc, n=net_name, i=ip))
                     return net_name
 
-            LOG.debug(_('Could not find VSphere network for IP {}.').format(ip))
+            desc = value_class.obj_desc_singular
+            LOG.debug(_('Could not find {d} for IP {ip}.').format(d=desc, ip=ip))
 
-        ips_str = ', '.join((str(x) for x in list(filter(bool, ips))))
-        LOG.error(_('Could not find VSphere network for IP addresses {}.').format(ips_str))
+        ips_str = format_list(str(x) for x in list(filter(bool, ips)))
+        LOG.error(_('Could not find {d} for IP addresses {ips}.').format(
+            d=value_class.obj_desc_singular, ips=ips_str))
+
         return None
 
 

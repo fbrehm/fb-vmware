@@ -53,7 +53,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -412,7 +412,8 @@ class VsphereConnection(BaseVsphereHandler):
                     msg += pp(list(self.dv_portgroups.keys()))
                 LOG.debug(msg)
         else:
-            LOG.info(_('No Distributed Virtual Port Groups found.'))
+            if self.verbose:
+                LOG.info(_('No Distributed Virtual Port Groups found.'))
 
         if self.networks:
             msg = ngettext(

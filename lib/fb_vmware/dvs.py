@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -403,6 +403,9 @@ class VsphereDvPortGroup(VsphereNetwork):
         'type': 'type',
         'uplink': 'uplink',
     }
+
+    obj_desc_singular = _('Distrubuted Virtual Port Group')
+    obj_desc_plural = _('Distrubuted Virtual Port Groups')
 
     # -------------------------------------------------------------------------
     def __init__(

@@ -12,6 +12,7 @@ from __future__ import absolute_import, print_function
 # Standard modules
 import logging
 import sys
+from operator import itemgetter
 
 # from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
@@ -21,12 +22,13 @@ from fb_tools.xlate import format_list
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
+from ..network import VsphereNetwork
 from ..network import VsphereNetworkDict
 from ..network import GeneralNetworksDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.3.0'
+__version__ = '1.4.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -59,8 +61,8 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         self.sort_keys = self.default_sort_keys
 
-        self.all_networks = GeneralNetworksDict()
         self.all_dvpgs = GeneralNetworksDict()
+        self.all_networks = GeneralNetworksDict()
 
         super(GetNetworkListApp, self).__init__(
             appname=appname, verbose=verbose, version=version, base_dir=base_dir,
@@ -90,9 +92,12 @@ class GetNetworkListApp(BaseVmwareApplication):
         LOG.debug(_('Starting {a!r}, version {v!r} ...').format(
             a=self.appname, v=self.version))
 
+        VsphereNetwork.warn_unassigned_net = False
+
         ret = 0
         try:
             ret = self.get_all_networks()
+            self.print_virtual_switches()
         finally:
             self.cleaning_up()
 
@@ -141,7 +146,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             self._get_all_networks()
 
         else:
-            spin_prompt = _('Getting all VSPhere networks ...')
+            spin_prompt = _('Getting all VSPhere networks') + ' '
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 self._get_all_networks()
@@ -181,10 +186,126 @@ class GetNetworkListApp(BaseVmwareApplication):
             msg = _('Found Virtual Networks:') + pp(networks)
             LOG.debug(msg)
 
-
-        # self.print_clusters(all_storage_clusters)
-
         return ret
+
+    # -------------------------------------------------------------------------
+    def print_virtual_switches(self):
+        """Print on STDOUT all information about Distributed Virtual Switches."""
+        all_dvs = []
+
+        print()
+        title = _('Distributed Virtual Switches')
+        print(self.colored(title, 'cyan'))
+        print(self.colored('-' * len(title), 'cyan'))
+
+        # -----------------------------
+        def get_contact(dvs):
+            """Generate and return a contact string for this DVS."""
+            contact_name = None
+            contact_info = None
+            contact = '~'
+            if dvs.contact_name is not None:
+                contact_name = dvs.contact_name.strip()
+            if dvs.contact_info is not None:
+                contact_info = dvs.contact_info.strip()
+            if contact_name:
+                if contact_info:
+                    contact = '{n} ({i})'.format(n=contact_name, i=contact_info)
+                else:
+                    contact = contact_name
+            elif contact_info:
+                contact = contact_info
+
+            return contact
+
+        for vsphere_name in self.vsphere:
+            for uuid in self.vsphere[vsphere_name].dvs.keys():
+                this_dvs = self.vsphere[vsphere_name].dvs[uuid]
+
+                dvs = {
+                    'vsphere': vsphere_name,
+                    'name': this_dvs.name,
+                    'contact': get_contact(this_dvs),
+                    'create_time': this_dvs.create_time.isoformat(sep=' ', timespec='seconds'),
+                    'description': this_dvs.description,
+                    'hosts': '{:,}'.format(this_dvs.num_hosts),
+                    'ports': '{:,}'.format(this_dvs.num_ports),
+                    'standalone_ports': '{:,}'.format(this_dvs.num_standalone_ports),
+                    'ratio_reservation': '{:d} %'.format(this_dvs.pnic_cap_ratio_reservation),
+                }
+                all_dvs.append(dvs)
+
+        if len(all_dvs):
+            self._print_virtual_switches(all_dvs)
+            return
+
+        print()
+        print(_('No Distributed Virtual Switches found.'))
+
+    # -------------------------------------------------------------------------
+    def _print_virtual_switches(self, all_dvs):
+
+        labels = {
+            'vsphere': 'VSPhere',
+            'name': _('Name'),
+            'contact': _('Contact'),
+            'create_time': _('Creation time'),
+            'description': _('Description'),
+            'hosts': _('Hosts'),
+            'ports': _('Ports'),
+            'standalone_ports': _('Standalone Ports'),
+            'ratio_reservation': _('Ratio reservation'),
+        }
+        label_list = (
+            'name', 'vsphere', 'create_time', 'hosts', 'ports', 'standalone_ports',
+            'ratio_reservation', 'contact', 'description',
+        )
+
+        str_lengths = {}
+        for label in labels:
+            str_lengths[label] = len(labels[label])
+
+        max_len = 0
+        count = 0
+        for dvs in all_dvs:
+            for label in labels.keys():
+                val = dvs[label]
+                if val is None:
+                    val = '-'
+                    dvs[label] = val
+                if len(val) > str_lengths[label]:
+                    str_lengths[label] = len(val)
+
+        for label in labels.keys():
+            if max_len:
+                max_len += 2
+            max_len += str_lengths[label]
+
+        if self.verbose > 1:
+            LOG.debug('Label length:\n' + pp(str_lengths))
+            LOG.debug('Max line length: {} chars'.format(max_len))
+
+        tpl = ''
+        for label in label_list:
+            if tpl != '':
+                tpl += '  '
+            if label in ('hosts', 'ports', 'standalone_ports', 'ratio_reservation'):
+                tpl += '{{{la}:>{le}}}'.format(la=label, le=str_lengths[label])
+            else:
+                tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+        if self.verbose > 1:
+            LOG.debug(_('Line template: {}').format(tpl))
+
+        if not self.quiet:
+            print()
+            print(tpl.format(**labels))
+            print('-' * max_len)
+
+        sort_keys = ['vsphere', 'name']
+        all_dvs.sort(key=itemgetter(*sort_keys))
+        for dvs in all_dvs:
+            count += 1
+            print(tpl.format(**dvs))
 
 
 # =============================================================================

@@ -53,7 +53,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.0.1'
+__version__ = '2.1.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -378,6 +378,7 @@ class VsphereConnection(BaseVsphereHandler):
     def get_networks(self, disconnect=False):
         """Get all networks from VSphere as VsphereNetwork objects."""
         LOG.debug(_('Trying to get all networks from VSphere ...'))
+        self.dv_portgroups = VsphereNetworkDict()
         self.networks = VsphereNetworkDict()
         self.network_mapping = {}
 
@@ -397,20 +398,41 @@ class VsphereConnection(BaseVsphereHandler):
             if disconnect:
                 self.disconnect()
 
+        if self.dv_portgroups:
+            msg = ngettext(
+                'Found one Distributed Virtual Port Group.',
+                'Found {n} Distributed Virtual Port Groups.',
+                 len(self.dv_portgroups))
+            LOG.debug(msg.format(n=len(self.dv_portgroups)))
+            if self.verbose > 2:
+                msg = _('Found Distributed Virtual Port Groups:') + '\n'
+                if self.verbose > 3:
+                    msg += pp(self.dv_portgroups.as_list())
+                else:
+                    msg += pp(list(self.dv_portgroups.keys()))
+                LOG.debug(msg)
+        else:
+            LOG.info(_('No Distributed Virtual Port Groups found.'))
+
         if self.networks:
             msg = ngettext(
-                'Found one VSphere network.', 'Found {n} VSphere networks.', len(self.networks))
+                'Found one Virtual Network.',
+                'Found {n} Virtual Networks.',
+                len(self.networks))
             LOG.debug(msg.format(n=len(self.networks)))
             if self.verbose > 2:
                 if self.verbose > 3:
-                    LOG.debug(_('Found VSphere networks:') + '\n' + pp(self.networks.as_list()))
+                    LOG.debug(_('Found Virtual Networks:') + '\n' + pp(self.networks.as_list()))
                 else:
-                    LOG.debug(_('Found VSphere networks:') + '\n' + pp(list(self.networks.keys())))
+                    LOG.debug(_('Found Virtual Networks:') + '\n' + pp(list(self.networks.keys())))
         else:
-            LOG.info(_('No VSphere networks found.'))
+            LOG.info(_('No Virtual Networks found.'))
 
+        for (net_name, dvpg) in self.dv_portgroups.items():
+            self.network_mapping[net_name] = dvpg.tf_name
         for (net_name, net) in self.networks.items():
-            self.network_mapping[net_name] = net.tf_name
+            if net_name not in self.network_mapping:
+                self.network_mapping[net_name] = net.tf_name
 
         if self.verbose > 2:
             LOG.debug(_('Network mappings:') + '\n' + pp(self.network_mapping))

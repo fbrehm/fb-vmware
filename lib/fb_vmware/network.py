@@ -10,6 +10,7 @@
 from __future__ import absolute_import
 
 # Standard modules
+import copy
 import functools
 import ipaddress
 import logging
@@ -32,14 +33,10 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
-
-NETWORK = 'network'
-DV_PORTGROUP = 'dv_portgroup'
-OPAQUE_NETWORK = 'opaque_network'
 
 
 # =============================================================================
@@ -53,9 +50,10 @@ class VsphereNetwork(VsphereObject):
         'accessible', 'ip_pool_id', 'ip_pool_name'
     ]
 
-    repr_fields = (
+    repr_fields = [
         'name', 'obj_type', 'status', 'config_status', 'accessible',
-        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose')
+        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose'
+    ]
 
     net_prop_source = {
         'status': 'overallStatus',
@@ -121,7 +119,7 @@ class VsphereNetwork(VsphereObject):
         if initialized is not None:
             self.initialized = initialized
 
-        if self.verbose > 3:
+        if self.verbose > 4:
             LOG.debug(_('Initialized network object:') + '\n' + pp(self.as_dict()))
 
     # -----------------------------------------------------------
@@ -387,6 +385,41 @@ class VsphereNetworkDict(TypedDict):
         ips_str = ', '.join((str(x) for x in list(filter(bool, ips))))
         LOG.error(_('Could not find VSphere network for IP addresses {}.').format(ips_str))
         return None
+
+
+# =============================================================================
+class GeneralNetworksDict(dict, FbGenericBaseObject):
+    """Encapsulate Network lists of multiple VSPhere instances."""
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True):
+        """Transform the values of the dict into dicts."""
+        res = {}
+        for key in self:
+            item = self[key]
+            if isinstance(item, FbGenericBaseObject):
+                res[key] = self[key].as_dict(short)
+            else:
+                res[key] = copy.copy(self[key].__dict__)
+
+        return res
+
+    # -------------------------------------------------------------------------
+    def as_lists(self, short=True):
+        """Transform the values of the dict into lists of items."""
+        res = {}
+        for key in self:
+            item = self[key]
+            res[key] = []
+            if hasattr(item, 'as_list'):
+                res[key] = self[key].as_list(short)
+            elif hasattr(item, 'values'):
+                for value in self[key].values():
+                    res[key].append(value)
+            else:
+                res[key].append(item)
+
+        return res
 
 
 # =============================================================================

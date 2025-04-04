@@ -22,10 +22,11 @@ from fb_tools.xlate import format_list
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..network import VsphereNetworkDict
+from ..network import GeneralNetworksDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.2.1'
+__version__ = '1.3.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -36,6 +37,7 @@ class GetVmNetworkAppError(VmwareAppError):
     """Base exception class for all exceptions in this application."""
 
     pass
+
 
 # =============================================================================
 class GetNetworkListApp(BaseVmwareApplication):
@@ -55,8 +57,10 @@ class GetNetworkListApp(BaseVmwareApplication):
             'Tries to get a list of all networks in '
             'VMWare VSphere and print it out.')
 
-        self.networks = []
         self.sort_keys = self.default_sort_keys
+
+        self.all_networks = GeneralNetworksDict()
+        self.all_dvpgs = GeneralNetworksDict()
 
         super(GetNetworkListApp, self).__init__(
             appname=appname, verbose=verbose, version=version, base_dir=base_dir,
@@ -113,28 +117,34 @@ class GetNetworkListApp(BaseVmwareApplication):
         return networks
 
     # -------------------------------------------------------------------------
+    def _get_all_networks(self):
+
+        for vsphere_name in self.vsphere:
+            vsphere = self.vsphere[vsphere_name]
+            LOG.debug(_('Get all network-like objects from VSPhere {!r} ...').format(vsphere_name))
+
+            try:
+                vsphere.get_networks()
+            except VSphereExpectedError as e:
+                LOG.error(str(e))
+                self.exit(6)
+
+            self.all_dvpgs[vsphere_name] = vsphere.dv_portgroups
+            self.all_networks[vsphere_name] = vsphere.networks
+
+    # -------------------------------------------------------------------------
     def get_all_networks(self):
         """Collect all networks."""
         ret = 0
-        all_networks = {}
-
-        # ----------
-        def _get_all_networks():
-
-            for vsphere_name in self.vsphere:
-                if vsphere_name not in all_networks:
-                    all_networks[vsphere_name] = VsphereNetworkDict()
-                for network in self.get_networks(vsphere_name):
-                    all_networks[vsphere_name].append(network)
 
         if self.verbose or self.quiet:
-            _get_all_networks()
+            self._get_all_networks()
 
         else:
             spin_prompt = _('Getting all VSPhere networks ...')
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
-                _get_all_networks()
+                self._get_all_networks()
             sys.stdout.write(' ' * len(spin_prompt))
             sys.stdout.write('\r')
             sys.stdout.flush()
@@ -151,18 +161,23 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         if self.verbose > 2:
             networks = {}
+            dv_port_groups = {}
             if self.verbose > 3:
-                # LOG.debug(_('Found networks:') + '\n' + pp(all_networks))
-                for vsphere_name in self.vsphere:
-                    networks[vsphere_name] = all_networks[vsphere_name].as_dict()
+                dv_port_groups = self.all_dvpgs.as_dict()
+                networks = self.all_networks.as_dict()
             else:
+                dv_port_group_lists = self.all_dvpgs.as_lists()
+                networks_lists = self.all_networks.as_lists()
                 for vsphere_name in self.vsphere:
+                    dv_port_groups[vsphere_name] = []
                     networks[vsphere_name] = []
-                    if len(all_networks[vsphere_name]):
-                        key = all_networks[vsphere_name].keys()[0]
-                        net = all_networks[vsphere_name][key]
-                        networks[vsphere_name] = [net.as_dict()]
+                    if len(dv_port_group_lists[vsphere_name]):
+                        dv_port_groups[vsphere_name] = [dv_port_group_lists[vsphere_name][0]]
+                    if len(networks_lists[vsphere_name]):
+                        networks[vsphere_name] = [networks_lists[vsphere_name][0]]
 
+            msg = _('Found Distributed Virtual Portgroups:') + pp(dv_port_groups)
+            LOG.debug(msg)
             msg = _('Found Virtual Networks:') + pp(networks)
             LOG.debug(msg)
 

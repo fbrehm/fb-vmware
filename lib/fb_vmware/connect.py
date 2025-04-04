@@ -41,7 +41,7 @@ from .controller import VsphereDiskController
 from .datastore import VsphereDatastore, VsphereDatastoreDict
 from .dc import VsphereDatacenter
 from .ds_cluster import VsphereDsCluster, VsphereDsClusterDict
-from .dvs import VsphereDVS
+from .dvs import VsphereDVS, VsphereDvPortGroup
 from .errors import TimeoutCreateVmError
 from .errors import VSphereDatacenterNotFoundError
 from .errors import VSphereExpectedError
@@ -53,7 +53,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -90,6 +90,7 @@ class VsphereConnection(BaseVsphereHandler):
         self.datastores = VsphereDatastoreDict()
         self.ds_clusters = VsphereDsClusterDict()
         self.networks = VsphereNetworkDict()
+        self.dv_portgroups = VsphereNetworkDict()
         self.about = None
         self.dc_obj = None
         self.dvs = {}
@@ -406,7 +407,7 @@ class VsphereConnection(BaseVsphereHandler):
                 else:
                     LOG.debug(_('Found VSphere networks:') + '\n' + pp(list(self.networks.keys())))
         else:
-            LOG.error(_('No VSphere networks found.'))
+            LOG.info(_('No VSphere networks found.'))
 
         for (net_name, net) in self.networks.items():
             self.network_mapping[net_name] = net.tf_name
@@ -433,7 +434,9 @@ class VsphereConnection(BaseVsphereHandler):
             self.dvs[uuid] = dvs
         elif isinstance(child, vim.Network):
             if isinstance(child, vim.dvs.DistributedVirtualPortgroup):
-                LOG.debug("Evaluating DV Port Group later ...")
+                portgroup = VsphereDvPortGroup.from_summary(
+                    child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
+                self.dv_portgroups.append(portgroup)
             elif isinstance(child, vim.OpaqueNetwork):
                 LOG.debug("Evaluating Opaque Network later ...")
             else:

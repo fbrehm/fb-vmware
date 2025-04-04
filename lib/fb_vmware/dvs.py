@@ -19,7 +19,7 @@ except ImportError:
     from collections import MutableMapping
 
 # Third party modules
-from fb_tools.common import pp
+from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbGenericBaseObject
 from fb_tools.xlate import format_list
 
@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -356,6 +356,259 @@ class VsphereDVS(VsphereObject):
         vds = cls(**params)
 
         return vds
+
+
+
+# =============================================================================
+class VsphereDvPortGroup(VsphereNetwork):
+    """Wrapper class for a Network definition in VSPhere (vim.dvs.DistributedVirtualPortgroup)."""
+
+    repr_fields = (
+        'name', 'obj_type', 'status', 'config_status', 'accessible',
+        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose')
+
+    dvpg_properties = [
+        'auto_expand',
+        'backing_type',
+        'description',
+        'dvs_uuid',
+        'key',
+        'num_ports',
+        'port_keys',
+        'port_name_format',
+        'segment_id',
+        'type',
+        'uplink',
+    ]
+
+    repr_fields = [
+        'name', 'obj_type', 'status', 'config_status', 'accessible',
+        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose',
+        'auto_expand', 'backing_type', 'description', 'dvs_uuid', 'key',
+        'num_ports', 'port_keys', 'port_name_format', 'segment_id', 'type', 'uplink',
+    ]
+
+    dvpg_prop_source = {
+        'key': 'key',
+        'port_keys': 'portKeys',
+    }
+
+    dvpg_prop_source_config = {
+        'auto_expand': 'autoExpand',
+        'backing_type': 'backingType',
+        'description': 'description',
+        'num_ports': 'numPorts',
+        'port_name_format': 'portNameFormat',
+        'segment_id': 'segmentId',
+        'type': 'type',
+        'uplink': 'uplink',
+    }
+
+    # -------------------------------------------------------------------------
+    def __init__(
+            self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
+            name=None, obj_type='vsphere_dvportgroup', name_prefix='dvpg',
+            status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS, **kwargs):
+        """Initialize a VsphereDvPortGroup object."""
+        for prop in self.dvpg_properties:
+            setattr(self, '_' + prop, None)
+
+        init_args = {
+            'name': name,
+            'obj_type': obj_type,
+            'name_prefix': name_prefix,
+            'status': status,
+            'config_status': config_status,
+            'appname': appname,
+            'verbose': verbose,
+            'version': version,
+            'base_dir': base_dir,
+            'initialized': initialized,
+        }
+
+        for arg in kwargs:
+            if arg in self.net_properties:
+                init_args[arg] = kwargs[arg]
+
+        super(VsphereDvPortGroup, self).__init__(**init_args)
+
+        self.initialized = False
+
+        for arg in kwargs:
+            if arg not in self.net_properties and arg not in self.dvpg_properties:
+                msg = _('Invalid Argument {arg!r} on {what} given.').format(
+                    arg=argname, what='VsphereNetwork.init()')
+                raise AttributeError(msg)
+            if arg in self.dvpg_properties and kwargs[arg] is not None:
+                setattr(self, arg, kwargs[arg])
+
+        if initialized is not None:
+            self.initialized = initialized
+
+        if self.verbose > 3:
+            LOG.debug(_('Initialized network object:') + '\n' + pp(self.as_dict()))
+
+    # -----------------------------------------------------------
+    @property
+    def auto_expand(self):
+        """Return, whether the number of ports will be ignored."""
+        return self._auto_expand
+
+    @auto_expand.setter
+    def auto_expand(self, value):
+        if value is None:
+            self._auto_expand = None
+            return
+        self._auto_expand = to_bool(value)
+
+    # -----------------------------------------------------------
+    @property
+    def backing_type(self):
+        """Return the backing type of the portgroup."""
+        return self._backing_type
+
+    @backing_type.setter
+    def backing_type(self, value):
+        self._backing_type = value
+
+    # -----------------------------------------------------------
+    @property
+    def description(self):
+        """Return the description of the portgroup."""
+        return self._description
+
+    @description.setter
+    def description(self, value):
+        self._description = value
+
+    # -----------------------------------------------------------
+    @property
+    def dvs_uuid(self):
+        """Return the UUID of the Distributed virtual Switch of the portgroup."""
+        return self._dvs_uuid
+
+    @dvs_uuid.setter
+    def dvs_uuid(self, value):
+        self._dvs_uuid = value
+
+    # -----------------------------------------------------------
+    @property
+    def num_ports(self):
+        """Return the number of ports in the portgroup."""
+        return self._num_ports
+
+    @num_ports.setter
+    def num_ports(self, value):
+        if value is None:
+            self._num_ports = None
+            return
+        self._num_ports = int(value)
+
+    # -----------------------------------------------------------
+    @property
+    def port_keys(self):
+        """Return the port keys for the set of ports in the portgroup.."""
+        return self._port_keys
+
+    @port_keys.setter
+    def port_keys(self, value):
+        self._port_keys = value
+
+    # -----------------------------------------------------------
+    @property
+    def port_name_format(self):
+        """Return the port name format of the portgroup."""
+        return self._port_name_format
+
+    @port_name_format.setter
+    def port_name_format(self, value):
+        self._description = value
+
+    # -----------------------------------------------------------
+    @property
+    def segment_id(self):
+        """Return the segment ID of the portgroup."""
+        return self._segment_id
+
+    @segment_id.setter
+    def segment_id(self, value):
+        self._segment_id = value
+
+    # -----------------------------------------------------------
+    @property
+    def type(self):
+        """Return the type of the portgroup."""
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value
+
+    # -----------------------------------------------------------
+    @property
+    def uplink(self):
+        """Return, whether the portgroup is an uplink portgroup."""
+        return self._uplink
+
+    @uplink.setter
+    def uplink(self, value):
+        if value is None:
+            self._uplink = None
+            return
+        self._uplink = to_bool(value)
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True):
+        """
+        Transform the elements of the object into a dict.
+
+        @param short: don't include local properties in resulting dict.
+        @type short: bool
+
+        @return: structure as dict
+        @rtype:  dict
+        """
+        res = super(VsphereDvPortGroup, self).as_dict(short=short)
+
+        for prop in self.dvpg_properties:
+            res[prop] = getattr(self, prop)
+
+        return res
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def get_init_params(cls, data, verbose=0):
+        """Return a dict with all keys for init a new network object with from_summary()."""
+        params = super(VsphereDvPortGroup, cls).get_init_params(data, verbose)
+
+        for prop in cls.dvpg_prop_source:
+            prop_src = cls.dvpg_prop_source[prop]
+            value = getattr(data, prop_src, None)
+            if value is not None:
+                params[prop] = value
+
+        for prop in cls.dvpg_prop_source_config:
+            prop_src = cls.dvpg_prop_source_config[prop]
+            value = getattr(data.config, prop_src, None)
+            if value is not None:
+                params[prop] = value
+
+        if hasattr(data.config, 'distributedVirtualSwitch'):
+            params['dvs_uuid'] = data.config.distributedVirtualSwitch.uuid
+
+        return params
+
+    # -------------------------------------------------------------------------
+    def get_params_dict(self):
+        """Return a dict with all keys for init a new network object with __init__."""
+        params = uper(VsphereDvPortGroup, self).get_params_dict()
+
+        for prop in self.dvpg_properties:
+            val = getattr(self, prop, None)
+            params[prop] = val
+
+        return params
+
 
 
 # =============================================================================

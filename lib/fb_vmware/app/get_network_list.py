@@ -28,7 +28,7 @@ from ..network import GeneralNetworksDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.4.0'
+__version__ = '1.5.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -45,10 +45,6 @@ class GetVmNetworkAppError(VmwareAppError):
 class GetNetworkListApp(BaseVmwareApplication):
     """Class for the application object."""
 
-    avail_sort_keys = (
-        'bla', 'blub')
-    default_sort_keys = ['bla']
-
     # -------------------------------------------------------------------------
     def __init__(
         self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
@@ -58,8 +54,6 @@ class GetNetworkListApp(BaseVmwareApplication):
         desc = _(
             'Tries to get a list of all networks in '
             'VMWare VSphere and print it out.')
-
-        self.sort_keys = self.default_sort_keys
 
         self.all_dvpgs = GeneralNetworksDict()
         self.all_networks = GeneralNetworksDict()
@@ -98,6 +92,8 @@ class GetNetworkListApp(BaseVmwareApplication):
         try:
             ret = self.get_all_networks()
             self.print_virtual_switches()
+            self.print_dv_portgroups()
+            self.print_networks()
         finally:
             self.cleaning_up()
 
@@ -196,7 +192,7 @@ class GetNetworkListApp(BaseVmwareApplication):
         print()
         title = _('Distributed Virtual Switches')
         print(self.colored(title, 'cyan'))
-        print(self.colored('-' * len(title), 'cyan'))
+        print(self.colored('=' * len(title), 'cyan'))
 
         # -----------------------------
         def get_contact(dvs):
@@ -306,6 +302,204 @@ class GetNetworkListApp(BaseVmwareApplication):
         for dvs in all_dvs:
             count += 1
             print(tpl.format(**dvs))
+
+    # -------------------------------------------------------------------------
+    def print_dv_portgroups(self):
+        """Print on STDOUT all information about Distributed Virtual Port Groups."""
+        all_dvpgs = []
+
+        print()
+        title = _('Distributed Virtual Port Groups')
+        print(self.colored(title, 'cyan'))
+        print(self.colored('=' * len(title), 'cyan'))
+
+        for vsphere_name in self.vsphere:
+            for name in self.vsphere[vsphere_name].dv_portgroups.keys():
+                this_dvpg = self.vsphere[vsphere_name].dv_portgroups[name]
+                dvs_name = '~'
+                dvs_uuid = this_dvpg.dvs_uuid
+                if dvs_uuid in self.vsphere[vsphere_name].dvs:
+                    dvs_name = self.vsphere[vsphere_name].dvs[dvs_uuid].name
+                network = '~'
+                if this_dvpg.network:
+                    network = str(this_dvpg.network)
+                uplink = _('No')
+                if this_dvpg.uplink:
+                    uplink = _('Yes')
+                accessible = 'No'
+                if this_dvpg.accessible:
+                    accessible = _('Yes')
+
+                dvpg = {
+                    'vsphere': vsphere_name,
+                    'name': name,
+                    'dvs': dvs_name,
+                    'network': network,
+                    'accessible': accessible,
+                    'num_ports': '{:,}'.format(this_dvpg.num_ports),
+                    'type': this_dvpg.type,
+                    'uplink': uplink,
+                    'description': this_dvpg.description,
+                }
+                all_dvpgs.append(dvpg)
+
+        if len(all_dvpgs):
+            self._print_dv_portgroups(all_dvpgs)
+            return
+
+        print()
+        print(_('No Distributed Virtual Port Groups found.'))
+
+    # -------------------------------------------------------------------------
+    def _print_dv_portgroups(self, all_dvpgs):
+
+        labels = {
+            'vsphere': 'VSPhere',
+            'name': _('Name'),
+            'dvs': 'DV Switch',
+            'network': _('Network'),
+            'accessible': _('Accessible'),
+            'num_ports': _('Ports'),
+            'type': _('Type'),
+            'uplink': _('Uplink'),
+            'description': _('Description'),
+        }
+        label_list = (
+            'name', 'vsphere', 'dvs', 'network', 'accessible','type',
+            'num_ports', 'uplink', 'description'
+        )
+
+        str_lengths = {}
+        for label in labels:
+            str_lengths[label] = len(labels[label])
+
+        max_len = 0
+        count = 0
+        for dvpg in all_dvpgs:
+            for label in labels.keys():
+                val = dvpg[label]
+                if val is None:
+                    val = '-'
+                    dvpg[label] = val
+                if len(val) > str_lengths[label]:
+                    str_lengths[label] = len(val)
+
+        for label in labels.keys():
+            if max_len:
+                max_len += 2
+            max_len += str_lengths[label]
+
+        if self.verbose > 1:
+            LOG.debug('Label length:\n' + pp(str_lengths))
+            LOG.debug('Max line length: {} chars'.format(max_len))
+
+        tpl = ''
+        for label in label_list:
+            if tpl != '':
+                tpl += '  '
+            if label in ('num_ports',):
+                tpl += '{{{la}:>{le}}}'.format(la=label, le=str_lengths[label])
+            else:
+                tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+        if self.verbose > 1:
+            LOG.debug(_('Line template: {}').format(tpl))
+
+        if not self.quiet:
+            print()
+            print(tpl.format(**labels))
+            print('-' * max_len)
+
+        for dvpg in all_dvpgs:
+            count += 1
+            print(tpl.format(**dvpg))
+
+    # -------------------------------------------------------------------------
+    def print_networks(self):
+        """Print on STDOUT all information about Virtual Networks."""
+        all_networks = []
+
+        print()
+        title = _('Virtual Networks')
+        print(self.colored(title, 'cyan'))
+        print(self.colored('=' * len(title), 'cyan'))
+
+        for vsphere_name in self.vsphere:
+            for name in self.vsphere[vsphere_name].networks.keys():
+                this_network = self.vsphere[vsphere_name].networks[name]
+                network_name = '~'
+                network = '~'
+                if this_network.network:
+                    network = str(this_network.network)
+                accessible = 'No'
+                if this_network.accessible:
+                    accessible = _('Yes')
+
+                net = {
+                    'vsphere': vsphere_name,
+                    'name': name,
+                    'network': network,
+                    'accessible': accessible,
+                }
+                all_networks.append(net)
+
+        if len(all_networks):
+            self._print_networks(all_networks)
+            return
+
+        print()
+        print(_('No Virtual Networks found.'))
+
+    # -------------------------------------------------------------------------
+    def _print_networks(self, all_networks):
+
+        labels = {
+            'vsphere': 'VSPhere',
+            'name': _('Name'),
+            'network': _('Network'),
+            'accessible': _('Accessible'),
+        }
+        label_list = ('name', 'vsphere', 'network', 'accessible')
+
+        str_lengths = {}
+        for label in labels:
+            str_lengths[label] = len(labels[label])
+
+        max_len = 0
+        count = 0
+        for net in all_networks:
+            for label in labels.keys():
+                val = net[label]
+                if val is None:
+                    val = '-'
+                    net[label] = val
+                if len(val) > str_lengths[label]:
+                    str_lengths[label] = len(val)
+
+        for label in labels.keys():
+            if max_len:
+                max_len += 2
+            max_len += str_lengths[label]
+
+        if self.verbose > 1:
+            LOG.debug('Label length:\n' + pp(str_lengths))
+            LOG.debug('Max line length: {} chars'.format(max_len))
+
+        tpl = ''
+        for label in label_list:
+            if tpl != '':
+                tpl += '  '
+            tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+        if self.verbose > 1:
+            LOG.debug(_('Line template: {}').format(tpl))
+
+        if not self.quiet:
+            print()
+            print(tpl.format(**labels))
+            print('-' * max_len)
+
+        for net in all_networks:
+            count += 1
+            print(tpl.format(**net))
 
 
 # =============================================================================

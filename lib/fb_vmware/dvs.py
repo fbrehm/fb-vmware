@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -308,7 +308,7 @@ class VsphereDVS(VsphereObject):
         obj = None
         ports = self._dvs.FetchDVPorts()
         for port in ports:
-            if port.key == key:
+            if port.key == port_key:
                 obj = port
 
         return obj
@@ -399,22 +399,6 @@ class VsphereDVS(VsphereObject):
         vds._dvs = data
 
         return vds
-
-    # -------------------------------------------------------------------------
-    def get_if_backing_device(self, port):
-        """Return a backing device for a new virtual network interface."""
-        backing_device = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
-
-        backing_device.port = vim.dvs.PortConnection()
-        backing_device.port.portgroupKey = port.portgroupKey
-        backing_device.port.switchUuid = port.dvsUuid
-        backing_device.port.portKey = port.key
-
-        if self.verbose > 0:
-            msg = _('Got Backing device for port group {!r}:').format(self.name)
-            LOG.debug(msg + ' ' + pp(backing_device))
-
-        return backing_device
 
 
 # =============================================================================
@@ -679,6 +663,28 @@ class VsphereDvPortGroup(VsphereNetwork):
             params[prop] = val
 
         return params
+
+    # -------------------------------------------------------------------------
+    def get_if_backing_device(self, port):
+        """Return a backing device for a new virtual network interface."""
+        if self.verbose > 1:
+            msg = _(
+                'Creating network device backing spcification with a '
+                'Distributed Virtual Port Group.')
+            LOG.debug(msg)
+
+        backing_device = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
+
+        backing_device.port = vim.dvs.PortConnection()
+        backing_device.port.portgroupKey = port.portgroupKey
+        backing_device.port.switchUuid = port.dvsUuid
+        backing_device.port.portKey = port.key
+
+        if self.verbose > 0:
+            msg = _('Got Backing device for port group {!r}:').format(self.name)
+            LOG.debug(msg + ' ' + pp(backing_device))
+
+        return backing_device
 
 
 

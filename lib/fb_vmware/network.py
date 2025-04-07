@@ -33,7 +33,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.8.0'
+__version__ = '1.8.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -307,6 +307,10 @@ class VsphereNetwork(VsphereObject):
     # -------------------------------------------------------------------------
     def get_if_backing_device(self, port=None):
         """Return a backing device for a new virtual network interface."""
+        if self.verbose > 1:
+            msg = _('Creating network device backing spcification with a Virtual Network.')
+            LOG.debug(msg)
+
         backing_device = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
 
         backing_device.useAutoDetect = False

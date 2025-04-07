@@ -54,7 +54,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.2.0'
+__version__ = '2.2.1'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -1297,8 +1297,8 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_(
                 'Adding spec for network interface {d!r} (Network {n!r}, '
                 'MAC: {m!r}, summary: {s!r}).').format(
-                d=dname, n=iface.network_name, m=iface.mac_address,
-                s=iface.summary))
+                d=dev_name, n=interface.network_name, m=interface.mac_address,
+                s=interface.summary))
 
         nic_spec = vim.vm.device.VirtualDeviceSpec()
 
@@ -1306,7 +1306,7 @@ class VsphereConnection(BaseVsphereHandler):
         nic_spec.device = vim.vm.device.VirtualVmxnet3()
         nic_spec.device.deviceInfo = vim.Description()
         nic_spec.device.deviceInfo.label = dev_name
-        if iface.summary:
+        if interface.summary:
             nic_spec.device.deviceInfo.summary = interface.summary
 
         if interface.network_name in self.dv_portgroups:
@@ -1337,7 +1337,7 @@ class VsphereConnection(BaseVsphereHandler):
         else:
             nic_spec.device.addressType = 'generated'
 
-        if self.verbose > 1:
+        if self.verbose > 3:
             LOG.debug(_('Networking device creation specification:') + ' ' + pp(nic_spec))
 
         return nic_spec

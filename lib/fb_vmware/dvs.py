@@ -665,7 +665,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         """Return a backing device for a new virtual network interface."""
         if self.verbose > 1:
             msg = _(
-                'Creating network device backing spcification with a '
+                'Creating network device backing specification with a '
                 'Distributed Virtual Port Group.')
             LOG.debug(msg)
 

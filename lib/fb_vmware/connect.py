@@ -1320,7 +1320,7 @@ class VsphereConnection(BaseVsphereHandler):
             backing_device = network.get_if_backing_device()
         else:
             msg = _(
-                'Dis not found neither a Distributed Virtual Port group nor a '
+                'Did not found neither a Distributed Virtual Port group nor a '
                 'Virtual Network for network name {!r}.').format(interface.network_name)
             LOG.error(msg)
             return None

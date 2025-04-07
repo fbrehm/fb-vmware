@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: fb_vmware 1.4.1\n"
+"Project-Id-Version: fb_vmware 1.5.0\n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2025-04-07 16:41+0200\n"
+"POT-Creation-Date: 2025-04-07 17:36+0200\n"
 "PO-Revision-Date: 2025-02-05 11:40+0100\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -237,19 +237,17 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: lib/fb_vmware/app/get_network_list.py:53
-#, fuzzy
 msgid "Tries to get a list of all networks in VMWare VSphere and print it out."
-msgstr "Trying to get all networks from VSphere …"
+msgstr ""
 
 #: lib/fb_vmware/app/get_network_list.py:123
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Get all network-like objects from VSPhere {!r} ..."
-msgstr "Trying to get all networks from VSphere …"
+msgstr "Get all network-like objects from VSPhere {!r} …"
 
 #: lib/fb_vmware/app/get_network_list.py:143
-#, fuzzy
 msgid "Getting all VSPhere networks"
-msgstr "Getting all VSPhere hosts …"
+msgstr ""
 
 #: lib/fb_vmware/app/get_network_list.py:158
 msgid "Found Distributed Virtual Switches:"
@@ -285,7 +283,6 @@ msgid "Description"
 msgstr ""
 
 #: lib/fb_vmware/app/get_network_list.py:248
-#, fuzzy
 msgid "Hosts"
 msgstr ""
 
@@ -306,7 +303,6 @@ msgid "Distributed Virtual Port Groups"
 msgstr ""
 
 #: lib/fb_vmware/app/get_network_list.py:358 lib/fb_vmware/app/get_network_list.py:455
-#, fuzzy
 msgid "Network"
 msgstr ""
 
@@ -742,14 +738,13 @@ msgid "No Distributed Virtual Port Groups found."
 msgstr ""
 
 #: lib/fb_vmware/connect.py:421
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Found one Virtual Network."
 msgid_plural "Found {n} Virtual Networks."
 msgstr[0] ""
 msgstr[1] ""
 
 #: lib/fb_vmware/app/get_network_list.py:180 lib/fb_vmware/connect.py:427 lib/fb_vmware/connect.py:429
-#, fuzzy, python-brace-format
 msgid "Found Virtual Networks:"
 msgstr ""
 
@@ -1015,7 +1010,7 @@ msgstr ""
 #: lib/fb_vmware/connect.py:1323
 #, python-brace-format
 msgid ""
-"Dis not found neither a Distributed Virtual Port group nor a Virtual Network for network name "
+"Did not found neither a Distributed Virtual Port group nor a Virtual Network for network name "
 "{!r}."
 msgstr ""
 
@@ -1217,9 +1212,9 @@ msgid "Found usable port keys for DVS {!r}:"
 msgstr ""
 
 #: lib/fb_vmware/dvs.py:390 lib/fb_vmware/network.py:231
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Creating {cls} object {name!r}."
-msgstr "Creating VM folder {!r} …"
+msgstr ""
 
 #: lib/fb_vmware/dvs.py:445
 msgid "Distrubuted Virtual Port Group"
@@ -1234,7 +1229,7 @@ msgid "Initialized network object:"
 msgstr ""
 
 #: lib/fb_vmware/dvs.py:668
-msgid "Creating network device backing spcification with a Distributed Virtual Port Group."
+msgid "Creating network device backing specification with a Distributed Virtual Port Group."
 msgstr ""
 
 #: lib/fb_vmware/dvs.py:680
@@ -1359,12 +1354,10 @@ msgid "Invalid MAC address {!r} for interface given."
 msgstr ""
 
 #: lib/fb_vmware/network.py:65
-#, fuzzy
 msgid "Virtual Network"
 msgstr ""
 
 #: lib/fb_vmware/app/get_network_list.py:420 lib/fb_vmware/network.py:66
-#, fuzzy
 msgid "Virtual Networks"
 msgstr ""
 

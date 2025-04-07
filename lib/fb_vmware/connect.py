@@ -23,6 +23,7 @@ except ImportError:
 from numbers import Number
 
 # Third party modules
+from fb_tools.common import is_sequence
 from fb_tools.common import RE_TF_NAME, pp
 from fb_tools.errors import HandlerError
 
@@ -53,7 +54,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.1.1'
+__version__ = '2.2.0'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -1259,56 +1260,87 @@ class VsphereConnection(BaseVsphereHandler):
         ifaces = []
         if isinstance(nw_interfaces, VsphereVmInterface):
             ifaces.append(nw_interfaces)
-        else:
+        elif is_sequence(nw_interfaces):
             for iface in nw_interfaces:
                 if not isinstance(iface, VsphereVmInterface):
                     msg = _('Invalid Interface description {!r} given.').format(iface)
                     raise TypeError(msg)
                 ifaces.append(iface)
+        else:
+            msg = _('Invalid Interface description {!r} given.').format(nw_interfaces)
+            raise TypeError(msg)
+
+        if not len(self.dv_portgroups) and not len(self.networks):
+            self.get_networks()
 
         dev_changes = []
         dev_name = 'eth{}'
-        i = 0
+        i = -1
 
         for iface in ifaces:
 
             if self.verbose > 2:
                 LOG.debug(_('Defined interface:') + '\n' + pp(iface.as_dict()))
 
+            i += 1
             dname = dev_name.format(i)
-            if self.verbose > 1:
-                LOG.debug(_(
-                    'Adding spec for network interface {d!r} (Network {n!r}, '
-                    'MAC: {m!r}, summary: {s!r}).').format(
-                    d=dname, n=iface.network_name, m=iface.mac_address,
-                    s=iface.summary))
 
-            nic_spec = vim.vm.device.VirtualDeviceSpec()
-            nic_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
-            nic_spec.device = vim.vm.device.VirtualVmxnet3()
-            nic_spec.device.deviceInfo = vim.Description()
-            nic_spec.device.deviceInfo.label = dname
-            if iface.summary:
-                nic_spec.device.deviceInfo.summary = iface.summary
-
-            nic_spec.device.backing = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
-            nic_spec.device.backing.useAutoDetect = False
-            nic_spec.device.backing.network = iface.network
-            nic_spec.device.backing.deviceName = iface.network_name
-
-            nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
-            nic_spec.device.connectable.startConnected = True
-            nic_spec.device.connectable.allowGuestControl = True
-            nic_spec.device.wakeOnLanEnabled = True
-            if iface.mac_address:
-                nic_spec.device.addressType = 'assigned'
-                nic_spec.device.macAddress = iface.mac_address
-            else:
-                nic_spec.device.addressType = 'generated'
-
+            nic_spec = self._generate_if_create_spec(iface, dname)
             dev_changes.append(nic_spec)
 
         return dev_changes
+
+    # -------------------------------------------------------------------------
+    def _generate_if_create_spec(self, interface, dev_name):
+
+        if self.verbose > 1:
+            LOG.debug(_(
+                'Adding spec for network interface {d!r} (Network {n!r}, '
+                'MAC: {m!r}, summary: {s!r}).').format(
+                d=dname, n=iface.network_name, m=iface.mac_address,
+                s=iface.summary))
+
+        nic_spec = vim.vm.device.VirtualDeviceSpec()
+
+        nic_spec.operation = vim.vm.device.VirtualDeviceSpec.Operation.add
+        nic_spec.device = vim.vm.device.VirtualVmxnet3()
+        nic_spec.device.deviceInfo = vim.Description()
+        nic_spec.device.deviceInfo.label = dev_name
+        if iface.summary:
+            nic_spec.device.deviceInfo.summary = interface.summary
+
+        if interface.network_name in self.dv_portgroups:
+            portgroup = self.dv_portgroups[interface.network_name]
+            dvs = self.dvs[portgroup.dvs_uuid]
+            port_keys = dvs.search_port_keys(portgroup.key)
+            port = dvs.find_port_by_portkey(port_keys[0])
+            backing_device = portgroup.get_if_backing_device(port)
+        elif interface.network_name in self.networks:
+            network = self.networks[interface.network_name]
+            backing_device = network.get_if_backing_device()
+        else:
+            msg = _(
+                'Dis not found neither a Distributed Virtual Port group nor a '
+                'Virtual Network for network name {!r}.').format(interface.network_name)
+            LOG.error(msg)
+            return None
+
+        nic_spec.device.backing = backing_device
+
+        nic_spec.device.connectable = vim.vm.device.VirtualDevice.ConnectInfo()
+        nic_spec.device.connectable.startConnected = True
+        nic_spec.device.connectable.allowGuestControl = True
+        nic_spec.device.wakeOnLanEnabled = True
+        if interface.mac_address:
+            nic_spec.device.addressType = 'assigned'
+            nic_spec.device.macAddress = interface.mac_address
+        else:
+            nic_spec.device.addressType = 'generated'
+
+        if self.verbose > 1:
+            LOG.debug(_('Networking device creation specification:') + ' ' + pp(nic_spec))
+
+        return nic_spec
 
     # -------------------------------------------------------------------------
     def purge_vm(self, vm, max_wait=20, disconnect=False):

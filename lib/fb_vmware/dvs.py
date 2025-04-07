@@ -31,7 +31,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -114,6 +114,8 @@ class VsphereDVS(VsphereObject):
         """Initialize a VsphereDVS object."""
         for prop in self.properties:
             setattr(self, '_' + prop, None)
+
+        self._dvs = None
 
         super(VsphereDVS, self).__init__(
             name=name, obj_type=obj_type, name_prefix=name_prefix, status=status,
@@ -273,6 +275,45 @@ class VsphereDVS(VsphereObject):
         return True
 
     # -------------------------------------------------------------------------
+    def search_port_keys(self, portgroup_key):
+        """Search usable ports in the current DVS by a Port Group key."""
+        if not self._dvs:
+            msg = _("No {o} reference found in VDS {n!r}.").format(
+                o='vim.DistributedVirtualSwitch', n=self.name)
+            raise RuntimeError(msg)
+
+        port_keys = []
+        criteria = vim.dvs.PortCriteria()
+        criteria.connected = False
+        criteria.inside = True
+        criteria.portgroupKey = portgroup_key
+
+        ports = self._dvs.FetchDVPorts(criteria)
+        for port in ports:
+            port_keys.append(port.key)
+        if self.verbose > 1:
+            msg = _('Found usable port keys for DVS {!r}:').format(self.name)
+            msg += ' ' + pp(port_keys)
+
+        return port_keys
+
+    # -------------------------------------------------------------------------
+    def find_port_by_portkey(self, port_key):
+        """Find a port object by a given port key."""
+        if not self._dvs:
+            msg = _("No {o} reference found in VDS {n!r}.").format(
+                o='vim.DistributedVirtualSwitch', n=self.name)
+            raise RuntimeError(msg)
+
+        obj = None
+        ports = self._dvs.FetchDVPorts()
+        for port in ports:
+            if port.key == key:
+                obj = port
+
+        return obj
+
+    # -------------------------------------------------------------------------
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
         """Create a new VsphereDVS object based on the data given from pyvmomi."""
@@ -355,8 +396,25 @@ class VsphereDVS(VsphereObject):
 
         vds = cls(**params)
 
+        vds._dvs = data
+
         return vds
 
+    # -------------------------------------------------------------------------
+    def get_if_backing_device(self, port):
+        """Return a backing device for a new virtual network interface."""
+        backing_device = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
+
+        backing_device.port = vim.dvs.PortConnection()
+        backing_device.port.portgroupKey = port.portgroupKey
+        backing_device.port.switchUuid = port.dvsUuid
+        backing_device.port.portKey = port.key
+
+        if self.verbose > 0:
+            msg = _('Got Backing device for port group {!r}:').format(self.name)
+            LOG.debug(msg + ' ' + pp(backing_device))
+
+        return backing_device
 
 
 # =============================================================================
@@ -493,6 +551,16 @@ class VsphereDvPortGroup(VsphereNetwork):
     @dvs_uuid.setter
     def dvs_uuid(self, value):
         self._dvs_uuid = value
+
+    # -----------------------------------------------------------
+    @property
+    def key(self):
+        """Return the generated UUID of the portgroup."""
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        self._key = value
 
     # -----------------------------------------------------------
     @property

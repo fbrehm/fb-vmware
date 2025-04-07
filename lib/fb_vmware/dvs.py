@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere Distributed Virtual Switch and a
-          Distributed Virtual Port Group.
+@summary: The module for a VSphere Distributed Virtual Switching.
+
+          The following classes were definded:
+          * Distributed Virtual Switch
+          * Distributed Virtual Port Group
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -12,16 +15,9 @@ from __future__ import absolute_import
 
 # Standard modules
 import logging
-import re
-try:
-    from collections.abc import MutableMapping
-except ImportError:
-    from collections import MutableMapping
 
 # Third party modules
 from fb_tools.common import pp, to_bool
-from fb_tools.obj import FbGenericBaseObject
-from fb_tools.xlate import format_list
 
 from pyVmomi import vim
 
@@ -31,7 +27,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -172,7 +168,7 @@ class VsphereDVS(VsphereObject):
         """
         Return the extension key of this VDS.
 
-        This is the Key of the extension registered by the remote server that controls the switch. 
+        This is the Key of the extension registered by the remote server that controls the switch.
         """
         return self._extension_key
 
@@ -278,7 +274,7 @@ class VsphereDVS(VsphereObject):
     def search_port_keys(self, portgroup_key):
         """Search usable ports in the current DVS by a Port Group key."""
         if not self._dvs:
-            msg = _("No {o} reference found in VDS {n!r}.").format(
+            msg = _('No {o} reference found in VDS {n!r}.').format(
                 o='vim.DistributedVirtualSwitch', n=self.name)
             raise RuntimeError(msg)
 
@@ -301,7 +297,7 @@ class VsphereDVS(VsphereObject):
     def find_port_by_portkey(self, port_key):
         """Find a port object by a given port key."""
         if not self._dvs:
-            msg = _("No {o} reference found in VDS {n!r}.").format(
+            msg = _('No {o} reference found in VDS {n!r}.').format(
                 o='vim.DistributedVirtualSwitch', n=self.name)
             raise RuntimeError(msg)
 
@@ -317,38 +313,38 @@ class VsphereDVS(VsphereObject):
     @classmethod
     def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
         """Create a new VsphereDVS object based on the data given from pyvmomi."""
-        if test_mode:
+        # if test_mode:
 
-            failing_fields = []
+        #     failing_fields = []
 
-            for field in cls.necessary_fields:
-                if not hasattr(data, field):
-                    failing_fields.append(field)
+        #     for field in cls.necessary_fields:
+        #         if not hasattr(data, field):
+        #             failing_fields.append(field)
 
-            if hasattr(data, 'config'):
-                for field in cls.necessary_config_fields:
-                    if not hasattr(data.config, field):
-                        failing_fields.append('config.' + field)
-                if not hasattr(data.config, 'name'):
-                    failing_fields.append('config.name')
-            else:
-                failing_fields.append('config')
+        #     if hasattr(data, 'config'):
+        #         for field in cls.necessary_config_fields:
+        #             if not hasattr(data.config, field):
+        #                 failing_fields.append('config.' + field)
+        #         if not hasattr(data.config, 'name'):
+        #             failing_fields.append('config.name')
+        #     else:
+        #         failing_fields.append('config')
 
-            if not hasattr(data, 'summary'):
-                failing_fields.append('summary')
+        #     if not hasattr(data, 'summary'):
+        #         failing_fields.append('summary')
 
-            if len(failing_fields):
-                msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
-                raise AssertionError(msg)
+        #     if len(failing_fields):
+        #         msg = _(
+        #             'The given parameter {p!r} on calling method {m}() has failing '
+        #             'attributes').format(p='data', m='from_summary')
+        #         msg += ': ' + format_list(failing_fields, do_repr=True)
+        #         raise AssertionError(msg)
 
-        else:
-            if not isinstance(data, vim.DistributedVirtualSwitch):
-                msg = _('Parameter {t!r} must be a {e}, {v} was given.').format(
-                    t='data', e='vim.DistributedVirtualSwitch', v=data.__class__.__name__)
-                raise TypeError(msg)
+        # else:
+        #     if not isinstance(data, vim.DistributedVirtualSwitch):
+        #         msg = _('Parameter {t!r} must be a {e}, {v} was given.').format(
+        #             t='data', e='vim.DistributedVirtualSwitch', v=data.__class__.__name__)
+        #         raise TypeError(msg)
 
         params = {
             'appname': appname,
@@ -419,7 +415,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         'port_keys',
         'port_name_format',
         'segment_id',
-        'type',
+        'pg_type',
         'uplink',
     ]
 
@@ -427,7 +423,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         'name', 'obj_type', 'status', 'config_status', 'accessible',
         'ip_pool_id', 'ip_pool_name', 'appname', 'verbose',
         'auto_expand', 'backing_type', 'description', 'dvs_uuid', 'key',
-        'num_ports', 'port_keys', 'port_name_format', 'segment_id', 'type', 'uplink',
+        'num_ports', 'port_keys', 'port_name_format', 'segment_id', 'pg_type', 'uplink',
     ]
 
     dvpg_prop_source = {
@@ -442,7 +438,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         'num_ports': 'numPorts',
         'port_name_format': 'portNameFormat',
         'segment_id': 'segmentId',
-        'type': 'type',
+        'pg_type': 'type',
         'uplink': 'uplink',
     }
 
@@ -482,7 +478,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         for arg in kwargs:
             if arg not in self.net_properties and arg not in self.dvpg_properties:
                 msg = _('Invalid Argument {arg!r} on {what} given.').format(
-                    arg=argname, what='VsphereNetwork.init()')
+                    arg=arg, what='VsphereNetwork.init()')
                 raise AttributeError(msg)
             if arg in self.dvpg_properties and kwargs[arg] is not None:
                 setattr(self, arg, kwargs[arg])
@@ -591,13 +587,13 @@ class VsphereDvPortGroup(VsphereNetwork):
 
     # -----------------------------------------------------------
     @property
-    def type(self):
+    def pg_type(self):
         """Return the type of the portgroup."""
-        return self._type
+        return self._pg_type
 
-    @type.setter
-    def type(self, value):
-        self._type = value
+    @pg_type.setter
+    def pg_type(self, value):
+        self._pg_type = value
 
     # -----------------------------------------------------------
     @property
@@ -656,7 +652,7 @@ class VsphereDvPortGroup(VsphereNetwork):
     # -------------------------------------------------------------------------
     def get_params_dict(self):
         """Return a dict with all keys for init a new network object with __init__."""
-        params = uper(VsphereDvPortGroup, self).get_params_dict()
+        params = super(VsphereDvPortGroup, self).get_params_dict()
 
         for prop in self.dvpg_properties:
             val = getattr(self, prop, None)
@@ -685,7 +681,6 @@ class VsphereDvPortGroup(VsphereNetwork):
             LOG.debug(msg + ' ' + pp(backing_device))
 
         return backing_device
-
 
 
 # =============================================================================

@@ -11,14 +11,9 @@ from __future__ import absolute_import
 
 # Standard modules
 import copy
-import functools
 import ipaddress
 import logging
 import re
-try:
-    from collections.abc import MutableMapping
-except ImportError:
-    from collections import MutableMapping
 
 # Third party modules
 from fb_tools.common import pp, to_bool
@@ -33,7 +28,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.8.1'
+__version__ = '1.8.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -198,12 +193,12 @@ class VsphereNetwork(VsphereObject):
 
             failing_fields = []
 
-            for field in self.necessary_net_fields:
+            for field in cls.necessary_net_fields:
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
             if hasattr(data, 'summary'):
-                for field in self.necessary_net_summary_fields:
+                for field in cls.necessary_net_summary_fields:
                     if not hasattr(data.summary, field):
                         failing_fields.append('summary.' + field)
 
@@ -263,7 +258,6 @@ class VsphereNetwork(VsphereObject):
     # -------------------------------------------------------------------------
     def get_params_dict(self):
         """Return a dict with all keys for init a new network object with __init__."""
-
         params = {
             'appname': self.appname,
             'verbose': self.verbose,
@@ -335,7 +329,7 @@ class VsphereNetworkDict(TypedDict):
 
     # -------------------------------------------------------------------------
     def check_key_by_item(self, key, item):
-        """Checks the key by the given item."""
+        """Check the key by the given item."""
         if not isinstance(item, VsphereNetwork):
             raise TypeError(self.msg_invalid_net_type.format(item.__class__.__name__))
 
@@ -355,7 +349,7 @@ class VsphereNetworkDict(TypedDict):
 
     # -------------------------------------------------------------------------
     def compare(self, x, y):
-        """Comparing two items, used with functools for sorting. Maybe overridden."""
+        """Compare two items, used with functools for sorting. Maybe overridden."""
         net_x = self[x]
         net_y = self[y]
 
@@ -406,12 +400,12 @@ class VsphereNetworkDict(TypedDict):
                         d=desc, n=net_name, i=ip))
                     return net_name
 
-            desc = value_class.obj_desc_singular
+            desc = self.value_class.obj_desc_singular
             LOG.debug(_('Could not find {d} for IP {ip}.').format(d=desc, ip=ip))
 
         ips_str = format_list(str(x) for x in list(filter(bool, ips)))
         LOG.error(_('Could not find {d} for IP addresses {ips}.').format(
-            d=value_class.obj_desc_singular, ips=ips_str))
+            d=self.value_class.obj_desc_singular, ips=ips_str))
 
         return None
 

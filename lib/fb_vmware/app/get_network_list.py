@@ -17,18 +17,16 @@ from operator import itemgetter
 # from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
 from fb_tools.spinner import Spinner
-from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-from ..network import VsphereNetwork
-from ..network import VsphereNetworkDict
-from ..network import GeneralNetworksDict
 from ..errors import VSphereExpectedError
+from ..network import GeneralNetworksDict
+from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -365,7 +363,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             'description': _('Description'),
         }
         label_list = (
-            'name', 'vsphere', 'dvs', 'network', 'accessible','type',
+            'name', 'vsphere', 'dvs', 'network', 'accessible', 'type',
             'num_ports', 'uplink', 'description'
         )
 
@@ -426,7 +424,6 @@ class GetNetworkListApp(BaseVmwareApplication):
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].networks.keys():
                 this_network = self.vsphere[vsphere_name].networks[name]
-                network_name = '~'
                 network = '~'
                 if this_network.network:
                     network = str(this_network.network)

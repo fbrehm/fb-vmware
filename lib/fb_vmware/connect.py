@@ -23,8 +23,8 @@ except ImportError:
 from numbers import Number
 
 # Third party modules
-from fb_tools.common import is_sequence
 from fb_tools.common import RE_TF_NAME, pp
+from fb_tools.common import is_sequence
 from fb_tools.errors import HandlerError
 
 from pyVmomi import vim, vmodl
@@ -54,7 +54,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = '2.2.1'
+__version__ = '2.2.2'
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = 'rhel9_64Guest'
@@ -403,7 +403,7 @@ class VsphereConnection(BaseVsphereHandler):
             msg = ngettext(
                 'Found one Distributed Virtual Port Group.',
                 'Found {n} Distributed Virtual Port Groups.',
-                 len(self.dv_portgroups))
+                len(self.dv_portgroups))
             LOG.debug(msg.format(n=len(self.dv_portgroups)))
             if self.verbose > 2:
                 msg = _('Found Distributed Virtual Port Groups:') + '\n'
@@ -462,7 +462,7 @@ class VsphereConnection(BaseVsphereHandler):
                     child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)
                 self.dv_portgroups.append(portgroup)
             elif isinstance(child, vim.OpaqueNetwork):
-                LOG.debug("Evaluating Opaque Network later ...")
+                LOG.debug('Evaluating Opaque Network later ...')
             else:
                 network = VsphereNetwork.from_summary(
                     child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir)

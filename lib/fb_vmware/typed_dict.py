@@ -12,21 +12,18 @@ from __future__ import absolute_import
 # Standard modules
 import functools
 import logging
-import re
 try:
     from collections.abc import MutableMapping
 except ImportError:
     from collections import MutableMapping
 
 # Third party modules
-from fb_tools.common import pp, to_bool
 from fb_tools.obj import FbGenericBaseObject
-from fb_tools.xlate import format_list
 
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -58,7 +55,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def check_key_by_item(self, key, item):
         """
-        Checks the key by the given item.
+        Check the key by the given item.
 
         Maybe overridden.
         Should throw a KeyError, if key is not valid.
@@ -135,7 +132,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
         if not strict and stripped_key not in self._map:
             return
 
-        del self._map[net_name]
+        del self._map[key]
 
     # -------------------------------------------------------------------------
     # The next five methods are requirements of the ABC.
@@ -192,7 +189,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
 
     # -------------------------------------------------------------------------
     def compare(self, x, y):
-        """Comparing two items, used with functools for sorting. Maybe overridden."""
+        """Compare two items, used with functools for sorting. Maybe overridden."""
         if x is None and y is None:
             return 0
         if x is None:
@@ -212,7 +209,6 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def keys(self):
         """Return all items of this dict in a sorted manner."""
-
         return sorted(
             self._map.keys(),
             key=functools.cmp_to_key(self.compare))
@@ -261,7 +257,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
         if key is None:
             raise TypeError(self.msg_none_type_error)
 
-        key = self.get_key_from_item(item)
+        # key = self.get_key_from_item(item)
         if key == '':
             raise ValueError(self.msg_empty_key_error.format(key))
 
@@ -299,7 +295,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
 
         if not isinstance(default, self.value_class):
             msg = self.msg_invalid_item_type.format(
-                got=item.__class__.__name__, expected=self.value_class.__name__)
+                got=default.__class__.__name__, expected=self.value_class.__name__)
             raise TypeError(msg)
 
         if stripped_key in self._map:

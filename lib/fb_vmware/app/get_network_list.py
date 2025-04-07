@@ -26,7 +26,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -335,7 +335,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                     'network': network,
                     'accessible': accessible,
                     'num_ports': '{:,}'.format(this_dvpg.num_ports),
-                    'type': this_dvpg.type,
+                    'type': this_dvpg.pg_type,
                     'uplink': uplink,
                     'description': this_dvpg.description,
                 }

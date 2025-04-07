@@ -24,7 +24,7 @@ from .errors import VSphereNameError
 from .xlate import XLATOR
 
 
-__version__ = '1.2.4'
+__version__ = '1.2.5'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -59,7 +59,7 @@ class VsphereVmInterface(FbBaseObject):
                 msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
                     t='network', e='vim.Network', v=network)
                 raise TypeError(msg)
-            self._network = network
+            self.network = network
 
         self.network_name = network_name
         self.summary = summary

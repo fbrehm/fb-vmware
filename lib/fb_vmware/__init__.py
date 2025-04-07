@@ -35,6 +35,8 @@ from .dc import VsphereDatacenter
 from .disk import VsphereDisk, VsphereDiskList
 from .ds_cluster import VsphereDsCluster
 from .ds_cluster import VsphereDsClusterDict
+from .dvs import VsphereDVS
+from .dvs import VsphereDvPortGroup
 from .ether import VsphereEthernetcard
 from .ether import VsphereEthernetcardList
 from .host import VsphereHost
@@ -43,16 +45,18 @@ from .host import VsphereHostList
 from .host_port_group import VsphereHostPortgroup
 from .host_port_group import VsphereHostPortgroupList
 from .iface import VsphereVmInterface
+from .network import GeneralNetworksDict
 from .network import VsphereNetwork
 from .network import VsphereNetworkDict
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
+from .typed_dict import TypedDict
 from .vm import VsphereVm
 from .vm import VsphereVmList
 from .xlate import XLATOR
 
 
-__version__ = '1.4.1'
+__version__ = '1.5.0'
 
 LOG = logging.getLogger(__name__)
 

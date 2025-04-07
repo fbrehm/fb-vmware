@@ -1,3 +1,13 @@
+fb-vmware (1.5.0) UNRELEASED; urgency=medium
+
+  * Adding lib/fb_vmware/typed_dict.py for class TypedDict
+  * Adding script bin/get-vsphere-network-list and its application class
+    module lib/fb_vmware/app/get_network_list.py.
+  * Adding module lib/fb_vmware/app/get_network_list.py for classes
+    VsphereDVS and VsphereDvPortGroup.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Mon, 07 Apr 2025 16:49:25 +0200
+
 fb-vmware (1.4.1) all; urgency=medium
 
   * Changing debug behaviour in lib/fb_vmware/ether.py

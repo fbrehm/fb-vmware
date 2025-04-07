@@ -23,7 +23,7 @@ from fb_tools.obj import FbBaseObject
 from .errors import VSphereNameError
 from .xlate import XLATOR
 
-__version__ = '1.3.4'
+__version__ = '1.3.5'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -221,9 +221,11 @@ class VsphereObject(FbBaseObject):
         res['name_prefix'] = self.name_prefix
         res['tf_name'] = self.tf_name
         res['var_name'] = self.var_name
-        res['repr_fields'] = copy.copy(self.repr_fields)
         res['status'] = self.status
         res['config_status'] = self.config_status
+
+        if self.verbose > 3:
+            res['repr_fields'] = copy.copy(self.repr_fields)
 
         return res
 

@@ -23,15 +23,17 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereNoNetFoundError
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.8.2'
+__version__ = '1.8.3'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+ngettext = XLATOR.ngettext
 
 
 # =============================================================================
@@ -386,9 +388,12 @@ class VsphereNetworkDict(TypedDict):
             LOG.debug(_('Empty {what}.').format(self.__class__.__name__))
             return None
 
+        ips_list_str = []
+
         for ip in ips:
             if not ip:
                 continue
+            ips_list_str.append(str(ip))
             LOG.debug(_('Searching VSphere network for address {} ...').format(ip))
             ipa = ipaddress.ip_address(ip)
 
@@ -403,11 +408,14 @@ class VsphereNetworkDict(TypedDict):
             desc = self.value_class.obj_desc_singular
             LOG.debug(_('Could not find {d} for IP {ip}.').format(d=desc, ip=ip))
 
-        ips_str = format_list(str(x) for x in list(filter(bool, ips)))
-        LOG.error(_('Could not find {d} for IP addresses {ips}.').format(
-            d=self.value_class.obj_desc_singular, ips=ips_str))
+        ips_str = format_list(ips_list_str)
+        no_ips = len(ips_list_str)
 
-        return None
+        msg = ngettext(
+            'Could not find {d} for IP address {ips}.',
+            'Could not find {d} for IP addresses {ips}.',
+            no_ips).format(d=self.value_class.obj_desc_singular, ips=ips_str)
+        raise VSphereNoNetFoundError(msg)
 
 
 # =============================================================================

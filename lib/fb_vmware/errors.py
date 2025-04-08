@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 
 _ = XLATOR.gettext
 
@@ -40,6 +40,13 @@ class BaseVSphereHandlerError(FbVMWareError):
 # =============================================================================
 class VSphereHandlerError(BaseVSphereHandlerError):
     """Base class for all exception belonging to VSphere."""
+
+    pass
+
+
+# =============================================================================
+class VSphereNoNetFoundError(VSphereHandlerError):
+    """Error class used, if no network could be found in a network dict for an IP address."""
 
     pass
 

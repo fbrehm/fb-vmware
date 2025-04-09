@@ -29,7 +29,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.8.3'
+__version__ = '1.8.4'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -385,7 +385,7 @@ class VsphereNetworkDict(TypedDict):
         have a match, will be returned.
         """
         if len(self) < 1:
-            LOG.debug(_('Empty {what}.').format(self.__class__.__name__))
+            LOG.debug(_('Empty {what}.').format(what=self.__class__.__name__))
             return None
 
         ips_list_str = []

@@ -1,4 +1,4 @@
-pyvmomi
+pyvmomi<8.0.3.0.1
 fb_logging>=1.0.0
 fb_tools>=2.6.2
 packaging

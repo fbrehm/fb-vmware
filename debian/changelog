@@ -1,3 +1,9 @@
+fb-vmware (1.5.2) all; urgency=medium
+
+  * Fixing lib/fb_vmware/network.py
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 09 Apr 2025 09:58:43 +0200
+
 fb-vmware (1.5.1) all; urgency=medium
 
   * Adding class VSphereNoNetFoundError to lib/fb_vmware/errors.py

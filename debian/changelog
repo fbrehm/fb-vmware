@@ -1,3 +1,9 @@
+fb-vmware (1.5.3) all; urgency=medium
+
+  * Fixing Github workflows
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 09 Apr 2025 10:40:34 +0200
+
 fb-vmware (1.5.2) all; urgency=medium
 
   * Fixing lib/fb_vmware/network.py

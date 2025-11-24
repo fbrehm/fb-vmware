@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for the application object of the get-vsphere-host-list application.
+@summary: Print a list of all physical hosts in a VMware vSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -10,7 +10,9 @@
 from __future__ import absolute_import, print_function
 
 # Standard modules
+import locale
 import logging
+import pathlib
 import re
 import sys
 from operator import itemgetter
@@ -27,7 +29,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -353,11 +355,29 @@ class GetHostsListApplication(BaseVmwareApplication):
 
         return hosts
 
+# =============================================================================
+def main():
+    """Entrypoint for get-vsphere-host-list."""
+    my_path = pathlib.Path(__file__)
+    appname = my_path.name
+
+    locale.setlocale(locale.LC_ALL, "")
+
+    app = GetHostsListApplication(appname=appname)
+    app.initialized = True
+
+    if app.verbose > 2:
+        print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
+
+    app()
+
+    sys.exit(0)
+
 
 # =============================================================================
 if __name__ == '__main__':
 
-    pass
+    main()
 
 # =============================================================================
 

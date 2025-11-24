@@ -47,6 +47,7 @@ name = "fb_vmware"
 directory = "data"
 
 [project.scripts]
+get-vsphere-host-list = "fb_vmware.app.get_host_list:main"
 get-vsphere-storage-cluster-list = "fb_vmware.app.get_storage_cluster_list:main"
 
 [project.optional-dependencies]

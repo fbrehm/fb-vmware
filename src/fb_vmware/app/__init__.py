@@ -12,6 +12,8 @@ from __future__ import absolute_import, print_function
 # Standard modules
 import copy
 import logging
+import os
+import pathlib
 import random
 
 # Third party modules
@@ -28,9 +30,15 @@ from .. import __version__ as GLOBAL_VERSION
 from ..config import VmwareConfiguration
 from ..connect import VsphereConnection
 from ..errors import VSphereExpectedError
+from ..xlate import DOMAIN
+from ..xlate import LOCALE_DIR
 from ..xlate import XLATOR
+from ..xlate import __base_dir__ as __xlate_base_dir__
+from ..xlate import __lib_dir__ as __xlate_lib_dir__
+from ..xlate import __mo_file__ as __xlate_mo_file__
+from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = '1.2.1'
+__version__ = '1.3.0'
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone('Europe/Berlin')
 
@@ -61,6 +69,9 @@ class BaseVmwareApplication(FbConfigApplication):
         self.req_vspheres = None
         self.do_vspheres = []
 
+        if base_dir is None:
+            base_dir = pathlib.Path(os.getcwd()).resolve()
+
         # Hash with all VSphere handler objects
         self.vsphere = {}
 
@@ -77,6 +88,30 @@ class BaseVmwareApplication(FbConfigApplication):
         """Clean up in emergency case."""
         if self.vsphere.keys():
             self.cleaning_up()
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True):
+        """
+        Transform the elements of the object into a dict.
+
+        @param short: don't include local properties in resulting dict.
+        @type short: bool
+
+        @return: structure as dict
+        @rtype:  dict
+        """
+        res = super(BaseVmwareApplication, self).as_dict(short=short)
+
+        res["xlate"]["fb_vmware"] = {
+            "__module_dir__": __xlate_module_dir__,
+            "__lib_dir__": __xlate_lib_dir__,
+            "__base_dir__": __xlate_base_dir__,
+            "LOCALE_DIR": LOCALE_DIR,
+            "DOMAIN": DOMAIN,
+            "__mo_file__": __xlate_mo_file__,
+        }
+
+        return res
 
     # -------------------------------------------------------------------------
     def post_init(self):

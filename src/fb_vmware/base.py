@@ -102,7 +102,7 @@ class BaseVsphereHandler(HandlingObject):
     # -----------------------------------------------------------
     @property
     def auto_close(self):
-        """Return wether an existing connection should be closed on destroying the current object."""
+        """Return wether existing connection should be closed on destroying the current object."""
         return getattr(self, '_auto_close', False)
 
     @auto_close.setter

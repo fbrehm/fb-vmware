@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@summary: The module for the application object of the get-vsphere-storage-cluster-list application.
+@summary: Print a list of all storage clusters in a VMware VSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -10,7 +10,9 @@
 from __future__ import absolute_import, print_function
 
 # Standard modules
+import locale
 import logging
+import pathlib
 import sys
 from operator import itemgetter
 
@@ -23,7 +25,8 @@ from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 # Own modules
-from . import BaseVmwareApplication, VmwareAppError
+from . import BaseVmwareApplication
+from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 # from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
@@ -356,9 +359,28 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
 
 # =============================================================================
-if __name__ == '__main__':
+def main():
+    """Entrypoint for get-vsphere-storage-cluster-list."""
+    my_path = pathlib.Path(__file__)
+    appname = my_path.name
 
-    pass
+    locale.setlocale(locale.LC_ALL, "")
+
+    app = GetStorageClusterListApp(appname=appname)
+    app.initialized = True
+
+    if app.verbose > 2:
+        print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
+
+    app()
+
+    sys.exit(0)
+
+
+# =============================================================================
+if __name__ == "__main__":
+
+    main()
 
 # =============================================================================
 

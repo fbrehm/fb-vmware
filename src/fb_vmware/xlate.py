@@ -3,8 +3,7 @@
 """
 @summary: The module for i18n.
 
-          It provides a translation object, usable from all other
-          modules in this package.
+It provides a translation object, usable from all other modules in this package.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -36,7 +35,7 @@ DOMAIN = 'fb_vmware'
 
 LOG = logging.getLogger(__name__)
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 
 __me__ = Path(__file__).resolve()
@@ -65,7 +64,7 @@ else:
             if LOCALE_DIR.is_dir():
                 LOCALE_DIR = str(LOCALE_DIR)
             else:
-                LOCALE_DIR = str(__base_dir__.prefix / 'share' / 'locale')
+                LOCALE_DIR = str(__base_dir__ / sys.prefix / 'share' / 'locale')
 
 DEFAULT_LOCALE_DEF = 'en_US'
 DEFAULT_LOCALE = babel.core.default_locale()

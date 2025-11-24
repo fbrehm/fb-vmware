@@ -13,11 +13,7 @@ import logging
 import os
 import sys
 import textwrap
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest
+import unittest
 
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
 sys.path.insert(0, libdir)

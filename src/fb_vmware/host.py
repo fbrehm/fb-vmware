@@ -31,6 +31,7 @@ from pyVmomi import vim
 # Own modules
 from .about import VsphereAboutInfo
 from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject

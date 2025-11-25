@@ -16,7 +16,6 @@ import re
 import socket
 import time
 import uuid
-
 try:
     from collections.abc import Sequence
 except ImportError:
@@ -1129,7 +1128,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0 : i + 1])
+            path = "/".join(parts[0:i + 1])
             paths.append(path)
 
         try:
@@ -1187,7 +1186,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0 : i + 1])
+            path = "/".join(parts[0:i + 1])
             paths.append(path)
 
         try:

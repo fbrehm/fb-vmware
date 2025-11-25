@@ -19,6 +19,7 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereNameError
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR

@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-datastore')
+LOG = logging.getLogger("test-datastore")
 
 
 # =============================================================================
@@ -45,13 +45,13 @@ class TestVDataStore(FbVMWareTestcase):
         from fb_vmware import VsphereDatastore
         from fb_vmware import VsphereDatastoreDict
 
-        LOG.debug('Version of fb_vmware.datastore: {!r}.'.format(fb_vmware.datastore.__version__))
+        LOG.debug("Version of fb_vmware.datastore: {!r}.".format(fb_vmware.datastore.__version__))
 
         doc = textwrap.dedent(VsphereDatastore.__doc__)
-        LOG.debug('Description of VsphereDatastore: ' + doc)
+        LOG.debug("Description of VsphereDatastore: " + doc)
 
         doc = textwrap.dedent(VsphereDatastoreDict.__doc__)
-        LOG.debug('Description of VsphereDatastoreDict: ' + doc)
+        LOG.debug("Description of VsphereDatastoreDict: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -64,12 +64,12 @@ class TestVDataStore(FbVMWareTestcase):
         with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             ds = VsphereDatastore(appname=self.appname)
-            LOG.debug('VsphereDatastore %s:\n{}'.format(ds))
+            LOG.debug("VsphereDatastore %s:\n{}".format(ds))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        ds_name = 'my-datastore'
+        ds_name = "my-datastore"
         capacity = int(100 * 1024 * 1024 * 1024)
         free_space = int(capacity * 0.6)
 
@@ -81,8 +81,8 @@ class TestVDataStore(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereDatastore %r: {!r}'.format(ds))
-        LOG.debug('VsphereDatastore %s:\n{}'.format(ds))
+        LOG.debug("VsphereDatastore %r: {!r}".format(ds))
+        LOG.debug("VsphereDatastore %s:\n{}".format(ds))
 
         self.assertIsInstance(ds, VsphereDatastore)
         self.assertEqual(ds.appname, self.appname)
@@ -91,19 +91,19 @@ class TestVDataStore(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVDataStore('test_import', verbose))
-    suite.addTest(TestVDataStore('test_init_object', verbose))
+    suite.addTest(TestVDataStore("test_import", verbose))
+    suite.addTest(TestVDataStore("test_init_object", verbose))
     # suite.addTest(TestVDataStore('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

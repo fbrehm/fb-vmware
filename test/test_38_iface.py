@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-iface')
+LOG = logging.getLogger("test-iface")
 
 
 # =============================================================================
@@ -44,10 +44,10 @@ class TestVInterface(FbVMWareTestcase):
         import fb_vmware.iface
         from fb_vmware import VsphereVmInterface
 
-        LOG.debug('Version of fb_vmware.iface: {!r}.'.format(fb_vmware.iface.__version__))
+        LOG.debug("Version of fb_vmware.iface: {!r}.".format(fb_vmware.iface.__version__))
 
         doc = textwrap.dedent(VsphereVmInterface.__doc__)
-        LOG.debug('Description of VsphereVmInterface: ' + doc)
+        LOG.debug("Description of VsphereVmInterface: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -56,8 +56,8 @@ class TestVInterface(FbVMWareTestcase):
 
         from fb_vmware import VsphereVmInterface
 
-        iface_name = 'iface0'
-        nw_name = '10.12.11.0_24'
+        iface_name = "iface0"
+        nw_name = "10.12.11.0_24"
 
         iface = VsphereVmInterface(
             name=iface_name,
@@ -66,8 +66,8 @@ class TestVInterface(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereVmInterface %r: {!r}'.format(iface))
-        LOG.debug('VsphereVmInterface %s:\n{}'.format(iface))
+        LOG.debug("VsphereVmInterface %r: {!r}".format(iface))
+        LOG.debug("VsphereVmInterface %s:\n{}".format(iface))
 
         self.assertIsInstance(iface, VsphereVmInterface)
         self.assertEqual(iface.appname, self.appname)
@@ -75,19 +75,19 @@ class TestVInterface(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVInterface('test_import', verbose))
-    suite.addTest(TestVInterface('test_init_object', verbose))
+    suite.addTest(TestVInterface("test_import", verbose))
+    suite.addTest(TestVInterface("test_init_object", verbose))
     # suite.addTest(TestVInterface('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

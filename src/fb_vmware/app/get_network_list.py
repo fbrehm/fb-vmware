@@ -28,7 +28,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

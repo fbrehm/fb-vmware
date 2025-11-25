@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a base VSphere class.
+@summary: The module for a base vSphere class.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -35,7 +35,7 @@ OBJ_STATUS_GREEN = "green"
 # =============================================================================
 class VsphereObject(FbBaseObject):
     """
-    A base class for some other VSphere classes.
+    A base class for some other vSphere classes.
 
     It is especially intended for classes mapping other classes from the pyVmomi package.
     """
@@ -91,7 +91,7 @@ class VsphereObject(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def obj_type(self):
-        """Return the type of the VSphere object."""
+        """Return the type of the vSphere object."""
         return self._obj_type
 
     @obj_type.setter

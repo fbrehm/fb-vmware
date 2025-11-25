@@ -67,7 +67,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     ):
         """Initialize a GetHostsListApplication object."""
         desc = _(
-            "Tries to get a list of all physical hosts in " "VMWare VSphere and print it out."
+            "Tries to get a list of all physical hosts in " "VMware vSphere and print it out."
         )
 
         self._host_pattern = self.default_host_pattern
@@ -202,7 +202,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_all_hosts(self):
-        """Collect all physical VMWare hosts."""
+        """Collect all physical VMware hosts."""
         ret = 0
         all_hosts = []
 
@@ -210,7 +210,7 @@ class GetHostsListApplication(BaseVmwareApplication):
             for vsphere_name in self.vsphere:
                 all_hosts += self.get_hosts(vsphere_name)
         elif not self.quiet:
-            spin_prompt = _("Getting all VSPhere hosts ...") + " "
+            spin_prompt = _("Getting all vSphere hosts ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 for vsphere_name in self.vsphere:
@@ -278,7 +278,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     def print_hosts(self, hosts):
         """Print on STDOUT all information about all hosts in a human readable format."""
         labels = {
-            "vsphere": "VSPhere",
+            "vsphere": "vSphere",
             "cluster": "Cluster",
             "name": "Host",
             "connection_state": _("Connect state"),
@@ -370,9 +370,9 @@ class GetHostsListApplication(BaseVmwareApplication):
         if not self.quiet:
             print()
             if count == 0:
-                msg = _("Found no VMWare hosts.")
+                msg = _("Found no VMware hosts.")
             else:
-                msg = ngettext("Found one VMWare host.", "Found {} VMWare hosts.", count).format(
+                msg = ngettext("Found one VMware host.", "Found {} VMware hosts.", count).format(
                     count
                 )
             print(msg)
@@ -380,7 +380,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_hosts(self, vsphere_name):
-        """Get all host of all physical hosts in a VMWare VSPhere."""
+        """Get all host of all physical hosts in a VMware vSphere."""
         hosts = []
 
         vsphere = self.vsphere[vsphere_name]

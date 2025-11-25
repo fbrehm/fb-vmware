@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for special error classes on VSphere API operations.
+@summary: The module for special error classes on vSphere API operations.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -25,21 +25,21 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class FbVMWareError(FbHandlerError):
-    """Base class for all exception belonging to VSphere/VMWare."""
+    """Base class for all exception belonging to vSphere/VMware."""
 
     pass
 
 
 # =============================================================================
 class BaseVSphereHandlerError(FbVMWareError):
-    """Base class for all exception belonging to VSphere."""
+    """Base class for all exception belonging to vSphere."""
 
     pass
 
 
 # =============================================================================
 class VSphereHandlerError(BaseVSphereHandlerError):
-    """Base class for all exception belonging to VSphere."""
+    """Base class for all exception belonging to vSphere."""
 
     pass
 
@@ -59,7 +59,7 @@ class VSphereNoDatastoresFoundError(FbHandlerError):
     def __init__(self, msg=None):
         """Initialize the VSphereNoDatastoresFoundError object."""
         if not msg:
-            msg = _("No VSphere datastores found.")
+            msg = _("No vSphere datastores found.")
         self.msg = msg
 
     # -------------------------------------------------------------------------
@@ -82,7 +82,7 @@ class VSphereExpectedError(VSphereHandlerError):
 
 # =============================================================================
 class VSphereUnsufficientCredentials(VSphereExpectedError):
-    """Special error class, if there are no sufficient credentials to connect to Vsphere."""
+    """Special error class, if there are no sufficient credentials to connect to vSphere."""
 
     # -------------------------------------------------------------------------
     def __init__(self, user=None):
@@ -94,10 +94,10 @@ class VSphereUnsufficientCredentials(VSphereExpectedError):
         """Typecast into a string."""
         if self.user:
             msg = _(
-                "Invalid credentials to connect to Vsphere as user {!r}: " "no password given."
+                "Invalid credentials to connect to vSphere as user {!r}: " "no password given."
             ).format(self.user)
         else:
-            msg = _("Invalid credentials to connect to Vsphere: no user given.")
+            msg = _("Invalid credentials to connect to vSphere: no user given.")
 
         return msg
 
@@ -121,7 +121,7 @@ class VSphereDiskCtrlrTypeNotFoudError(VSphereExpectedError):
 
 # =============================================================================
 class VSphereNameError(VSphereExpectedError):
-    """Special error class for invalid Vsphere object names."""
+    """Special error class for invalid vSphere object names."""
 
     # -------------------------------------------------------------------------
     def __init__(self, name, obj_type=None):
@@ -133,18 +133,18 @@ class VSphereNameError(VSphereExpectedError):
     def __str__(self):
         """Typecast into a string."""
         if self.obj_type:
-            msg = _("Invalid name {n!r} for a {o} VSphere object.").format(
+            msg = _("Invalid name {n!r} for a {o} vSphere object.").format(
                 n=self.name, o=self.obj_type
             )
         else:
-            msg = _("Invalid name {!r} for a VSphere object.").format(self.name)
+            msg = _("Invalid name {!r} for a vSphere object.").format(self.name)
 
         return msg
 
 
 # =============================================================================
 class VSphereDatacenterNotFoundError(VSphereExpectedError):
-    """Error class, if the given datacenter was not found in VSphere."""
+    """Error class, if the given datacenter was not found in vSphere."""
 
     # -------------------------------------------------------------------------
     def __init__(self, dc):
@@ -154,13 +154,13 @@ class VSphereDatacenterNotFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _("The VSphere datacenter {!r} is not existing.").format(self.dc)
+        msg = _("The vSphere datacenter {!r} is not existing.").format(self.dc)
         return msg
 
 
 # =============================================================================
 class VSphereVmNotFoundError(VSphereExpectedError):
-    """Special error class for the case, that the given VM was not found in VSphere."""
+    """Special error class for the case, that the given VM was not found in vSphere."""
 
     # -------------------------------------------------------------------------
     def __init__(self, vm):
@@ -170,7 +170,7 @@ class VSphereVmNotFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _("The VSphere Virtual machine {!r} was not found.").format(self.vm)
+        msg = _("The vSphere Virtual machine {!r} was not found.").format(self.vm)
         return msg
 
 
@@ -279,7 +279,7 @@ class TimeoutCreateVmError(VSphereExpectedError):
 
 # =============================================================================
 class WrongPortTypeError(FbVMWareError, TypeError):
-    """Exception when wrong VSPhere server port was given."""
+    """Exception when wrong vSphere server port was given."""
 
     # -------------------------------------------------------------------------
     def __init__(self, port, emesg=None):
@@ -290,7 +290,7 @@ class WrongPortTypeError(FbVMWareError, TypeError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _("Invalid type of {!r} for a port of a VSPhere server").format(self.port)
+        msg = _("Invalid type of {!r} for a port of a vSphere server").format(self.port)
         if self.emesg:
             msg += ": " + self.emesg
         else:
@@ -317,7 +317,7 @@ class WrongPortValueError(FbVMWareError, ValueError):
     def __str__(self):
         """Typecast into a string."""
         msg = _(
-            "Invalid port number {port!r} for the VSphere server, "
+            "Invalid port number {port!r} for the vSphere server, "
             "PORT must be greater than zero and less or equal to {max}."
         ).format(port=self.port, max=self.max_port)
 

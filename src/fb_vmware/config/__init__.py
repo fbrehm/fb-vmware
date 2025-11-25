@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: A module for providing a configuration for VSPhere.
+@summary: A module for providing a configuration for vSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -56,7 +56,7 @@ class VmwareConfigError(MultiConfigError):
 
 # =============================================================================
 class VSPhereConfigInfo(FbBaseObject):
-    """Encapsulating all necessary data to connect to a VSPhere server."""
+    """Encapsulating all necessary data to connect to a vSphere server."""
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -127,7 +127,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def host(self):
-        """Return the host name (or IP address) of the VSPhere server."""
+        """Return the host name (or IP address) of the vSphere server."""
         return self._host
 
     @host.setter
@@ -140,7 +140,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def use_https(self):
-        """Return the need for HTTPS for communicating with the VSPhere server."""
+        """Return the need for HTTPS for communicating with the vSphere server."""
         return self._use_https
 
     @use_https.setter
@@ -150,7 +150,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def port(self):
-        """Return the TCP port number of the VSPhere server."""
+        """Return the TCP port number of the vSphere server."""
         return self._port
 
     @port.setter
@@ -167,13 +167,13 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def dc(self):
-        """Return the name of the datacenter in VSPhere to use."""
+        """Return the name of the datacenter in vSphere to use."""
         return self._dc
 
     @dc.setter
     def dc(self, value):
         if value is None or str(value).strip() == "":
-            msg = _("An empty name for a VSPhere datacenter is not allowed.")
+            msg = _("An empty name for a vSphere datacenter is not allowed.")
             LOG.warn(msg)
             return
         self._dc = str(value).strip()
@@ -181,7 +181,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def user(self):
-        """Return the user name to use to connect to the VSPhere server."""
+        """Return the user name to use to connect to the vSphere server."""
         return self._user
 
     @user.setter
@@ -244,7 +244,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def schema(self):
-        """Return the schema as part of the URL to connect to the VSPhere server."""
+        """Return the schema as part of the URL to connect to the vSphere server."""
         if self.use_https:
             return "https"
         return "http"
@@ -252,7 +252,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def url(self):
-        """Return the URL, which can be used to connect to the VSPhere server."""
+        """Return the URL, which can be used to connect to the vSphere server."""
         if not self.host:
             return None
 
@@ -269,7 +269,7 @@ class VSPhereConfigInfo(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def full_url(self):
-        """Reurn the full URL, which can be used to connect to the VSPhere server."""
+        """Reurn the full URL, which can be used to connect to the vSphere server."""
         if not self.host:
             return None
 
@@ -324,13 +324,13 @@ class VSPhereConfigInfo(FbBaseObject):
                     continue
 
                 msg = _(
-                    "Unknown key {k!r} with value {v!r} for VSphere {vs!r} in section "
+                    "Unknown key {k!r} with value {v!r} for vSphere {vs!r} in section "
                     "{sec!r} found."
                 ).format(k=key, v=value, vs=vsphere_name, sec=section_name)
                 LOG.warn(msg)
 
         except Exception as e:
-            msg = _("{e} in section {sn!r} for VSphere {vs!r}:").format(
+            msg = _("{e} in section {sn!r} for vSphere {vs!r}:").format(
                 e=e.__class__.__name__, sn=section_name, vs=vsphere_name
             )
             msg += " " + str(e)
@@ -338,8 +338,8 @@ class VSPhereConfigInfo(FbBaseObject):
 
         if not info.host:
             msg = _(
-                "There must be given at least the VSPhere hostname in section {sn!r} "
-                "for VSphere {vs!r}."
+                "There must be given at least the vSphere hostname in section {sn!r} "
+                "for vSphere {vs!r}."
             ).format(vs=vsphere_name, sec=section_name)
             raise VmwareConfigError(msg)
 
@@ -405,7 +405,7 @@ class VSPhereConfigInfo(FbBaseObject):
 
 # =============================================================================
 class VSPhereConfigInfoDict(dict, FbGenericBaseObject):
-    """A dictionary containing VSPhereConfigInfo as values and their VSPhere names as keys."""
+    """A dictionary containing VSPhereConfigInfo as values and their vSphere names as keys."""
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
@@ -517,7 +517,7 @@ class VmwareConfiguration(BaseMultiConfig):
                 vsphere_name = sn.replace("vsphere:", "").strip()
                 return self._eval_vsphere_instance(section_name, vsphere_name, section)
 
-            LOG.error(_("Empty VSphere name found."))
+            LOG.error(_("Empty vSphere name found."))
 
     # -------------------------------------------------------------------------
     def _eval_bare_vsphere(self, section_name, section):

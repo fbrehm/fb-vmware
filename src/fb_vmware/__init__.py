@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a base VSphere handler object.
+@summary: The module for a base vSphere handler object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com

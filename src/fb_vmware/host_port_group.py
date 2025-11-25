@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere host portgroup object.
+@summary: The module for a vSphere host portgroup object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com

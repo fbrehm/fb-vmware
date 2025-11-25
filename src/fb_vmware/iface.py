@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere object for a network interface of a VM.
+@summary: The module for a vSphere object for a network interface of a VM.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -78,7 +78,7 @@ class VsphereVmInterface(FbBaseObject):
     # -----------------------------------------------------------
     @property
     def obj_type(self):
-        """Return the type of the VSphere object."""
+        """Return the type of the vSphere object."""
         return "vsphere_vm_interface"
 
     # -----------------------------------------------------------

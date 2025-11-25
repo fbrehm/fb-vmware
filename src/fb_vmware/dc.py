@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for capsulating a VSphere datacenter object.
+@summary: The module for capsulating a vSphere datacenter object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -36,7 +36,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDatacenter(VsphereObject):
-    """Encapsulation class for a VSphere Datacenter object."""
+    """Encapsulation class for a vSphere Datacenter object."""
 
     # -------------------------------------------------------------------------
     def __init__(

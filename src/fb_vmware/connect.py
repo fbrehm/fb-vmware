@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere connection object.
+@summary: The module for a vSphere connection object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -67,7 +67,7 @@ ngettext = XLATOR.ngettext
 
 # =============================================================================
 class VsphereConnection(BaseVsphereHandler):
-    """Class for a VSphere connection handler object."""
+    """Class for a vSphere connection handler object."""
 
     re_local_ds = re.compile(r"^local[_-]", re.IGNORECASE)
     vmw_api_version_to_hw_version = {
@@ -140,8 +140,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_about(self, disconnect=False):
-        """Get the 'about' information from VSphere as a VsphereAboutInfo object."""
-        LOG.debug(_("Trying to get some 'about' information from VSphere."))
+        """Get the 'about' information from vSphere as a VsphereAboutInfo object."""
+        LOG.debug(_("Trying to get some 'about' information from vSphere."))
 
         try:
 
@@ -161,7 +161,7 @@ class VsphereConnection(BaseVsphereHandler):
             urllib3.exceptions.MaxRetryError,
             requests.exceptions.ConnectTimeout,
         ) as e:
-            msg = _("Got a {c} on requesting 'about' information from VSPhere {url}: {e}").format(
+            msg = _("Got a {c} on requesting 'about' information from vSphere {url}: {e}").format(
                 c=e.__class__.__name__, url=self.connect_info.url, e=e
             )
             raise VSphereExpectedError(msg)
@@ -171,14 +171,14 @@ class VsphereConnection(BaseVsphereHandler):
                 self.disconnect()
 
         if self.verbose:
-            LOG.info(_("VSphere version: {!r}").format(self.about.os_version))
+            LOG.info(_("vSphere version: {!r}").format(self.about.os_version))
         if self.verbose > 1:
-            LOG.debug(_("Found VSphere about-information:") + "\n" + pp(self.about.as_dict()))
+            LOG.debug(_("Found vSphere about-information:") + "\n" + pp(self.about.as_dict()))
 
     # -------------------------------------------------------------------------
     def get_datacenter(self, disconnect=False):
-        """Get the datacenter from VSphere as a VsphereDatacenter object."""
-        LOG.debug(_("Trying to get datacenter from VSphere ..."))
+        """Get the datacenter from vSphere as a VsphereDatacenter object."""
+        LOG.debug(_("Trying to get datacenter from vSphere ..."))
 
         try:
 
@@ -193,7 +193,7 @@ class VsphereConnection(BaseVsphereHandler):
             self.dc_obj = VsphereDatacenter.from_summary(
                 dc_obj, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
             )
-            LOG.debug(_("Found VSphere datacenter {!r}.").format(self.dc_obj.name))
+            LOG.debug(_("Found vSphere datacenter {!r}.").format(self.dc_obj.name))
             if self.verbose > 2:
                 LOG.debug(_("Info about datacenter:") + "\n" + str(self.dc_obj))
 
@@ -205,8 +205,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_clusters(self, disconnect=False):
-        """Get all clusters from VSphere as VsphereCluster objects."""
-        LOG.debug(_("Trying to get all clusters from VSphere ..."))
+        """Get all clusters from vSphere as VsphereCluster objects."""
+        LOG.debug(_("Trying to get all clusters from vSphere ..."))
 
         self.clusters = []
 
@@ -295,8 +295,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_datastores(self, disconnect=False):
-        """Get all datastores from VSphere as VsphereDatastore objects."""
-        LOG.debug(_("Trying to get all datastores from VSphere ..."))
+        """Get all datastores from vSphere as VsphereDatastore objects."""
+        LOG.debug(_("Trying to get all datastores from vSphere ..."))
         self.datastores = VsphereDatastoreDict()
         self.ds_mapping = {}
 
@@ -361,8 +361,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_ds_clusters(self, disconnect=False):
-        """Get all datastores clusters from VSphere as VsphereDsCluster objects."""
-        LOG.debug(_("Trying to get all datastore clusters from VSphere ..."))
+        """Get all datastores clusters from vSphere as VsphereDsCluster objects."""
+        LOG.debug(_("Trying to get all datastore clusters from vSphere ..."))
         self.ds_clusters = VsphereDsClusterDict()
         self.ds_cluster_mapping = {}
 
@@ -393,7 +393,7 @@ class VsphereConnection(BaseVsphereHandler):
                         _("Found datastore clusters:") + "\n" + pp(list(self.ds_clusters.keys()))
                     )
         else:
-            LOG.warning(_("No VSphere datastore clusters found."))
+            LOG.warning(_("No vSphere datastore clusters found."))
 
         for dsc_name, dsc in self.ds_clusters.items():
             self.ds_cluster_mapping[dsc_name] = dsc.tf_name
@@ -423,8 +423,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_networks(self, disconnect=False):
-        """Get all networks from VSphere as VsphereNetwork objects."""
-        LOG.debug(_("Trying to get all networks from VSphere ..."))
+        """Get all networks from vSphere as VsphereNetwork objects."""
+        LOG.debug(_("Trying to get all networks from vSphere ..."))
         self.dv_portgroups = VsphereNetworkDict()
         self.networks = VsphereNetworkDict()
         self.network_mapping = {}
@@ -521,7 +521,7 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_hosts(self, re_name=None, vsphere_name=None, disconnect=False):
-        """Get all physical hosts from VSphere as VsphereHost objects."""
+        """Get all physical hosts from vSphere as VsphereHost objects."""
         if re_name is not None:
             if not hasattr(re_name, "match"):
                 msg = _("Parameter {p!r} => {r!r} seems not to be a regex object.").format(
@@ -529,12 +529,12 @@ class VsphereConnection(BaseVsphereHandler):
                 )
                 raise TypeError(msg)
             LOG.debug(
-                _("Trying to get all host systems from VSphere with name pattern {!r} ...").format(
+                _("Trying to get all host systems from vSphere with name pattern {!r} ...").format(
                     re_name.pattern
                 )
             )
         else:
-            LOG.debug(_("Trying to get all host systems from VSphere ..."))
+            LOG.debug(_("Trying to get all host systems from vSphere ..."))
 
         self.clusters = []
         self.hosts = {}
@@ -649,10 +649,10 @@ class VsphereConnection(BaseVsphereHandler):
         as_obj=False,
         name_only=False,
     ):
-        """Get a virtual machine from VSphere as VsphereVm object by its name."""
+        """Get a virtual machine from vSphere as VsphereVm object by its name."""
         pattern_name = r"^\s*" + re.escape(vm_name) + r"\s*$"
         LOG.debug(
-            _("Searching for VM {n!r} (pattern: {p!r}) in VSPhere {v!r} ...").format(
+            _("Searching for VM {n!r} (pattern: {p!r}) in vSphere {v!r} ...").format(
                 n=vm_name, p=pattern_name, v=vsphere_name
             )
         )
@@ -668,7 +668,7 @@ class VsphereConnection(BaseVsphereHandler):
         )
 
         if not vmlist:
-            msg = _("VSphere VM {!r} not found.").format(vm_name)
+            msg = _("vSphere VM {!r} not found.").format(vm_name)
             if no_error:
                 LOG.debug(msg)
             else:
@@ -777,7 +777,7 @@ class VsphereConnection(BaseVsphereHandler):
         name_only=False,
         stop_at_found=False,
     ):
-        """Get all virtual machines from VSphere as VsphereVm objects."""
+        """Get all virtual machines from vSphere as VsphereVm objects."""
         if not hasattr(re_name, "match"):
             msg = _("Parameter {p!r} => {r!r} seems not to be a regex object.").format(
                 p="re_name", r=re_name
@@ -1043,8 +1043,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def ensure_vm_folders(self, folders, disconnect=False):
-        """Ensure existence of the given VSphere VM folders."""
-        LOG.debug(_("Ensuring existence of VSphere VM folders:") + "\n" + pp(folders))
+        """Ensure existence of the given vSphere VM folders."""
+        LOG.debug(_("Ensuring existence of vSphere VM folders:") + "\n" + pp(folders))
         try:
 
             if not self.service_instance:
@@ -1059,7 +1059,7 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_vm_folder(self, folder, disconnect=False):
-        """Get the given VSphere VM folder as a vim.Folder object."""
+        """Get the given vSphere VM folder as a vim.Folder object."""
         if self.verbose > 1:
             LOG.debug(_("Trying to get VM folder object for path {!r}.").format(folder))
 
@@ -1118,8 +1118,8 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def ensure_vm_folder(self, folder, disconnect=False):
-        """Ensure existence of the given VSphere VM folder."""
-        LOG.debug(_("Ensuring existence of VSphere VM folder {!r}.").format(folder))
+        """Ensure existence of the given vSphere VM folder."""
+        LOG.debug(_("Ensuring existence of vSphere VM folder {!r}.").format(folder))
 
         paths = []
         parts = folder.split("/")
@@ -1164,7 +1164,7 @@ class VsphereConnection(BaseVsphereHandler):
     def wait_for_tasks(
         self, tasks, poll_time=0.1, disconnect=False, max_wait=None, start_time=None
     ):
-        """Wat for finishing the given VSPhere task."""
+        """Wait for finishing the given vSphere task."""
         LOG.debug(_("Waiting for tasks to finish ..."))
         if not start_time:
             start_time = time.time()
@@ -1553,7 +1553,7 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def purge_vm(self, vm, max_wait=20, disconnect=False):
-        """Purge a vitual machine completely from VSPhere."""
+        """Purge a vitual machine completely from vSphere."""
         try:
 
             if not self.service_instance:
@@ -1664,12 +1664,12 @@ class VsphereConnection(BaseVsphereHandler):
                 requests.exceptions.ConnectTimeout,
             ) as e:
                 msg = _(
-                    "Got a {c} on requesting custom field names from VSPhere {url}: {e}"
+                    "Got a {c} on requesting custom field names from vSphere {url}: {e}"
                 ).format(c=e.__class__.__name__, url=self.connect_info.url, e=e)
                 raise VSphereExpectedError(msg)
 
             if self.verbose > 2:
-                msg = _("Got custom field names from VSPhere {}:").format(self.connect_info.url)
+                msg = _("Got custom field names from vSphere {}:").format(self.connect_info.url)
                 msg += "\n" + pp(self.custom_fields)
                 LOG.debug(msg)
 

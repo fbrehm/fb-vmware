@@ -59,7 +59,7 @@ class GetVmApplication(BaseVmwareApplication):
         """Initialize the GetVmApplication object."""
         desc = _(
             "Tries to get information about the given virtual machines in "
-            "VMWare VSphere and print it out."
+            "VMware vSphere and print it out."
         )
 
         self.vms = []
@@ -149,7 +149,7 @@ class GetVmApplication(BaseVmwareApplication):
                 s=vm.power_state, v=vm.config_version
             )
         )
-        msg = "    VSPhere:  {vs:<10}    Cluster: {cl:<20}    Path: {p}".format(
+        msg = "    vSphere:  {vs:<10}    Cluster: {cl:<20}    Path: {p}".format(
             vs=vm.vsphere, cl=vm.cluster_name, p=vm.path
         )
         print(msg)

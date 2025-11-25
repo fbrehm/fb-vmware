@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for capsulating a VSphere host system object.
+@summary: The module for capsulating a vSphere host system object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -370,7 +370,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """Return the name of the VSPhere from configuration, of thr host."""
+        """Return the name of the vSphere from configuration, of thr host."""
         return self._vsphere
 
     @vsphere.setter
@@ -381,7 +381,7 @@ class VsphereHost(VsphereObject):
 
         val = str(value).strip()
         if val == "":
-            msg = _("The name of the vsphere may not be empty.")
+            msg = _("The name of the vSphere may not be empty.")
             raise VSphereHandlerError(msg)
 
         self._vsphere = val

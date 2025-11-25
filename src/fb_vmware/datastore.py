@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere datastore object.
+@summary: The module for a vSphere datastore object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -38,7 +38,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDatastore(VsphereObject):
-    """Wrapper class for a VSphere datastore object."""
+    """Wrapper class for a vSphere datastore object."""
 
     re_is_nfs = re.compile(r"(?:share[_-]*nfs|nfs[_-]*share)", re.IGNORECASE)
     re_vmcb_fs = re.compile(r"vmcb-\d+-fc-\d+", re.IGNORECASE)

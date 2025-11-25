@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere Distributed Virtual Switching.
+@summary: The module for a vSphere Distributed Virtual Switching.
 
           The following classes were definded:
           * Distributed Virtual Switch
@@ -35,7 +35,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDVS(VsphereObject):
-    """Wrapper class for a VSphere Distributed Virtual Switch (vim.DistributedVirtualSwitch)."""
+    """Wrapper class for a vSphere Distributed Virtual Switch (vim.DistributedVirtualSwitch)."""
 
     properties = [
         "contact_info",
@@ -423,7 +423,7 @@ class VsphereDVS(VsphereObject):
 
 # =============================================================================
 class VsphereDvPortGroup(VsphereNetwork):
-    """Wrapper class for a Network definition in VSPhere (vim.dvs.DistributedVirtualPortgroup)."""
+    """Wrapper class for a Network definition in vSphere (vim.dvs.DistributedVirtualPortgroup)."""
 
     repr_fields = (
         "name",

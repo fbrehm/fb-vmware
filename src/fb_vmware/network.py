@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere network object.
+@summary: The module for a vSphere network object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -38,7 +38,7 @@ ngettext = XLATOR.ngettext
 
 # =============================================================================
 class VsphereNetwork(VsphereObject):
-    """Wrapper class for a Network definition in VSPhere (vim.Network)."""
+    """Wrapper class for a Network definition in vSphere (vim.Network)."""
 
     re_ipv4_name = re.compile(r"\s*((?:\d{1,3}\.){3}\d{1,3})_(\d+)\s*$")
     re_tf_name = re.compile(r"[^a-z0-9_]+", re.IGNORECASE)
@@ -423,7 +423,7 @@ class VsphereNetworkDict(TypedDict):
             if not ip:
                 continue
             ips_list_str.append(str(ip))
-            LOG.debug(_("Searching VSphere network for address {} ...").format(ip))
+            LOG.debug(_("Searching vSphere network for address {} ...").format(ip))
             ipa = ipaddress.ip_address(ip)
 
             for net_name in self.keys():
@@ -449,7 +449,7 @@ class VsphereNetworkDict(TypedDict):
 
 # =============================================================================
 class GeneralNetworksDict(dict, FbGenericBaseObject):
-    """Encapsulate Network lists of multiple VSPhere instances."""
+    """Encapsulate Network lists of multiple vSphere instances."""
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

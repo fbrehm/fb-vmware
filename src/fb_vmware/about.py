@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for capsulating a VSphere about info object.
+@summary: The module for capsulating a vSphere about info object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -32,7 +32,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereAboutInfo(FbBaseObject):
-    """This is a wrapper for the about-information of a VMWare-VSphere center."""
+    """This is a wrapper for the about-information of a VMware vSphere center."""
 
     # -------------------------------------------------------------------------
     def __init__(

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for capsulating a VSphere calculation cluster object.
+@summary: The module for capsulating a vSphere calculation cluster object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -32,7 +32,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereCluster(VsphereObject):
-    """An object for encapsulating a VSphere calculation cluster object."""
+    """An object for encapsulating a vSphere calculation cluster object."""
 
     # -------------------------------------------------------------------------
     def __init__(

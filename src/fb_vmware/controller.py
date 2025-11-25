@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere disk controller object.
+@summary: The module for a vSphere disk controller object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com

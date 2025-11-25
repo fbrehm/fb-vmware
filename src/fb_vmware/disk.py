@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: Mdule for capsulating a VSphere disk object, which can be assigned to a VM.
+@summary: Mdule for capsulating a vSphere disk object, which can be assigned to a VM.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -37,7 +37,7 @@ _ = XLATOR.gettext
 
 # =============================================================================
 class VsphereDisk(FbBaseObject):
-    """Encapsulation of a VSphere disk object, which can be assigned to a VM."""
+    """Encapsulation of a vSphere disk object, which can be assigned to a VM."""
 
     re_file_storage = re.compile(r"^\s*\[\s*([^\s\]]+)")
     re_file_rel = re.compile(r"^\s*\[[^\]]*]\s*(\S.*)\s*$")

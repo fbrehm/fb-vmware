@@ -61,7 +61,7 @@ class GetNetworkListApp(BaseVmwareApplication):
         env_prefix=None,
     ):
         """Initialize a GetNetworkListApp object."""
-        desc = _("Tries to get a list of all networks in " "VMWare VSphere and print it out.")
+        desc = _("Tries to get a list of all networks in VMware vSphere and print it out.")
 
         self.all_dvpgs = GeneralNetworksDict()
         self.all_networks = GeneralNetworksDict()
@@ -112,7 +112,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_networks(self, vsphere_name):
-        """Get all networks in a VMWare VSPhere."""
+        """Get all networks in a VMware vSphere."""
         networks = []
 
         vsphere = self.vsphere[vsphere_name]
@@ -133,7 +133,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         for vsphere_name in self.vsphere:
             vsphere = self.vsphere[vsphere_name]
-            LOG.debug(_("Get all network-like objects from VSPhere {!r} ...").format(vsphere_name))
+            LOG.debug(_("Get all network-like objects from vSphere {!r} ...").format(vsphere_name))
 
             try:
                 vsphere.get_networks()
@@ -153,7 +153,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             self._get_all_networks()
 
         else:
-            spin_prompt = _("Getting all VSPhere networks") + " "
+            spin_prompt = _("Getting all vSphere networks") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 self._get_all_networks()
@@ -253,7 +253,7 @@ class GetNetworkListApp(BaseVmwareApplication):
     def _print_virtual_switches(self, all_dvs):
 
         labels = {
-            "vsphere": "VSPhere",
+            "vsphere": "vSphere",
             "name": _("Name"),
             "contact": _("Contact"),
             "create_time": _("Creation time"),
@@ -372,7 +372,7 @@ class GetNetworkListApp(BaseVmwareApplication):
     def _print_dv_portgroups(self, all_dvpgs):
 
         labels = {
-            "vsphere": "VSPhere",
+            "vsphere": "vSphere",
             "name": _("Name"),
             "dvs": "DV Switch",
             "network": _("Network"),
@@ -477,7 +477,7 @@ class GetNetworkListApp(BaseVmwareApplication):
     def _print_networks(self, all_networks):
 
         labels = {
-            "vsphere": "VSPhere",
+            "vsphere": "vSphere",
             "name": _("Name"),
             "network": _("Network"),
             "accessible": _("Accessible"),

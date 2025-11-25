@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a VSphere virtual machine or template object.
+@summary: The module for a vSphere virtual machine or template object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -116,7 +116,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """Return the name of the VSPhere from config, in which the VM should be existing."""
+        """Return the name of the vSphere from config, in which the VM should be existing."""
         return self._vsphere
 
     @vsphere.setter
@@ -127,7 +127,7 @@ class VsphereVm(VsphereObject):
 
         val = str(value).strip()
         if val == "":
-            msg = _("The name of the vsphere may not be empty.")
+            msg = _("The name of the vSphere may not be empty.")
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
@@ -186,7 +186,7 @@ class VsphereVm(VsphereObject):
     # -----------------------------------------------------------
     @property
     def template(self):
-        """Is this a VMWare template instead of a VM."""
+        """Is this a VMware template instead of a VM."""
         return self._template
 
     @template.setter

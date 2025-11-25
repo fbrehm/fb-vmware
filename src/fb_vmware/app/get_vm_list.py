@@ -68,7 +68,7 @@ class GetVmListApplication(BaseVmwareApplication):
     ):
         """Initialize a GetVmListApplication object."""
         desc = _(
-            "Tries to get a list of all virtual machines in " "VMWare VSphere and print it out."
+            "Tries to get a list of all virtual machines in " "VMware vSphere and print it out."
         )
 
         self._vm_pattern = self.default_vm_pattern
@@ -197,10 +197,10 @@ class GetVmListApplication(BaseVmwareApplication):
             metavar="REGEX",
             action=RegexOptionAction,
             dest="hw",
-            topic=_("for VMWare hardware config version"),
+            topic=_("for VMware hardware config version"),
             re_options=re.IGNORECASE,
             help=_(
-                "A regular expression to filter the output list of VMs by the VMWare hardware "
+                "A regular expression to filter the output list of VMs by the VMware hardware "
                 "configuration version (e.g. '{}')."
             ).format(r"vmx-0\d$"),
         )
@@ -319,7 +319,7 @@ class GetVmListApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_all_vms(self):
-        """Get all VMs from VSphere, maybe filtered."""
+        """Get all VMs from vSphere, maybe filtered."""
         ret = 0
         all_vms = []
 
@@ -329,7 +329,7 @@ class GetVmListApplication(BaseVmwareApplication):
             for vsphere_name in self.vsphere:
                 all_vms += self.get_vms(vsphere_name, re_name)
         elif not self.quiet:
-            spin_prompt = _("Getting all VSPhere VMs ...") + " "
+            spin_prompt = _("Getting all vSphere VMs ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 for vsphere_name in self.vsphere:
@@ -354,7 +354,7 @@ class GetVmListApplication(BaseVmwareApplication):
         label_list = ("name", "vsphere", "path")
         labels = {
             "name": "Host",
-            "vsphere": "VSphere",
+            "vsphere": "vSphere",
             "path": "Path",
         }
 
@@ -366,7 +366,7 @@ class GetVmListApplication(BaseVmwareApplication):
         label_list = self.avail_sort_keys
         labels = {
             "name": "VM/Template",
-            "vsphere": "VSphere",
+            "vsphere": "vSphere",
             "cluster": "Cluster",
             "path": "Path",
             "type": "Type",
@@ -427,15 +427,15 @@ class GetVmListApplication(BaseVmwareApplication):
         if not self.quiet:
             print()
             if count == 0:
-                msg = _("Found no VMWare VMs.")
+                msg = _("Found no VMware VMs.")
             else:
-                msg = ngettext("Found one VMWare VM.", "Found {} VMWare VMs.", count).format(count)
+                msg = ngettext("Found one VMware VM.", "Found {} VMware VMs.", count).format(count)
             print(msg)
             print()
 
     # -------------------------------------------------------------------------
     def get_vms(self, vsphere_name, re_name=None):
-        """Get the filtered list of VMs from VSPhere."""
+        """Get the filtered list of VMs from vSphere."""
         vsphere = self.vsphere[vsphere_name]
         vsphere.get_datacenter()
 
@@ -570,7 +570,7 @@ class GetVmListApplication(BaseVmwareApplication):
             cdata["onl_str"] = "Offline"
 
         if vm.template:
-            cdata["type"] = "VMWare Template"
+            cdata["type"] = "VMware Template"
 
         return cdata
 

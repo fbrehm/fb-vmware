@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: A base module for all VMWare/VSPhere application classes.
+@summary: A base module for all VMware/vSphere application classes.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -48,14 +48,14 @@ ngettext = XLATOR.ngettext
 
 # =============================================================================
 class VmwareAppError(FbAppError):
-    """Base exception class for all exceptions in all VMWare/VSPhere application classes."""
+    """Base exception class for all exceptions in all VMware/vSphere application classes."""
 
     pass
 
 
 # =============================================================================
 class BaseVmwareApplication(FbConfigApplication):
-    """Base class for all VMWare/VSPhere application classes."""
+    """Base class for all VMware/vSphere application classes."""
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -85,7 +85,7 @@ class BaseVmwareApplication(FbConfigApplication):
         if base_dir is None:
             base_dir = pathlib.Path(os.getcwd()).resolve()
 
-        # Hash with all VSphere handler objects
+        # Hash with all vSphere handler objects
         self.vsphere = {}
 
         super(BaseVmwareApplication, self).__init__(
@@ -154,7 +154,7 @@ class BaseVmwareApplication(FbConfigApplication):
             LOG.debug(_("{what} of {app} ...").format(what="post_init()", app=self.appname))
 
         if not self.cfg.vsphere.keys():
-            msg = _("Did not found any configured Vsphere environments.")
+            msg = _("Did not found any configured vSphere environments.")
             LOG.error(msg)
             self.exit(3)
 
@@ -162,12 +162,12 @@ class BaseVmwareApplication(FbConfigApplication):
             self.req_vspheres = []
             all_found = True
             for vs_name in self.args.req_vsphere:
-                LOG.debug(_("Checking for configured VSPhere instance {!r} ...").format(vs_name))
+                LOG.debug(_("Checking for configured vSphere instance {!r} ...").format(vs_name))
                 vs = vs_name.strip().lower()
                 if vs not in self.cfg.vsphere.keys():
                     all_found = False
                     msg = _(
-                        "VSPhere {!r} not found in list of configured VSPhere instances."
+                        "vSphere {!r} not found in list of configured vSphere instances."
                     ).format(vs_name)
                     LOG.error(msg)
                 else:
@@ -194,7 +194,7 @@ class BaseVmwareApplication(FbConfigApplication):
             "--vsphere",
             dest="req_vsphere",
             nargs="*",
-            help=_("The VSPhere names from configuration, in which the VMs should be searched."),
+            help=_("The vSphere names from configuration, in which the VMs should be searched."),
         )
 
     # -------------------------------------------------------------------------
@@ -205,9 +205,9 @@ class BaseVmwareApplication(FbConfigApplication):
 
     # -------------------------------------------------------------------------
     def init_vsphere_handlers(self):
-        """Initialize all VSphere handlers."""
+        """Initialize all vSphere handlers."""
         if self.verbose > 1:
-            LOG.debug(_("Initializing VSphere handlers ..."))
+            LOG.debug(_("Initializing vSphere handlers ..."))
 
         try:
             for vsphere_name in self.do_vspheres:
@@ -218,9 +218,9 @@ class BaseVmwareApplication(FbConfigApplication):
 
     # -------------------------------------------------------------------------
     def init_vsphere_handler(self, vsphere_name):
-        """Initialize the given VSphere handler."""
+        """Initialize the given vSphere handler."""
         if self.verbose > 2:
-            LOG.debug(_("Initializing handler for VSPhere {!r} ...").format(vsphere_name))
+            LOG.debug(_("Initializing handler for vSphere {!r} ...").format(vsphere_name))
 
         vsphere_data = self.cfg.vsphere[vsphere_name]
 
@@ -248,13 +248,13 @@ class BaseVmwareApplication(FbConfigApplication):
 
     # -------------------------------------------------------------------------
     def cleaning_up(self):
-        """Close all VSPhere connections and remove all VSphere handlers."""
+        """Close all vSphere connections and remove all vSphere handlers."""
         if self.verbose > 1:
             LOG.debug(_("Cleaning up ..."))
 
         for vsphere_name in self.do_vspheres:
             if vsphere_name in self.vsphere:
-                LOG.debug(_("Closing VSPhere object {!r} ...").format(vsphere_name))
+                LOG.debug(_("Closing vSphere object {!r} ...").format(vsphere_name))
                 self.vsphere[vsphere_name].disconnect()
                 del self.vsphere[vsphere_name]
 

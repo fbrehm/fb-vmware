@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: General used functions an objects used for unit tests on the VMWare/VSphere python modules.
+@summary: General used functions an objects used for unit tests on the VMware python modules.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com

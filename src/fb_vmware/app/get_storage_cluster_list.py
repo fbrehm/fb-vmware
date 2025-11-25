@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@summary: Print a list of all storage clusters in a VMware VSphere.
+@summary: Print a list of all storage clusters in a VMware vSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -78,7 +78,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
     ):
         """Initialize a GetStorageClusterListApp object."""
         desc = _(
-            "Tries to get a list of all datastore clusters in " "VMWare VSphere and print it out."
+            "Tries to get a list of all datastore clusters in " "VMware vSphere and print it out."
         )
 
         self.st_clusters = []
@@ -176,7 +176,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def get_datastore_clusters(self, vsphere_name):
-        """Get all datastore clusters in a VMWare VSPhere."""
+        """Get all datastore clusters in a VMware vSphere."""
         storage_clusters = []
 
         vsphere = self.vsphere[vsphere_name]
@@ -210,7 +210,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             _get_all_storage_clusters()
 
         else:
-            spin_prompt = _("Getting all VSPhere storage clusters ...")
+            spin_prompt = _("Getting all vSphere storage clusters ...")
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 _get_all_storage_clusters()
@@ -314,7 +314,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         """Print on STDOUT all information about all datastore clusters."""
         labels = {
             "cluster_name": "Cluster",
-            "vsphere_name": "VSPhere",
+            "vsphere_name": "vSphere",
             "capacity_gb": _("Capacity in GB"),
             "free_space_gb": _("Free space in GB"),
             "usage_gb": _("Calculated usage in GB"),
@@ -383,12 +383,12 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             print()
             if count:
                 msg = ngettext(
-                    "Found one VMWare storage cluster.",
-                    "Found {} VMWare storage clusters.".format(count),
+                    "Found one VMware storage cluster.",
+                    "Found {} VMware storage clusters.".format(count),
                     count,
                 )
             else:
-                msg = _("No VMWare storage clusters found.")
+                msg = _("No VMware storage clusters found.")
 
             print(msg)
             print()

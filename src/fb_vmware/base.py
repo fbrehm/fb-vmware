@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for a base VSphere handler object.
+@summary: The module for a base vSphere handler object.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -52,7 +52,7 @@ DEFAULT_MAX_SEARCH_DEPTH = 10
 @add_metaclass(ABCMeta)
 class BaseVsphereHandler(HandlingObject):
     """
-    Base class for a VSphere handler object.
+    Base class for a vSphere handler object.
 
     Must not be instantiated.
     """
@@ -101,7 +101,7 @@ class BaseVsphereHandler(HandlingObject):
             raise BaseVSphereHandlerError(msg)
 
         if not connect_info.host:
-            msg = _("No VSPhere host name or address given in {w}.").format(w="connect_info")
+            msg = _("No vSphere host name or address given in {w}.").format(w="connect_info")
             raise BaseVSphereHandlerError(msg)
 
         if not connect_info.initialized:
@@ -130,7 +130,7 @@ class BaseVsphereHandler(HandlingObject):
     # -----------------------------------------------------------
     @property
     def dc(self):
-        """Return the name of the VSphere datacenter to use."""
+        """Return the name of the vSphere datacenter to use."""
         connect_info = getattr(self, "connect_info", None)
         if connect_info:
             return connect_info.dc
@@ -139,7 +139,7 @@ class BaseVsphereHandler(HandlingObject):
     # -----------------------------------------------------------
     @property
     def cluster(self):
-        """Return the name of the VSphere cluster to use."""
+        """Return the name of the vSphere cluster to use."""
         return self._cluster
 
     # -----------------------------------------------------------
@@ -201,7 +201,7 @@ class BaseVsphereHandler(HandlingObject):
 
     # -------------------------------------------------------------------------
     def connect(self):
-        """Connect to the the configured VSPhere instance."""
+        """Connect to the the configured vSphere instance."""
         LOG.debug(_("Connecting to vSphere {!r} ...").format(self.connect_info.full_url))
 
         if not self.connect_info.user:
@@ -289,9 +289,9 @@ class BaseVsphereHandler(HandlingObject):
 
     # -------------------------------------------------------------------------
     def disconnect(self):
-        """Disconnect from the the configured VSPhere instance."""
+        """Disconnect from the the configured vSphere instance."""
         if self.service_instance:
-            LOG.debug(_("Disconnecting from VSPhere {!r}.").format(self.connect_info.url))
+            LOG.debug(_("Disconnecting from vSphere {!r}.").format(self.connect_info.url))
             Disconnect(self.service_instance)
 
         self.service_instance = None

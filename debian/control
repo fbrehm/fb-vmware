@@ -7,14 +7,15 @@ Build-Depends: debhelper (>= 9),
                dh-python,
                help2man,
                python3-all,
-               python3-packaging,
                python3-babel,
+               python3-chardet,
                python3-fb-logging (>=1.0.0),
                python3-fb-tools (>=2.6.2),
                python3-pip,
                python3-pyvmomi,
-               python3-setuptools,
+               python3-semver,
                python3-six,
+               python3-yaml,
                python3-tz
 Standards-Version: 3.9.6
 Homepage: https://github.com/fbrehm/fb-vmware
@@ -25,11 +26,13 @@ X-Python3-Version: >= 3.6
 Package: python3-fb-vmware
 Architecture: all
 Depends: python3-six,
-         python3-packaging,
          python3-babel,
+         python3-chardet,
          python3-fb-logging (>=1.0.0),
          python3-fb-tools (>=2.6.2),
          python3-pyvmomi,
+         python3-semver,
+         python3-yaml,
          python3-tz,
          ${misc:Depends},
          ${python3:Depends}

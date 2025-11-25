@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-disk')
+LOG = logging.getLogger("test-disk")
 
 
 # =============================================================================
@@ -45,13 +45,13 @@ class TestVdisk(FbVMWareTestcase):
         from fb_vmware import VsphereDisk
         from fb_vmware import VsphereDiskList
 
-        LOG.debug('Version of fb_vmware.disk: {!r}.'.format(fb_vmware.disk.__version__))
+        LOG.debug("Version of fb_vmware.disk: {!r}.".format(fb_vmware.disk.__version__))
 
         doc = textwrap.dedent(VsphereDisk.__doc__)
-        LOG.debug('Description of VsphereDisk: ' + doc)
+        LOG.debug("Description of VsphereDisk: " + doc)
 
         doc = textwrap.dedent(VsphereDiskList.__doc__)
-        LOG.debug('Description of VsphereDiskList: ' + doc)
+        LOG.debug("Description of VsphereDiskList: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -68,8 +68,8 @@ class TestVdisk(FbVMWareTestcase):
             size=capacity,
         )
 
-        LOG.debug('VsphereDisk %r: {!r}'.format(disk))
-        LOG.debug('VsphereDisk %s:\n{}'.format(disk))
+        LOG.debug("VsphereDisk %r: {!r}".format(disk))
+        LOG.debug("VsphereDisk %s:\n{}".format(disk))
 
         self.assertIsInstance(disk, VsphereDisk)
         self.assertEqual(disk.appname, self.appname)
@@ -78,19 +78,19 @@ class TestVdisk(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVdisk('test_import', verbose))
-    suite.addTest(TestVdisk('test_init_object', verbose))
+    suite.addTest(TestVdisk("test_import", verbose))
+    suite.addTest(TestVdisk("test_init_object", verbose))
     # suite.addTest(TestVdisk('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

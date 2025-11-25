@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-ether')
+LOG = logging.getLogger("test-ether")
 
 
 # =============================================================================
@@ -45,13 +45,13 @@ class TestVEthernet(FbVMWareTestcase):
         from fb_vmware import VsphereEthernetcard
         from fb_vmware import VsphereEthernetcardList
 
-        LOG.debug('Version of fb_vmware.ether: {!r}.'.format(fb_vmware.ether.__version__))
+        LOG.debug("Version of fb_vmware.ether: {!r}.".format(fb_vmware.ether.__version__))
 
         doc = textwrap.dedent(VsphereEthernetcard.__doc__)
-        LOG.debug('Description of VsphereEthernetcard: ' + doc)
+        LOG.debug("Description of VsphereEthernetcard: " + doc)
 
         doc = textwrap.dedent(VsphereEthernetcardList.__doc__)
-        LOG.debug('Description of VsphereEthernetcardList: ' + doc)
+        LOG.debug("Description of VsphereEthernetcardList: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -65,8 +65,8 @@ class TestVEthernet(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereEthernetcard %r: {!r}'.format(ether))
-        LOG.debug('VsphereEthernetcard %s:\n{}'.format(ether))
+        LOG.debug("VsphereEthernetcard %r: {!r}".format(ether))
+        LOG.debug("VsphereEthernetcard %s:\n{}".format(ether))
 
         self.assertIsInstance(ether, VsphereEthernetcard)
         self.assertEqual(ether.appname, self.appname)
@@ -74,19 +74,19 @@ class TestVEthernet(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVEthernet('test_import', verbose))
-    suite.addTest(TestVEthernet('test_init_object', verbose))
+    suite.addTest(TestVEthernet("test_import", verbose))
+    suite.addTest(TestVEthernet("test_init_object", verbose))
     # suite.addTest(TestVEthernet('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-object')
+LOG = logging.getLogger("test-object")
 
 
 # =============================================================================
@@ -44,9 +44,9 @@ class TestVMWareObject(FbVMWareTestcase):
         import fb_vmware.obj
         from fb_vmware import VsphereObject
 
-        LOG.debug('Version of fb_vmware.obj: {!r}.'.format(fb_vmware.obj.__version__))
+        LOG.debug("Version of fb_vmware.obj: {!r}.".format(fb_vmware.obj.__version__))
         doc = textwrap.dedent(VsphereObject.__doc__)
-        LOG.debug('Description of VsphereObject: ' + doc)
+        LOG.debug("Description of VsphereObject: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -54,8 +54,9 @@ class TestVMWareObject(FbVMWareTestcase):
         LOG.info(self.get_method_doc())
 
         from fb_vmware import VsphereObject, DEFAULT_OBJ_STATUS
-        obj_type = 'testobject'
-        obj_name = 'Test-Object'
+
+        obj_type = "testobject"
+        obj_name = "Test-Object"
 
         gen_obj = VsphereObject(
             name=obj_name,
@@ -64,8 +65,8 @@ class TestVMWareObject(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereObject %r: {!r}'.format(gen_obj))
-        LOG.debug('VsphereObject %s:\n{}'.format(gen_obj))
+        LOG.debug("VsphereObject %r: {!r}".format(gen_obj))
+        LOG.debug("VsphereObject %s:\n{}".format(gen_obj))
 
         self.assertIsInstance(gen_obj, VsphereObject)
         self.assertEqual(gen_obj.verbose, 1)
@@ -76,19 +77,19 @@ class TestVMWareObject(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVMWareObject('test_import', verbose))
-    suite.addTest(TestVMWareObject('test_init_object', verbose))
+    suite.addTest(TestVMWareObject("test_import", verbose))
+    suite.addTest(TestVMWareObject("test_init_object", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

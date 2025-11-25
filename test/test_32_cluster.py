@@ -19,13 +19,13 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 from general import SimpleTestObject
 
-LOG = logging.getLogger('test-cluster')
+LOG = logging.getLogger("test-cluster")
 
 
 # =============================================================================
@@ -45,10 +45,10 @@ class TestVMCluster(FbVMWareTestcase):
         import fb_vmware.cluster
         from fb_vmware import VsphereCluster
 
-        LOG.debug('Version of fb_vmware.cluster: {!r}.'.format(fb_vmware.cluster.__version__))
+        LOG.debug("Version of fb_vmware.cluster: {!r}.".format(fb_vmware.cluster.__version__))
 
         doc = textwrap.dedent(VsphereCluster.__doc__)
-        LOG.debug('Description of VsphereCluster: ' + doc)
+        LOG.debug("Description of VsphereCluster: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -61,12 +61,12 @@ class TestVMCluster(FbVMWareTestcase):
         with self.assertRaises(VSphereNameError) as cm:
 
             cluster = VsphereCluster(appname=self.appname)
-            LOG.debug('VsphereCluster %s:\n{}'.format(cluster))
+            LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        cluster_name = 'my-cluster'
+        cluster_name = "my-cluster"
 
         cluster = VsphereCluster(
             name=cluster_name,
@@ -74,8 +74,8 @@ class TestVMCluster(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereCluster %r: {!r}'.format(cluster))
-        LOG.debug('VsphereCluster %s:\n{}'.format(cluster))
+        LOG.debug("VsphereCluster %r: {!r}".format(cluster))
+        LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
         self.assertIsInstance(cluster, VsphereCluster)
         self.assertEqual(cluster.appname, self.appname)
@@ -89,7 +89,7 @@ class TestVMCluster(FbVMWareTestcase):
 
         from fb_vmware import VsphereCluster
 
-        cluster_name = 'my-cluster'
+        cluster_name = "my-cluster"
 
         data = SimpleTestObject()
 
@@ -98,7 +98,7 @@ class TestVMCluster(FbVMWareTestcase):
 
         data.name = cluster_name
         data.summary = SimpleTestObject()
-        data.configStatus = 'gray'
+        data.configStatus = "gray"
         data.datastore = []
         data.datastore.append(ds1)
         data.datastore.append(ds2)
@@ -112,56 +112,57 @@ class TestVMCluster(FbVMWareTestcase):
         mem_host = 256 * 1024
         data.summary.totalMemory = 9 * mem_host * 1024 * 1024
 
-        ds1.name = 'Datastore-0101'
-        ds2.name = 'Datastore-0102'
+        ds1.name = "Datastore-0101"
+        ds2.name = "Datastore-0102"
 
         with self.assertRaises(TypeError) as cm:
 
-            cluster = VsphereCluster.from_summary(
-                data, appname=self.appname, verbose=self.verbose)
-            LOG.debug('VsphereCluster %s:\n{}'.format(cluster))
+            cluster = VsphereCluster.from_summary(data, appname=self.appname, verbose=self.verbose)
+            LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
         with self.assertRaises(AssertionError) as cm:
 
             cluster = VsphereCluster.from_summary(
-                data, appname=self.appname, verbose=self.verbose, test_mode=True)
-            LOG.debug('VsphereCluster %s:\n{}'.format(cluster))
+                data, appname=self.appname, verbose=self.verbose, test_mode=True
+            )
+            LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        data.overallStatus = 'gray'
+        data.overallStatus = "gray"
         data.summary.effectiveMemory = 8 * mem_host
 
         nw1 = SimpleTestObject()
-        nw1.name = 'Network-01'
+        nw1.name = "Network-01"
 
         data.network = []
         data.network.append(nw1)
 
         cluster = VsphereCluster.from_summary(
-            data, appname=self.appname, verbose=self.verbose, test_mode=True)
-        LOG.debug('VsphereCluster %s:\n{}'.format(cluster))
+            data, appname=self.appname, verbose=self.verbose, test_mode=True
+        )
+        LOG.debug("VsphereCluster %s:\n{}".format(cluster))
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVMCluster('test_import', verbose))
-    suite.addTest(TestVMCluster('test_init_object', verbose))
-    suite.addTest(TestVMCluster('test_init_from_summary', verbose))
+    suite.addTest(TestVMCluster("test_import", verbose))
+    suite.addTest(TestVMCluster("test_init_object", verbose))
+    suite.addTest(TestVMCluster("test_init_from_summary", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

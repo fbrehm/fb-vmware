@@ -1,3 +1,10 @@
+fb-vmware (1.6.0) all; urgency=medium
+
+  * Refactoring for package build with pyproject.toml and flit.
+  * See CHANGELOG.md for details.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Tue, 25 Nov 2025 16:06:17 +0100
+
 fb-vmware (1.5.3) all; urgency=medium
 
   * Fixing Github workflows

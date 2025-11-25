@@ -135,5 +135,5 @@ etc/*.ini
 etc/*.yaml
 rpmdir/*
 .rpm-version*
-local_version.py
-usr/
+.venv
+/get*.awk

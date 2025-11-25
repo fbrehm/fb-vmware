@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-host-port-group')
+LOG = logging.getLogger("test-host-port-group")
 
 
 # =============================================================================
@@ -45,14 +45,17 @@ class TestVHostPortGroup(FbVMWareTestcase):
         from fb_vmware import VsphereHostPortgroup
         from fb_vmware import VsphereHostPortgroupList
 
-        LOG.debug('Version of fb_vmware.host_port_group: {!r}.'.format(
-            fb_vmware.host_port_group.__version__))
+        LOG.debug(
+            "Version of fb_vmware.host_port_group: {!r}.".format(
+                fb_vmware.host_port_group.__version__
+            )
+        )
 
         doc = textwrap.dedent(VsphereHostPortgroup.__doc__)
-        LOG.debug('Description of VsphereHostPortgroup: ' + doc)
+        LOG.debug("Description of VsphereHostPortgroup: " + doc)
 
         doc = textwrap.dedent(VsphereHostPortgroupList.__doc__)
-        LOG.debug('Description of VsphereHostPortgroupList: ' + doc)
+        LOG.debug("Description of VsphereHostPortgroupList: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -66,8 +69,8 @@ class TestVHostPortGroup(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereHostPortgroup %r: {!r}'.format(group))
-        LOG.debug('VsphereHostPortgroup %s:\n{}'.format(group))
+        LOG.debug("VsphereHostPortgroup %r: {!r}".format(group))
+        LOG.debug("VsphereHostPortgroup %s:\n{}".format(group))
 
         self.assertIsInstance(group, VsphereHostPortgroup)
         self.assertEqual(group.appname, self.appname)
@@ -75,19 +78,19 @@ class TestVHostPortGroup(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVHostPortGroup('test_import', verbose))
-    suite.addTest(TestVHostPortGroup('test_init_object', verbose))
+    suite.addTest(TestVHostPortGroup("test_import", verbose))
+    suite.addTest(TestVHostPortGroup("test_init_object", verbose))
     # suite.addTest(TestVHostPortGroup('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

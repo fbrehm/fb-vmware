@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-ds-cluster')
+LOG = logging.getLogger("test-ds-cluster")
 
 
 # =============================================================================
@@ -45,13 +45,15 @@ class TestVDataStoreCluster(FbVMWareTestcase):
         from fb_vmware import VsphereDsCluster
         from fb_vmware import VsphereDsClusterDict
 
-        LOG.debug('Version of fb_vmware.ds_cluster: {!r}.'.format(fb_vmware.ds_cluster.__version__))
+        LOG.debug(
+            "Version of fb_vmware.ds_cluster: {!r}.".format(fb_vmware.ds_cluster.__version__)
+        )
 
         doc = textwrap.dedent(VsphereDsCluster.__doc__)
-        LOG.debug('Description of VsphereDsCluster: ' + doc)
+        LOG.debug("Description of VsphereDsCluster: " + doc)
 
         doc = textwrap.dedent(VsphereDsClusterDict.__doc__)
-        LOG.debug('Description of VsphereDsClusterDict: ' + doc)
+        LOG.debug("Description of VsphereDsClusterDict: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -64,12 +66,12 @@ class TestVDataStoreCluster(FbVMWareTestcase):
         with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             dsc = VsphereDsCluster(appname=self.appname)
-            LOG.debug('VsphereDsCluster %s:\n{}'.format(dsc))
+            LOG.debug("VsphereDsCluster %s:\n{}".format(dsc))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        ds_cluster_name = 'my-datastore-cluster'
+        ds_cluster_name = "my-datastore-cluster"
         capacity = int(500 * 1024 * 1024 * 1024)
         free_space = int(capacity * 0.7)
 
@@ -81,8 +83,8 @@ class TestVDataStoreCluster(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereDsCluster %r: {!r}'.format(dsc))
-        LOG.debug('VsphereDsCluster %s:\n{}'.format(dsc))
+        LOG.debug("VsphereDsCluster %r: {!r}".format(dsc))
+        LOG.debug("VsphereDsCluster %s:\n{}".format(dsc))
 
         self.assertIsInstance(dsc, VsphereDsCluster)
         self.assertEqual(dsc.appname, self.appname)
@@ -91,19 +93,19 @@ class TestVDataStoreCluster(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVDataStoreCluster('test_import', verbose))
-    suite.addTest(TestVDataStoreCluster('test_init_object', verbose))
+    suite.addTest(TestVDataStoreCluster("test_import", verbose))
+    suite.addTest(TestVDataStoreCluster("test_init_object", verbose))
     # suite.addTest(TestVDataStoreCluster('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

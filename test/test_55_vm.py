@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-vm')
+LOG = logging.getLogger("test-vm")
 
 
 # =============================================================================
@@ -45,13 +45,13 @@ class TestVsphereVM(FbVMWareTestcase):
         from fb_vmware import VsphereVm
         from fb_vmware import VsphereVmList
 
-        LOG.debug('Version of fb_vmware.vm: {!r}.'.format(fb_vmware.vm.__version__))
+        LOG.debug("Version of fb_vmware.vm: {!r}.".format(fb_vmware.vm.__version__))
 
         doc = textwrap.dedent(VsphereVm.__doc__)
-        LOG.debug('Description of VsphereVm: ' + doc)
+        LOG.debug("Description of VsphereVm: " + doc)
 
         doc = textwrap.dedent(VsphereVmList.__doc__)
-        LOG.debug('Description of VsphereVmList: ' + doc)
+        LOG.debug("Description of VsphereVmList: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -64,12 +64,12 @@ class TestVsphereVM(FbVMWareTestcase):
         with self.assertRaises((VSphereNameError, TypeError)) as cm:
 
             vm = VsphereVm(appname=self.appname)
-            LOG.debug('VsphereVm %s:\n{}'.format(vm))
+            LOG.debug("VsphereVm %s:\n{}".format(vm))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
-        vm_name = 'my-vmware-vm'
+        vm_name = "my-vmware-vm"
 
         vm = VsphereVm(
             name=vm_name,
@@ -77,8 +77,8 @@ class TestVsphereVM(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereVm %r: {!r}'.format(vm))
-        LOG.debug('VsphereVm %s:\n{}'.format(vm))
+        LOG.debug("VsphereVm %r: {!r}".format(vm))
+        LOG.debug("VsphereVm %s:\n{}".format(vm))
 
         self.assertIsInstance(vm, VsphereVm)
         self.assertEqual(vm.appname, self.appname)
@@ -87,19 +87,19 @@ class TestVsphereVM(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVsphereVM('test_import', verbose))
-    suite.addTest(TestVsphereVM('test_init_object', verbose))
+    suite.addTest(TestVsphereVM("test_import", verbose))
+    suite.addTest(TestVsphereVM("test_init_object", verbose))
     # suite.addTest(TestVsphereVM('test_init_from_summary', verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)

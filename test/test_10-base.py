@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-base')
+LOG = logging.getLogger("test-base")
 
 
 # =============================================================================
@@ -44,10 +44,10 @@ class TestVMWareBase(FbVMWareTestcase):
         import fb_vmware.base
         from fb_vmware import BaseVsphereHandler
 
-        LOG.debug('Version of fb_vmware.base: {!r}.'.format(fb_vmware.base.__version__))
+        LOG.debug("Version of fb_vmware.base: {!r}.".format(fb_vmware.base.__version__))
 
         doc = textwrap.dedent(BaseVsphereHandler.__doc__)
-        LOG.debug('Description of BaseVsphereHandler: ' + doc)
+        LOG.debug("Description of BaseVsphereHandler: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_base(self):
@@ -59,22 +59,31 @@ class TestVMWareBase(FbVMWareTestcase):
 
         with self.assertRaises(TypeError) as cm:
             gen_handler = BaseVsphereHandler()
-            LOG.error('This should not be visible - version of BaseVsphereHandler: {!r}'.format(
-                gen_handler.version))
+            LOG.error(
+                "This should not be visible - version of BaseVsphereHandler: {!r}".format(
+                    gen_handler.version
+                )
+            )
         e = cm.exception
-        LOG.debug('TypeError raised on instantiate a BaseVsphereHandler: %s', str(e))
+        LOG.debug("TypeError raised on instantiate a BaseVsphereHandler: %s", str(e))
 
         from fb_vmware import DEFAULT_MAX_SEARCH_DEPTH
         from fb_vmware import DEFAULT_VSPHERE_PORT, DEFAULT_TZ_NAME
 
-        my_vsphere_host = 'my-vsphere.uhu-banane.de'
-        my_vsphere_user = 'test.user'
-        my_vsphere_passwd = 'test-password'
-        my_vsphere_dc = 'mydc'
+        my_vsphere_host = "my-vsphere.uhu-banane.de"
+        my_vsphere_user = "test.user"
+        my_vsphere_passwd = "test-password"
+        my_vsphere_dc = "mydc"
 
         connect_info = VSPhereConfigInfo(
-            host=my_vsphere_host, user=my_vsphere_user, password=my_vsphere_passwd,
-            dc=my_vsphere_dc, appname=self.appname, verbose=1, initialized=True)
+            host=my_vsphere_host,
+            user=my_vsphere_user,
+            password=my_vsphere_passwd,
+            dc=my_vsphere_dc,
+            appname=self.appname,
+            verbose=1,
+            initialized=True,
+        )
 
         class TestVsphereHandler(BaseVsphereHandler):
 
@@ -86,8 +95,8 @@ class TestVMWareBase(FbVMWareTestcase):
             appname=self.appname,
             verbose=1,
         )
-        LOG.debug('TestVsphereHandler %r: {!r}'.format(gen_handler))
-        LOG.debug('TestVsphereHandler %s:\n{}'.format(gen_handler))
+        LOG.debug("TestVsphereHandler %r: {!r}".format(gen_handler))
+        LOG.debug("TestVsphereHandler %s:\n{}".format(gen_handler))
 
         self.assertIsInstance(gen_handler, BaseVsphereHandler)
         self.assertEqual(gen_handler.verbose, 1)
@@ -103,19 +112,19 @@ class TestVMWareBase(FbVMWareTestcase):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVMWareBase('test_import', verbose))
-    suite.addTest(TestVMWareBase('test_init_base', verbose))
+    suite.addTest(TestVMWareBase("test_import", verbose))
+    suite.addTest(TestVMWareBase("test_init_base", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

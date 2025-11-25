@@ -19,12 +19,12 @@ try:
 except ImportError:
     import unittest
 
-libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'lib'))
+libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
 from general import FbVMWareTestcase, get_arg_verbose, init_root_logger
 
-LOG = logging.getLogger('test-controller')
+LOG = logging.getLogger("test-controller")
 
 
 # =============================================================================
@@ -45,13 +45,15 @@ class TestVController(FbVMWareTestcase):
         from fb_vmware import VsphereDiskController
         from fb_vmware import VsphereDiskControllerList
 
-        LOG.debug('Version of fb_vmware.controller: {!r}.'.format(fb_vmware.controller.__version__))
+        LOG.debug(
+            "Version of fb_vmware.controller: {!r}.".format(fb_vmware.controller.__version__)
+        )
 
         doc = textwrap.dedent(VsphereDiskController.__doc__)
-        LOG.debug('Description of VsphereDiskController: ' + doc)
+        LOG.debug("Description of VsphereDiskController: " + doc)
 
         doc = textwrap.dedent(VsphereDiskControllerList.__doc__)
-        LOG.debug('Description of VsphereDiskControllerList: ' + doc)
+        LOG.debug("Description of VsphereDiskControllerList: " + doc)
 
     # -------------------------------------------------------------------------
     def test_init_object(self):
@@ -65,8 +67,8 @@ class TestVController(FbVMWareTestcase):
             verbose=1,
         )
 
-        LOG.debug('VsphereDiskController %r: {!r}'.format(controller))
-        LOG.debug('VsphereDiskController %s:\n{}'.format(controller))
+        LOG.debug("VsphereDiskController %r: {!r}".format(controller))
+        LOG.debug("VsphereDiskController %s:\n{}".format(controller))
 
         self.assertIsInstance(controller, VsphereDiskController)
         self.assertEqual(controller.appname, self.appname)
@@ -81,41 +83,41 @@ class TestVController(FbVMWareTestcase):
         from fb_vmware import VsphereDiskController
         from fb_vmware.errors import VSphereDiskCtrlrTypeNotFoudError
 
-        LOG.debug('Test VsphereDiskController.get_disk_controller_class().')
+        LOG.debug("Test VsphereDiskController.get_disk_controller_class().")
         (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class()
-        LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+        LOG.debug("Got a {cls} class - {desc!r}".format(cls=cls.__name__, desc=desc))
         self.assertIs(cls, vim.vm.device.ParaVirtualSCSIController)
         self.assertEqual(type_name, VsphereDiskController.default_conroller_type)
 
         LOG.debug("Test VsphereDiskController.get_disk_controller_class('lsi_logic').")
-        (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class('lsi_logic')
-        LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+        (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class("lsi_logic")
+        LOG.debug("Got a {cls} class - {desc!r}".format(cls=cls.__name__, desc=desc))
         self.assertIs(cls, vim.vm.device.VirtualLsiLogicController)
 
         with self.assertRaises(VSphereDiskCtrlrTypeNotFoudError) as cm:
 
-            (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class('uhu')
-            LOG.debug('Got a {cls} class - {desc!r}'.format(cls=cls.__name__, desc=desc))
+            (cls, desc, type_name) = VsphereDiskController.get_disk_controller_class("uhu")
+            LOG.debug("Got a {cls} class - {desc!r}".format(cls=cls.__name__, desc=desc))
 
         e = cm.exception
-        LOG.debug('%s raised: %s', e.__class__.__qualname__, e)
+        LOG.debug("%s raised: %s", e.__class__.__qualname__, e)
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     verbose = get_arg_verbose()
     if verbose is None:
         verbose = 0
     init_root_logger(verbose)
 
-    LOG.info('Starting tests ...')
+    LOG.info("Starting tests ...")
 
     suite = unittest.TestSuite()
 
-    suite.addTest(TestVController('test_import', verbose))
-    suite.addTest(TestVController('test_init_object', verbose))
-    suite.addTest(TestVController('test_get_controller_class', verbose))
+    suite.addTest(TestVController("test_import", verbose))
+    suite.addTest(TestVController("test_init_object", verbose))
+    suite.addTest(TestVController("test_get_controller_class", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

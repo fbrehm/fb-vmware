@@ -114,7 +114,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Changing version of package builder in .gitlab-ci.yml to v2.0.
 
-## [1.1.0} - 2024-06-19
+## [1.1.0] - 2024-06-19
 
 ### Added
 

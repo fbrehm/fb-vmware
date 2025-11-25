@@ -78,7 +78,7 @@ ls -lA '%{buildroot}'
 %files -f %{pyproject_files}
 %defattr(-,root,root,-)
 %license LICENSE
-%doc CHANGELOG.md LICENSE README.md requirements.txt debian/changelog
+%doc CHANGELOG.md LICENSE README.md pyproject.toml debian/changelog
 %{_bindir}/*
 %{_datadir}/*
 

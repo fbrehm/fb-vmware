@@ -28,13 +28,12 @@ from fb_tools.xlate import format_list
 from . import BaseVmwareApplication
 from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-
 # from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

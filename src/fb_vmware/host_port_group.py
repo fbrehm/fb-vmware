@@ -20,7 +20,6 @@ except ImportError:
 
 # Third party modules
 from fb_tools.common import pp
-
 # from fb_tools.common import to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list
@@ -30,7 +29,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

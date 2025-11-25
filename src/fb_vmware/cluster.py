@@ -23,7 +23,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.4.4"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 
@@ -42,6 +42,7 @@ class VsphereCluster(VsphereObject):
         version=__version__,
         base_dir=None,
         initialized=None,
+        dc_name=None,
         name=None,
         status=DEFAULT_OBJ_STATUS,
         cpu_cores=0,
@@ -55,6 +56,7 @@ class VsphereCluster(VsphereObject):
     ):
         """Initialize a VsphereCluster object."""
         self.repr_fields = (
+            "dc_name",
             "name",
             "status",
             "config_status",
@@ -77,6 +79,7 @@ class VsphereCluster(VsphereObject):
         self._mem_mb_effective = None
         self._mem_total = None
         self._standalone = False
+        self._dc_name = None
         self.networks = []
         self.datastores = []
         self.resource_pool = None
@@ -93,6 +96,7 @@ class VsphereCluster(VsphereObject):
             base_dir=base_dir,
         )
 
+        self.dc_name = dc_name
         self.cpu_cores = cpu_cores
         self.cpu_threads = cpu_threads
         self.hosts_effective = hosts_effective
@@ -103,6 +107,25 @@ class VsphereCluster(VsphereObject):
 
         if initialized is not None:
             self.initialized = initialized
+
+    # -----------------------------------------------------------
+    @property
+    def dc_name(self):
+        """Return the datacenter name of the cluster."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
 
     # -----------------------------------------------------------
     @property
@@ -253,6 +276,7 @@ class VsphereCluster(VsphereObject):
         """
         res = super(VsphereCluster, self).as_dict(short=short)
 
+        res["dc_name"] = self.dc_name
         res["resource_pool_name"] = self.resource_pool_name
         res["resource_pool_var"] = self.resource_pool_var
         res["cpu_cores"] = self.cpu_cores
@@ -285,6 +309,7 @@ class VsphereCluster(VsphereObject):
             base_dir=self.base_dir,
             initialized=self.initialized,
             name=self.name,
+            dc_name=self.dc_name,
             standalone=self.standalone,
             status=self.status,
             cpu_cores=self.cpu_cores,
@@ -304,6 +329,9 @@ class VsphereCluster(VsphereObject):
         if not isinstance(other, VsphereCluster):
             return False
 
+        if self.dc_name != other.dc_name:
+            return False
+
         if self.name != other.name:
             return False
 
@@ -311,7 +339,9 @@ class VsphereCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
+    def from_summary(
+        cls, data, dc_name=None, appname=None, verbose=0, base_dir=None, test_mode=False
+    ):
         """Create a new VsphereCluster object based on the appropriate data from pyvomi."""
         if test_mode:
             cls._check_summary_data(data)
@@ -327,6 +357,7 @@ class VsphereCluster(VsphereObject):
             "verbose": verbose,
             "base_dir": base_dir,
             "initialized": True,
+            "dc_name": dc_name,
             "name": data.name,
             "status": data.overallStatus,
             "config_status": data.configStatus,

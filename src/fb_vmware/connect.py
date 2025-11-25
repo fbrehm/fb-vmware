@@ -16,6 +16,7 @@ import re
 import socket
 import time
 import uuid
+
 try:
     from collections.abc import Sequence
 except ImportError:
@@ -54,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.2.3"
+__version__ = "2.3.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -106,6 +107,8 @@ class VsphereConnection(BaseVsphereHandler):
         self.about = None
         self.dc_obj = None
         self.dvs = {}
+
+        self.datacenters = {}
 
         self.ds_mapping = {}
         self.ds_cluster_mapping = {}
@@ -203,6 +206,37 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
+    def get_datacenters(self, disconnect=False):
+        """
+        Get all datacenters controlled by the current vCenter.
+
+        The evaluated datacenters are stored as VsphereDatacenter objects in
+        self.datacenters with their names as keys.
+        """
+        LOG.debug(_("Trying to get all datacenters from vSphere ..."))
+        self.datacenters = {}
+
+        try:
+
+            if not self.service_instance:
+                self.connect()
+
+            content = self.service_instance.RetrieveContent()
+            for child in content.rootFolder.childEntity:
+                if hasattr(child, "hostFolder"):
+                    dc_obj = VsphereDatacenter.from_summary(
+                        child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                    )
+                    LOG.debug(_("Found vSphere datacenter {!r}.").format(dc_obj.name))
+                    self.datacenters[dc_obj.name] = dc_obj
+
+        finally:
+            if disconnect:
+                self.disconnect()
+
+        return
+
+    # -------------------------------------------------------------------------
     def get_clusters(self, disconnect=False):
         """Get all clusters from vSphere as VsphereCluster objects."""
         LOG.debug(_("Trying to get all clusters from vSphere ..."))
@@ -214,12 +248,13 @@ class VsphereConnection(BaseVsphereHandler):
             if not self.service_instance:
                 self.connect()
 
+            self.get_datacenters()
             content = self.service_instance.RetrieveContent()
-            dc = self.get_obj(content, [vim.Datacenter], self.dc)
-            if not dc:
-                raise VSphereDatacenterNotFoundError(self.dc)
-            for child in dc.hostFolder.childEntity:
-                self._get_clusters(child)
+            for dc_name in self.datacenters.keys():
+                dc = self.get_obj(content, [vim.Datacenter], dc_name)
+
+                for child in dc.hostFolder.childEntity:
+                    self._get_clusters(child, dc_name=dc_name)
 
         finally:
             if disconnect:
@@ -237,18 +272,22 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Found clusters:") + "\n" + pp(out))
 
     # -------------------------------------------------------------------------
-    def _get_clusters(self, child, depth=1):
+    def _get_clusters(self, child, dc_name=None, depth=1):
 
         if hasattr(child, "childEntity"):
             if depth > self.max_search_depth:
                 return
             for sub_child in child.childEntity:
-                self._get_clusters(sub_child, depth + 1)
+                self._get_clusters(sub_child, dc_name, depth + 1)
             return
 
         if isinstance(child, (vim.ClusterComputeResource, vim.ComputeResource)):
             cluster = VsphereCluster.from_summary(
-                child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                child,
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
+                dc_name=dc_name,
             )
             if self.verbose > 1:
                 obj_name = _("Found standalone host")
@@ -543,13 +582,16 @@ class VsphereConnection(BaseVsphereHandler):
             if not self.service_instance:
                 self.connect()
 
+            self.get_datacenters()
             content = self.service_instance.RetrieveContent()
-            dc = self.get_obj(content, [vim.Datacenter], self.dc)
-            if not dc:
-                raise VSphereDatacenterNotFoundError(self.dc)
-
-            for child in dc.hostFolder.childEntity:
-                self._get_hosts(child, re_name=re_name, vsphere_name=vsphere_name)
+            for dc_name in self.datacenters.keys():
+                if self.verbose > 0:
+                    LOG.debug(_("Get all computing clusters in DC {!r} ...").format(dc_name))
+                dc = self.get_obj(content, [vim.Datacenter], dc_name)
+                for child in dc.hostFolder.childEntity:
+                    self._get_hosts(
+                        child, re_name=re_name, vsphere_name=vsphere_name, dc_name=dc_name
+                    )
 
         finally:
             if disconnect:
@@ -568,21 +610,41 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Found hosts:") + "\n" + pp(out))
 
     # -------------------------------------------------------------------------
-    def _get_hosts(self, child, depth=1, re_name=None, vsphere_name=None, cluster_name=None):
+    def _get_hosts(
+        self, child, depth=1, re_name=None, vsphere_name=None, cluster_name=None, dc_name=None
+    ):
 
-        if self.verbose > 3:
+        if dc_name is None:
+            dc_name = self.dc
+
+        if self.verbose > 1:
             LOG.debug(
-                _("Checking {o}-object in cluster {c!r} ...").format(
-                    o=child.__class__.__name__, c=cluster_name
+                _("Checking {o}-object in dc {dc!r}, cluster {c!r} ...").format(
+                    o=child.__class__.__name__, dc=dc_name, c=cluster_name
                 )
             )
 
+        if isinstance(child, vim.Folder):
+            for item in child.childEntity:
+                self._get_hosts(
+                    item,
+                    depth=(depth + 1),
+                    re_name=re_name,
+                    vsphere_name=vsphere_name,
+                    dc_name=dc_name,
+                )
+            return
+
         if isinstance(child, (vim.ClusterComputeResource, vim.ComputeResource)):
             cluster = VsphereCluster.from_summary(
-                child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                child,
+                dc_name=dc_name,
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
             )
             cluster_name = cluster.name
-            if self.verbose > 1:
+            if self.verbose:
                 obj_name = _("Found standalone host")
                 if isinstance(child, vim.ClusterComputeResource):
                     obj_name = _("Found cluster")
@@ -593,11 +655,12 @@ class VsphereConnection(BaseVsphereHandler):
                 ds_label = ngettext("datastore", "datastores", len(cluster.datastores))
                 LOG.debug(
                     _(
-                        "{on} {cl!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, "
+                        "{on} {cl!r} in dc {dc!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, "
                         "{mem:0.1f} GiB Memory, {net} {nw_l} and {ds} {ds_l}."
                     ).format(
                         on=obj_name,
                         cl=cluster.name,
+                        dc=dc_name,
                         h=cluster.hosts_total,
                         h_l=host_label,
                         cpu=cluster.cpu_cores,
@@ -628,6 +691,7 @@ class VsphereConnection(BaseVsphereHandler):
                 host = VsphereHost.from_summary(
                     host_def,
                     vsphere=vsphere_name,
+                    dc_name=dc_name,
                     cluster_name=cluster_name,
                     appname=self.appname,
                     verbose=self.verbose,
@@ -1065,7 +1129,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0:i + 1])
+            path = "/".join(parts[0 : i + 1])
             paths.append(path)
 
         try:
@@ -1123,7 +1187,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0:i + 1])
+            path = "/".join(parts[0 : i + 1])
             paths.append(path)
 
         try:

@@ -51,6 +51,7 @@ get-vsphere-host-list = "fb_vmware.app.get_host_list:main"
 get-vsphere-network-list = "fb_vmware.app.get_network_list:main"
 get-vsphere-storage-cluster-list = "fb_vmware.app.get_storage_cluster_list:main"
 get-vsphere-vm-info = "fb_vmware.app.get_vm_info:main"
+get-vsphere-vm-list = "fb_vmware.app.get_vm_list:main"
 
 [project.optional-dependencies]
 development = [

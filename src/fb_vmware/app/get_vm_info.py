@@ -290,7 +290,7 @@ class GetVmApplication(BaseVmwareApplication):
 
 # =============================================================================
 def main():
-    """Entrypoint for get-vsphere-host-list."""
+    """Entrypoint for get-vsphere-vm-info."""
     my_path = pathlib.Path(__file__)
     appname = my_path.name
 

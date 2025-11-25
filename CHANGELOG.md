@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Transforming the modules `src/fb_vmware/app/get_storage_cluster_list.py`, `src/fb_vmware/app/get_host_list.py`,
   `src/fb_vmware/app/get_network_list.py`, `src/fb_vmware/app/get_vm_info.py` and
   `src/fb_vmware/app/get_vm_list.py` into entrypoints.
+* Applying `black` to all Python scripts.
 
 ### Fixed
 

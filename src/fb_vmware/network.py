@@ -29,7 +29,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = '1.8.4'
+__version__ = "1.8.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -40,77 +40,101 @@ ngettext = XLATOR.ngettext
 class VsphereNetwork(VsphereObject):
     """Wrapper class for a Network definition in VSPhere (vim.Network)."""
 
-    re_ipv4_name = re.compile(r'\s*((?:\d{1,3}\.){3}\d{1,3})_(\d+)\s*$')
-    re_tf_name = re.compile(r'[^a-z0-9_]+', re.IGNORECASE)
+    re_ipv4_name = re.compile(r"\s*((?:\d{1,3}\.){3}\d{1,3})_(\d+)\s*$")
+    re_tf_name = re.compile(r"[^a-z0-9_]+", re.IGNORECASE)
 
-    net_properties = [
-        'accessible', 'ip_pool_id', 'ip_pool_name'
-    ]
+    net_properties = ["accessible", "ip_pool_id", "ip_pool_name"]
 
     repr_fields = [
-        'name', 'obj_type', 'status', 'config_status', 'accessible',
-        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose'
+        "name",
+        "obj_type",
+        "status",
+        "config_status",
+        "accessible",
+        "ip_pool_id",
+        "ip_pool_name",
+        "appname",
+        "verbose",
     ]
 
     net_prop_source = {
-        'status': 'overallStatus',
-        'config_status': 'configStatus',
+        "status": "overallStatus",
+        "config_status": "configStatus",
     }
 
     net_prop_source_summary = {
-        'name': 'name',
-        'accessible': 'accessible',
-        'ip_pool_id': 'ipPoolId',
-        'ip_pool_name': 'ipPoolName',
+        "name": "name",
+        "accessible": "accessible",
+        "ip_pool_id": "ipPoolId",
+        "ip_pool_name": "ipPoolName",
     }
 
-    obj_desc_singular = _('Virtual Network')
-    obj_desc_plural = _('Virtual Networks')
+    obj_desc_singular = _("Virtual Network")
+    obj_desc_plural = _("Virtual Networks")
 
-    necessary_net_fields = ['summary', 'overallStatus', 'configStatus']
-    necessary_net_summary_fields = ['name']
+    necessary_net_fields = ["summary", "overallStatus", "configStatus"]
+    necessary_net_summary_fields = ["name"]
 
     warn_unassigned_net = True
 
     # -------------------------------------------------------------------------
     def __init__(
-            self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, obj_type='vsphere_network', name_prefix='net', status=DEFAULT_OBJ_STATUS,
-            config_status=DEFAULT_OBJ_STATUS, **kwargs):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        obj_type="vsphere_network",
+        name_prefix="net",
+        status=DEFAULT_OBJ_STATUS,
+        config_status=DEFAULT_OBJ_STATUS,
+        **kwargs,
+    ):
         """Initialize a VsphereNetwork object."""
         for prop in self.net_properties:
-            setattr(self, '_' + prop, None)
+            setattr(self, "_" + prop, None)
 
         self._network = None
 
         super(VsphereNetwork, self).__init__(
-            name=name, obj_type=obj_type, name_prefix=name_prefix, status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type=obj_type,
+            name_prefix=name_prefix,
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         for argname in kwargs:
             if argname not in self.net_properties:
-                msg = _('Invalid Argument {arg!r} on {what} given.').format(
-                    arg=argname, what='VsphereNetwork.init()')
+                msg = _("Invalid Argument {arg!r} on {what} given.").format(
+                    arg=argname, what="VsphereNetwork.init()"
+                )
                 raise AttributeError(msg)
             if kwargs[argname] is not None:
                 setattr(self, argname, kwargs[argname])
 
         match = self.re_ipv4_name.search(self.name)
         if match:
-            ip = '{a}/{m}'.format(a=match.group(1), m=match.group(2))
+            ip = "{a}/{m}".format(a=match.group(1), m=match.group(2))
             if self.verbose > 3:
-                LOG.debug(_('Trying to get IPv4 network {n!r} -> {i!r}.').format(
-                    n=self.name, i=ip))
+                LOG.debug(
+                    _("Trying to get IPv4 network {n!r} -> {i!r}.").format(n=self.name, i=ip)
+                )
 
             try:
                 net = ipaddress.ip_network(ip)
                 self._network = net
             except ValueError:
-                LOG.error(_('Could not get IP network from network name {!r}.').format(self.name))
+                LOG.error(_("Could not get IP network from network name {!r}.").format(self.name))
 
         if not self.network:
-            msg = _('Network {!r} has no IP network assigned.').format(self.name)
+            msg = _("Network {!r} has no IP network assigned.").format(self.name)
             if self.warn_unassigned_net:
                 LOG.warning(msg)
             else:
@@ -120,7 +144,7 @@ class VsphereNetwork(VsphereObject):
             self.initialized = initialized
 
         if self.verbose > 4:
-            LOG.debug(_('Initialized network object:') + '\n' + pp(self.as_dict()))
+            LOG.debug(_("Initialized network object:") + "\n" + pp(self.as_dict()))
 
     # -----------------------------------------------------------
     @property
@@ -182,8 +206,8 @@ class VsphereNetwork(VsphereObject):
         for prop in self.net_properties:
             res[prop] = getattr(self, prop)
 
-        res['network'] = self.network
-        res['gateway'] = self.gateway
+        res["network"] = self.network
+        res["gateway"] = self.gateway
 
         return res
 
@@ -199,39 +223,43 @@ class VsphereNetwork(VsphereObject):
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
-            if hasattr(data, 'summary'):
+            if hasattr(data, "summary"):
                 for field in cls.necessary_net_summary_fields:
                     if not hasattr(data.summary, field):
-                        failing_fields.append('summary.' + field)
+                        failing_fields.append("summary." + field)
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.Network):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
-                    t='data', e='vim.Network', v=data)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                    t="data", e="vim.Network", v=data
+                )
                 raise TypeError(msg)
 
         common_params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
         }
         params = cls.get_init_params(data=data, verbose=verbose)
         params.update(common_params)
 
         if verbose > 1:
             if verbose > 3:
-                LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+                LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
             else:
-                LOG.debug(_('Creating {cls} object {name!r}.').format(
-                    cls=cls.__name__, name=data.summary.name))
+                LOG.debug(
+                    _("Creating {cls} object {name!r}.").format(
+                        cls=cls.__name__, name=data.summary.name
+                    )
+                )
 
         net = cls(**params)
 
@@ -261,14 +289,14 @@ class VsphereNetwork(VsphereObject):
     def get_params_dict(self):
         """Return a dict with all keys for init a new network object with __init__."""
         params = {
-            'appname': self.appname,
-            'verbose': self.verbose,
-            'base_dir': self.base_dir,
-            'initialized': self.initialized,
-            'name': self.name,
-            'obj_type': self.obj_type,
-            'name_prefix': self.name_prefix,
-            'status': self.status,
+            "appname": self.appname,
+            "verbose": self.verbose,
+            "base_dir": self.base_dir,
+            "initialized": self.initialized,
+            "name": self.name,
+            "obj_type": self.obj_type,
+            "name_prefix": self.name_prefix,
+            "status": self.status,
         }
         for prop in self.net_properties:
             val = getattr(self, prop, None)
@@ -287,7 +315,7 @@ class VsphereNetwork(VsphereObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereNetwork):
             return False
@@ -304,7 +332,7 @@ class VsphereNetwork(VsphereObject):
     def get_if_backing_device(self, port=None):
         """Return a backing device for a new virtual network interface."""
         if self.verbose > 1:
-            msg = _('Creating network device backing spcification with a Virtual Network.')
+            msg = _("Creating network device backing spcification with a Virtual Network.")
             LOG.debug(msg)
 
         backing_device = vim.vm.device.VirtualEthernetCard.NetworkBackingInfo()
@@ -313,8 +341,8 @@ class VsphereNetwork(VsphereObject):
         backing_device.deviceName = self.name
 
         if self.verbose > 0:
-            msg = _('Got Backing device for network {!r}:').format(self.name)
-            LOG.debug(msg + ' ' + pp(backing_device))
+            msg = _("Got Backing device for network {!r}:").format(self.name)
+            LOG.debug(msg + " " + pp(backing_device))
 
         return backing_device
 
@@ -325,9 +353,10 @@ class VsphereNetworkDict(TypedDict):
 
     value_class = VsphereNetwork
 
-    msg_invalid_net_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
-        'VsphereNetwork')
-    msg_key_not_name = _('The key {k!r} must be equal to the network name {n!r}.')
+    msg_invalid_net_type = _("Invalid item type {{!r}} to set, only {} allowed.").format(
+        "VsphereNetwork"
+    )
+    msg_key_not_name = _("The key {k!r} must be equal to the network name {n!r}.")
 
     # -------------------------------------------------------------------------
     def check_key_by_item(self, key, item):
@@ -385,7 +414,7 @@ class VsphereNetworkDict(TypedDict):
         have a match, will be returned.
         """
         if len(self) < 1:
-            LOG.debug(_('Empty {what}.').format(what=self.__class__.__name__))
+            LOG.debug(_("Empty {what}.").format(what=self.__class__.__name__))
             return None
 
         ips_list_str = []
@@ -394,27 +423,27 @@ class VsphereNetworkDict(TypedDict):
             if not ip:
                 continue
             ips_list_str.append(str(ip))
-            LOG.debug(_('Searching VSphere network for address {} ...').format(ip))
+            LOG.debug(_("Searching VSphere network for address {} ...").format(ip))
             ipa = ipaddress.ip_address(ip)
 
             for net_name in self.keys():
                 net = self[net_name]
                 if net.network and ipa in net.network:
                     desc = net.obj_desc_singular
-                    LOG.debug(_('Found {d} {n!r} for IP {i}.').format(
-                        d=desc, n=net_name, i=ip))
+                    LOG.debug(_("Found {d} {n!r} for IP {i}.").format(d=desc, n=net_name, i=ip))
                     return net_name
 
             desc = self.value_class.obj_desc_singular
-            LOG.debug(_('Could not find {d} for IP {ip}.').format(d=desc, ip=ip))
+            LOG.debug(_("Could not find {d} for IP {ip}.").format(d=desc, ip=ip))
 
         ips_str = format_list(ips_list_str)
         no_ips = len(ips_list_str)
 
         msg = ngettext(
-            'Could not find {d} for IP address {ips}.',
-            'Could not find {d} for IP addresses {ips}.',
-            no_ips).format(d=self.value_class.obj_desc_singular, ips=ips_str)
+            "Could not find {d} for IP address {ips}.",
+            "Could not find {d} for IP addresses {ips}.",
+            no_ips,
+        ).format(d=self.value_class.obj_desc_singular, ips=ips_str)
         raise VSphereNoNetFoundError(msg)
 
 
@@ -442,9 +471,9 @@ class GeneralNetworksDict(dict, FbGenericBaseObject):
         for key in self:
             item = self[key]
             res[key] = []
-            if hasattr(item, 'as_list'):
+            if hasattr(item, "as_list"):
                 res[key] = self[key].as_list(short)
-            elif hasattr(item, 'values'):
+            elif hasattr(item, "values"):
                 for value in self[key].values():
                     res[key].append(value)
             else:
@@ -454,7 +483,7 @@ class GeneralNetworksDict(dict, FbGenericBaseObject):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

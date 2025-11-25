@@ -13,6 +13,7 @@ from __future__ import absolute_import
 import logging
 import random
 import re
+
 try:
     from collections.abc import MutableMapping
 except ImportError:
@@ -29,7 +30,7 @@ from pyVmomi import vim
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.4.4'
+__version__ = "1.4.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -39,30 +40,54 @@ _ = XLATOR.gettext
 class VsphereDatastore(VsphereObject):
     """Wrapper class for a VSphere datastore object."""
 
-    re_is_nfs = re.compile(r'(?:share[_-]*nfs|nfs[_-]*share)', re.IGNORECASE)
-    re_vmcb_fs = re.compile(r'vmcb-\d+-fc-\d+', re.IGNORECASE)
-    re_local_ds = re.compile(r'^local_', re.IGNORECASE)
-    re_k8s_ds = re.compile(r'[_-](?:k8s|kubernetes)[_-]', re.IGNORECASE)
+    re_is_nfs = re.compile(r"(?:share[_-]*nfs|nfs[_-]*share)", re.IGNORECASE)
+    re_vmcb_fs = re.compile(r"vmcb-\d+-fc-\d+", re.IGNORECASE)
+    re_local_ds = re.compile(r"^local_", re.IGNORECASE)
+    re_k8s_ds = re.compile(r"[_-](?:k8s|kubernetes)[_-]", re.IGNORECASE)
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, status='gray', config_status='gray', accessible=True, capacity=None,
-            free_space=None, maintenance_mode=None, multiple_host_access=True, fs_type=None,
-            uncommitted=None, url=None, for_k8s=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        status="gray",
+        config_status="gray",
+        accessible=True,
+        capacity=None,
+        free_space=None,
+        maintenance_mode=None,
+        multiple_host_access=True,
+        fs_type=None,
+        uncommitted=None,
+        url=None,
+        for_k8s=None,
+    ):
         """Initialize the VsphereDatastore object."""
         self.repr_fields = (
-            'name', 'status', 'accessible', 'capacity', 'free_space', 'fs_type', 'storage_type',
-            'appname', 'verbose', 'version')
+            "name",
+            "status",
+            "accessible",
+            "capacity",
+            "free_space",
+            "fs_type",
+            "storage_type",
+            "appname",
+            "verbose",
+            "version",
+        )
 
         self._accessible = bool(accessible)
         self._capacity = int(capacity)
         self._free_space = int(free_space)
-        self._maintenance_mode = 'normal'
+        self._maintenance_mode = "normal"
         if maintenance_mode is not None:
             self._maintenance_mode = str(maintenance_mode)
         self._multiple_host_access = bool(multiple_host_access)
-        self._fs_type = 'unknown'
+        self._fs_type = "unknown"
         if fs_type is not None:
             self._fs_type = fs_type
         self._uncommitted = 0
@@ -73,14 +98,21 @@ class VsphereDatastore(VsphereObject):
             self._url = str(url)
         self._for_k8s = False
 
-        self._storage_type = 'unknown'
+        self._storage_type = "unknown"
 
         self._calculated_usage = 0.0
 
         super(VsphereDatastore, self).__init__(
-            name=name, obj_type='vsphere_datastore', name_prefix='ds', status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type="vsphere_datastore",
+            name_prefix="ds",
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         st_type = self.storage_type_by_name(self.name)
         if st_type:
@@ -211,8 +243,8 @@ class VsphereDatastore(VsphereObject):
         """Create a new VsphereDatastore object based on the data given from pyvmomi module."""
         if test_mode:
 
-            necessary_fields = ('summary', 'overallStatus', 'configStatus')
-            summary_fields = ('capacity', 'freeSpace', 'name', 'type', 'url')
+            necessary_fields = ("summary", "overallStatus", "configStatus")
+            summary_fields = ("capacity", "freeSpace", "name", "type", "url")
 
             failing_fields = []
 
@@ -220,54 +252,55 @@ class VsphereDatastore(VsphereObject):
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
-            if hasattr(data, 'summary') and data.summary:
+            if hasattr(data, "summary") and data.summary:
                 summary = data.summary
                 for field in summary_fields:
                     if not hasattr(summary, field):
-                        failing_fields.append('summary.' + field)
+                        failing_fields.append("summary." + field)
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.Datastore):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
-                    t='data', e='vim.Datastore', v=data)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                    t="data", e="vim.Datastore", v=data
+                )
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'capacity': data.summary.capacity,
-            'free_space': data.summary.freeSpace,
-            'name': data.summary.name,
-            'fs_type': data.summary.type,
-            'url': data.summary.url,
-            'status': data.overallStatus,
-            'config_status': data.configStatus,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "capacity": data.summary.capacity,
+            "free_space": data.summary.freeSpace,
+            "name": data.summary.name,
+            "fs_type": data.summary.type,
+            "url": data.summary.url,
+            "status": data.overallStatus,
+            "config_status": data.configStatus,
         }
 
-        if hasattr(data.summary, 'accessible'):
-            params['accessible'] = data.summary.accessible
+        if hasattr(data.summary, "accessible"):
+            params["accessible"] = data.summary.accessible
 
-        if hasattr(data.summary, 'maintenanceMode'):
-            params['maintenance_mode'] = data.summary.maintenanceMode
+        if hasattr(data.summary, "maintenanceMode"):
+            params["maintenance_mode"] = data.summary.maintenanceMode
 
-        if hasattr(data.summary, 'multipleHostAccess'):
-            params['multiple_host_access'] = data.summary.multipleHostAccess
+        if hasattr(data.summary, "multipleHostAccess"):
+            params["multiple_host_access"] = data.summary.multipleHostAccess
 
-        if hasattr(data.summary, 'uncommitted'):
-            params['uncommitted'] = data.summary.uncommitted
+        if hasattr(data.summary, "uncommitted"):
+            params["uncommitted"] = data.summary.uncommitted
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         ds = cls(**params)
         return ds
@@ -277,22 +310,22 @@ class VsphereDatastore(VsphereObject):
     def storage_type_by_name(cls, name):
         """Guess the storage type by its name. May be overridden in descentant classes."""
         if cls.re_is_nfs.search(name):
-            return 'NFS'
+            return "NFS"
 
-        if '-sas-' in name.lower():
-            return 'SAS'
+        if "-sas-" in name.lower():
+            return "SAS"
 
-        if '-ssd-' in name.lower():
-            return 'SSD'
+        if "-ssd-" in name.lower():
+            return "SSD"
 
-        if '-sata-' in name.lower():
-            return 'SATA'
+        if "-sata-" in name.lower():
+            return "SATA"
 
         if cls.re_vmcb_fs.search(name):
-            return 'SATA'
+            return "SATA"
 
         if cls.re_local_ds.search(name):
-            return 'LOCAL'
+            return "LOCAL"
 
         return None
 
@@ -320,21 +353,21 @@ class VsphereDatastore(VsphereObject):
         @rtype:  dict
         """
         res = super(VsphereDatastore, self).as_dict(short=short)
-        res['accessible'] = self.accessible
-        res['capacity'] = self.capacity
-        res['capacity_gb'] = self.capacity_gb
-        res['free_space'] = self.free_space
-        res['free_space_gb'] = self.free_space_gb
-        res['maintenance_mode'] = self.maintenance_mode
-        res['multiple_host_access'] = self.multiple_host_access
-        res['fs_type'] = self.fs_type
-        res['for_k8s'] = self.for_k8s
-        res['uncommitted'] = self.uncommitted
-        res['uncommitted_gb'] = self.uncommitted_gb
-        res['url'] = self.url
-        res['storage_type'] = self.storage_type
-        res['calculated_usage'] = self.calculated_usage
-        res['avail_space_gb'] = self.avail_space_gb
+        res["accessible"] = self.accessible
+        res["capacity"] = self.capacity
+        res["capacity_gb"] = self.capacity_gb
+        res["free_space"] = self.free_space
+        res["free_space_gb"] = self.free_space_gb
+        res["maintenance_mode"] = self.maintenance_mode
+        res["multiple_host_access"] = self.multiple_host_access
+        res["fs_type"] = self.fs_type
+        res["for_k8s"] = self.for_k8s
+        res["uncommitted"] = self.uncommitted
+        res["uncommitted_gb"] = self.uncommitted_gb
+        res["url"] = self.url
+        res["storage_type"] = self.storage_type
+        res["calculated_usage"] = self.calculated_usage
+        res["avail_space_gb"] = self.avail_space_gb
 
         return res
 
@@ -342,18 +375,29 @@ class VsphereDatastore(VsphereObject):
     def __copy__(self):
         """Return a new VsphereDatastore object with data from current object copied in."""
         return VsphereDatastore(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, name=self.name, accessible=self.accessible,
-            capacity=self.capacity, free_space=self.free_space, for_k8s=self.for_k8s,
-            maintenance_mode=self.maintenance_mode, multiple_host_access=self.multiple_host_access,
-            fs_type=self.fs_type, uncommitted=self.uncommitted, url=self.url,
-            status=self.status, config_status=self.config_status)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            name=self.name,
+            accessible=self.accessible,
+            capacity=self.capacity,
+            free_space=self.free_space,
+            for_k8s=self.for_k8s,
+            maintenance_mode=self.maintenance_mode,
+            multiple_host_access=self.multiple_host_access,
+            fs_type=self.fs_type,
+            uncommitted=self.uncommitted,
+            url=self.url,
+            status=self.status,
+            config_status=self.config_status,
+        )
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDatastore):
             return False
@@ -372,12 +416,13 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     It works like a dict.
     """
 
-    msg_invalid_ds_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
-        'VsphereDatastore')
-    msg_key_not_name = _('The key {k!r} must be equal to the datastore name {n!r}.')
-    msg_none_type_error = _('None type as key is not allowed.')
-    msg_empty_key_error = _('Empty key {!r} is not allowed.')
-    msg_no_ds_dict = _('Object {{!r}} is not a {} object.').format('VsphereDatastoreDict')
+    msg_invalid_ds_type = _("Invalid item type {{!r}} to set, only {} allowed.").format(
+        "VsphereDatastore"
+    )
+    msg_key_not_name = _("The key {k!r} must be equal to the datastore name {n!r}.")
+    msg_none_type_error = _("None type as key is not allowed.")
+    msg_empty_key_error = _("Empty key {!r} is not allowed.")
+    msg_no_ds_dict = _("Object {{!r}} is not a {} object.").format("VsphereDatastoreDict")
 
     # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
@@ -413,7 +458,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         ds_name = str(key).strip()
-        if ds_name == '':
+        if ds_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map[ds_name]
@@ -430,7 +475,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         ds_name = str(key).strip()
-        if ds_name == '':
+        if ds_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not strict and ds_name not in self._map:
@@ -474,10 +519,9 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Transform into a string for reproduction."""
-        return '{}, {}({})'.format(
-            super(VsphereDatastoreDict, self).__repr__(),
-            self.__class__.__name__,
-            self._map)
+        return "{}, {}({})".format(
+            super(VsphereDatastoreDict, self).__repr__(), self.__class__.__name__, self._map
+        )
 
     # -------------------------------------------------------------------------
     def __contains__(self, key):
@@ -486,7 +530,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         ds_name = str(key).strip()
-        if ds_name == '':
+        if ds_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return ds_name in self._map
@@ -537,7 +581,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         ds_name = str(key).strip()
-        if ds_name == '':
+        if ds_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map.pop(ds_name, *args)
@@ -569,7 +613,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         ds_name = str(key).strip()
-        if ds_name == '':
+        if ds_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not isinstance(default, VsphereDatastore):
@@ -611,34 +655,37 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
         return res
 
     # -------------------------------------------------------------------------
-    def find_ds(self, needed_gb, ds_type='sata', reserve_space=True, use_ds=None, no_k8s=False):
+    def find_ds(self, needed_gb, ds_type="sata", reserve_space=True, use_ds=None, no_k8s=False):
         """Find a datastore in dict with the given minimum free space and the given type."""
         search_chains = {
-            'sata': ('sata', 'sas', 'ssd'),
-            'sas': ('sas', 'sata', 'ssd'),
-            'ssd': ('ssd', 'sas', 'sata'),
+            "sata": ("sata", "sas", "ssd"),
+            "sas": ("sas", "sata", "ssd"),
+            "ssd": ("ssd", "sas", "sata"),
         }
 
         if ds_type not in search_chains:
-            raise ValueError(_('Could not handle datastore type {!r}.').format(ds_type))
+            raise ValueError(_("Could not handle datastore type {!r}.").format(ds_type))
         for dstp in search_chains[ds_type]:
-            ds_name = self._find_ds(
-                needed_gb, dstp, reserve_space, use_ds=use_ds, no_k8s=no_k8s)
+            ds_name = self._find_ds(needed_gb, dstp, reserve_space, use_ds=use_ds, no_k8s=no_k8s)
             if ds_name:
                 return ds_name
 
-        LOG.error(_('Could not found a datastore for {c:0.1f} GiB of type {t!r}.').format(
-            c=needed_gb, t=ds_type))
+        LOG.error(
+            _("Could not found a datastore for {c:0.1f} GiB of type {t!r}.").format(
+                c=needed_gb, t=ds_type
+            )
+        )
         return None
 
     # -------------------------------------------------------------------------
     def _find_ds(self, needed_gb, ds_type, reserve_space=True, use_ds=None, no_k8s=False):
 
-        LOG.debug(_('Searching datastore for {c:0.1f} GiB of type {t!r}.').format(
-            c=needed_gb, t=ds_type))
+        LOG.debug(
+            _("Searching datastore for {c:0.1f} GiB of type {t!r}.").format(c=needed_gb, t=ds_type)
+        )
 
         avail_ds_names = []
-        for (ds_name, ds) in self.items():
+        for ds_name, ds in self.items():
             if use_ds:
                 if ds.name not in use_ds:
                     continue
@@ -661,7 +708,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

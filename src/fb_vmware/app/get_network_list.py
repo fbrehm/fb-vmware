@@ -28,11 +28,12 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = '1.6.0'
+__version__ = "1.6.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
+
 
 # =============================================================================
 class GetVmNetworkAppError(VmwareAppError):
@@ -47,20 +48,31 @@ class GetNetworkListApp(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
-            initialized=False, usage=None, description=None,
-            argparse_epilog=None, argparse_prefix_chars='-', env_prefix=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=GLOBAL_VERSION,
+        base_dir=None,
+        initialized=False,
+        usage=None,
+        description=None,
+        argparse_epilog=None,
+        argparse_prefix_chars="-",
+        env_prefix=None,
+    ):
         """Initialize a GetNetworkListApp object."""
-        desc = _(
-            'Tries to get a list of all networks in '
-            'VMWare VSphere and print it out.')
+        desc = _("Tries to get a list of all networks in " "VMWare VSphere and print it out.")
 
         self.all_dvpgs = GeneralNetworksDict()
         self.all_networks = GeneralNetworksDict()
 
         super(GetNetworkListApp, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            description=desc, initialized=False,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+            description=desc,
+            initialized=False,
         )
 
         self.initialized = True
@@ -83,8 +95,7 @@ class GetNetworkListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _run(self):
 
-        LOG.debug(_('Starting {a!r}, version {v!r} ...').format(
-            a=self.appname, v=self.version))
+        LOG.debug(_("Starting {a!r}, version {v!r} ...").format(a=self.appname, v=self.version))
 
         VsphereNetwork.warn_unassigned_net = False
 
@@ -122,7 +133,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         for vsphere_name in self.vsphere:
             vsphere = self.vsphere[vsphere_name]
-            LOG.debug(_('Get all network-like objects from VSPhere {!r} ...').format(vsphere_name))
+            LOG.debug(_("Get all network-like objects from VSPhere {!r} ...").format(vsphere_name))
 
             try:
                 vsphere.get_networks()
@@ -142,12 +153,12 @@ class GetNetworkListApp(BaseVmwareApplication):
             self._get_all_networks()
 
         else:
-            spin_prompt = _('Getting all VSPhere networks') + ' '
+            spin_prompt = _("Getting all VSPhere networks") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 self._get_all_networks()
-            sys.stdout.write(' ' * len(spin_prompt))
-            sys.stdout.write('\r')
+            sys.stdout.write(" " * len(spin_prompt))
+            sys.stdout.write("\r")
             sys.stdout.flush()
 
         if self.verbose > 2:
@@ -157,7 +168,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                 for uuid in self.vsphere[vsphere_name].dvs.keys():
                     dvs[vsphere_name][uuid] = self.vsphere[vsphere_name].dvs[uuid].as_dict()
 
-            msg = _('Found Distributed Virtual Switches:') + '\n' + pp(dvs)
+            msg = _("Found Distributed Virtual Switches:") + "\n" + pp(dvs)
             LOG.debug(msg)
 
         if self.verbose > 2:
@@ -177,9 +188,9 @@ class GetNetworkListApp(BaseVmwareApplication):
                     if len(networks_lists[vsphere_name]):
                         networks[vsphere_name] = [networks_lists[vsphere_name][0]]
 
-            msg = _('Found Distributed Virtual Portgroups:') + pp(dv_port_groups)
+            msg = _("Found Distributed Virtual Portgroups:") + pp(dv_port_groups)
             LOG.debug(msg)
-            msg = _('Found Virtual Networks:') + pp(networks)
+            msg = _("Found Virtual Networks:") + pp(networks)
             LOG.debug(msg)
 
         return ret
@@ -190,23 +201,23 @@ class GetNetworkListApp(BaseVmwareApplication):
         all_dvs = []
 
         print()
-        title = _('Distributed Virtual Switches')
-        print(self.colored(title, 'cyan'))
-        print(self.colored('=' * len(title), 'cyan'))
+        title = _("Distributed Virtual Switches")
+        print(self.colored(title, "cyan"))
+        print(self.colored("=" * len(title), "cyan"))
 
         # -----------------------------
         def get_contact(dvs):
             """Generate and return a contact string for this DVS."""
             contact_name = None
             contact_info = None
-            contact = '~'
+            contact = "~"
             if dvs.contact_name is not None:
                 contact_name = dvs.contact_name.strip()
             if dvs.contact_info is not None:
                 contact_info = dvs.contact_info.strip()
             if contact_name:
                 if contact_info:
-                    contact = '{n} ({i})'.format(n=contact_name, i=contact_info)
+                    contact = "{n} ({i})".format(n=contact_name, i=contact_info)
                 else:
                     contact = contact_name
             elif contact_info:
@@ -219,15 +230,15 @@ class GetNetworkListApp(BaseVmwareApplication):
                 this_dvs = self.vsphere[vsphere_name].dvs[uuid]
 
                 dvs = {
-                    'vsphere': vsphere_name,
-                    'name': this_dvs.name,
-                    'contact': get_contact(this_dvs),
-                    'create_time': this_dvs.create_time.isoformat(sep=' ', timespec='seconds'),
-                    'description': this_dvs.description,
-                    'hosts': '{:,}'.format(this_dvs.num_hosts),
-                    'ports': '{:,}'.format(this_dvs.num_ports),
-                    'standalone_ports': '{:,}'.format(this_dvs.num_standalone_ports),
-                    'ratio_reservation': '{:d} %'.format(this_dvs.pnic_cap_ratio_reservation),
+                    "vsphere": vsphere_name,
+                    "name": this_dvs.name,
+                    "contact": get_contact(this_dvs),
+                    "create_time": this_dvs.create_time.isoformat(sep=" ", timespec="seconds"),
+                    "description": this_dvs.description,
+                    "hosts": "{:,}".format(this_dvs.num_hosts),
+                    "ports": "{:,}".format(this_dvs.num_ports),
+                    "standalone_ports": "{:,}".format(this_dvs.num_standalone_ports),
+                    "ratio_reservation": "{:d} %".format(this_dvs.pnic_cap_ratio_reservation),
                 }
                 all_dvs.append(dvs)
 
@@ -236,25 +247,32 @@ class GetNetworkListApp(BaseVmwareApplication):
             return
 
         print()
-        print(_('No Distributed Virtual Switches found.'))
+        print(_("No Distributed Virtual Switches found."))
 
     # -------------------------------------------------------------------------
     def _print_virtual_switches(self, all_dvs):
 
         labels = {
-            'vsphere': 'VSPhere',
-            'name': _('Name'),
-            'contact': _('Contact'),
-            'create_time': _('Creation time'),
-            'description': _('Description'),
-            'hosts': _('Hosts'),
-            'ports': _('Ports'),
-            'standalone_ports': _('Standalone Ports'),
-            'ratio_reservation': _('Ratio reservation'),
+            "vsphere": "VSPhere",
+            "name": _("Name"),
+            "contact": _("Contact"),
+            "create_time": _("Creation time"),
+            "description": _("Description"),
+            "hosts": _("Hosts"),
+            "ports": _("Ports"),
+            "standalone_ports": _("Standalone Ports"),
+            "ratio_reservation": _("Ratio reservation"),
         }
         label_list = (
-            'name', 'vsphere', 'create_time', 'hosts', 'ports', 'standalone_ports',
-            'ratio_reservation', 'contact', 'description',
+            "name",
+            "vsphere",
+            "create_time",
+            "hosts",
+            "ports",
+            "standalone_ports",
+            "ratio_reservation",
+            "contact",
+            "description",
         )
 
         str_lengths = {}
@@ -267,7 +285,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             for label in labels.keys():
                 val = dvs[label]
                 if val is None:
-                    val = '-'
+                    val = "-"
                     dvs[label] = val
                 if len(val) > str_lengths[label]:
                     str_lengths[label] = len(val)
@@ -278,26 +296,26 @@ class GetNetworkListApp(BaseVmwareApplication):
             max_len += str_lengths[label]
 
         if self.verbose > 1:
-            LOG.debug('Label length:\n' + pp(str_lengths))
-            LOG.debug('Max line length: {} chars'.format(max_len))
+            LOG.debug("Label length:\n" + pp(str_lengths))
+            LOG.debug("Max line length: {} chars".format(max_len))
 
-        tpl = ''
+        tpl = ""
         for label in label_list:
-            if tpl != '':
-                tpl += '  '
-            if label in ('hosts', 'ports', 'standalone_ports', 'ratio_reservation'):
-                tpl += '{{{la}:>{le}}}'.format(la=label, le=str_lengths[label])
+            if tpl != "":
+                tpl += "  "
+            if label in ("hosts", "ports", "standalone_ports", "ratio_reservation"):
+                tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
             else:
-                tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+                tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug(_('Line template: {}').format(tpl))
+            LOG.debug(_("Line template: {}").format(tpl))
 
         if not self.quiet:
             print()
             print(tpl.format(**labels))
-            print('-' * max_len)
+            print("-" * max_len)
 
-        sort_keys = ['vsphere', 'name']
+        sort_keys = ["vsphere", "name"]
         all_dvs.sort(key=itemgetter(*sort_keys))
         for dvs in all_dvs:
             count += 1
@@ -309,37 +327,37 @@ class GetNetworkListApp(BaseVmwareApplication):
         all_dvpgs = []
 
         print()
-        title = _('Distributed Virtual Port Groups')
-        print(self.colored(title, 'cyan'))
-        print(self.colored('=' * len(title), 'cyan'))
+        title = _("Distributed Virtual Port Groups")
+        print(self.colored(title, "cyan"))
+        print(self.colored("=" * len(title), "cyan"))
 
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].dv_portgroups.keys():
                 this_dvpg = self.vsphere[vsphere_name].dv_portgroups[name]
-                dvs_name = '~'
+                dvs_name = "~"
                 dvs_uuid = this_dvpg.dvs_uuid
                 if dvs_uuid in self.vsphere[vsphere_name].dvs:
                     dvs_name = self.vsphere[vsphere_name].dvs[dvs_uuid].name
-                network = '~'
+                network = "~"
                 if this_dvpg.network:
                     network = str(this_dvpg.network)
-                uplink = _('No')
+                uplink = _("No")
                 if this_dvpg.uplink:
-                    uplink = _('Yes')
-                accessible = 'No'
+                    uplink = _("Yes")
+                accessible = "No"
                 if this_dvpg.accessible:
-                    accessible = _('Yes')
+                    accessible = _("Yes")
 
                 dvpg = {
-                    'vsphere': vsphere_name,
-                    'name': name,
-                    'dvs': dvs_name,
-                    'network': network,
-                    'accessible': accessible,
-                    'num_ports': '{:,}'.format(this_dvpg.num_ports),
-                    'type': this_dvpg.pg_type,
-                    'uplink': uplink,
-                    'description': this_dvpg.description,
+                    "vsphere": vsphere_name,
+                    "name": name,
+                    "dvs": dvs_name,
+                    "network": network,
+                    "accessible": accessible,
+                    "num_ports": "{:,}".format(this_dvpg.num_ports),
+                    "type": this_dvpg.pg_type,
+                    "uplink": uplink,
+                    "description": this_dvpg.description,
                 }
                 all_dvpgs.append(dvpg)
 
@@ -348,25 +366,32 @@ class GetNetworkListApp(BaseVmwareApplication):
             return
 
         print()
-        print(_('No Distributed Virtual Port Groups found.'))
+        print(_("No Distributed Virtual Port Groups found."))
 
     # -------------------------------------------------------------------------
     def _print_dv_portgroups(self, all_dvpgs):
 
         labels = {
-            'vsphere': 'VSPhere',
-            'name': _('Name'),
-            'dvs': 'DV Switch',
-            'network': _('Network'),
-            'accessible': _('Accessible'),
-            'num_ports': _('Ports'),
-            'type': _('Type'),
-            'uplink': _('Uplink'),
-            'description': _('Description'),
+            "vsphere": "VSPhere",
+            "name": _("Name"),
+            "dvs": "DV Switch",
+            "network": _("Network"),
+            "accessible": _("Accessible"),
+            "num_ports": _("Ports"),
+            "type": _("Type"),
+            "uplink": _("Uplink"),
+            "description": _("Description"),
         }
         label_list = (
-            'name', 'vsphere', 'dvs', 'network', 'accessible', 'type',
-            'num_ports', 'uplink', 'description'
+            "name",
+            "vsphere",
+            "dvs",
+            "network",
+            "accessible",
+            "type",
+            "num_ports",
+            "uplink",
+            "description",
         )
 
         str_lengths = {}
@@ -379,7 +404,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             for label in labels.keys():
                 val = dvpg[label]
                 if val is None:
-                    val = '-'
+                    val = "-"
                     dvpg[label] = val
                 if len(val) > str_lengths[label]:
                     str_lengths[label] = len(val)
@@ -390,24 +415,24 @@ class GetNetworkListApp(BaseVmwareApplication):
             max_len += str_lengths[label]
 
         if self.verbose > 1:
-            LOG.debug('Label length:\n' + pp(str_lengths))
-            LOG.debug('Max line length: {} chars'.format(max_len))
+            LOG.debug("Label length:\n" + pp(str_lengths))
+            LOG.debug("Max line length: {} chars".format(max_len))
 
-        tpl = ''
+        tpl = ""
         for label in label_list:
-            if tpl != '':
-                tpl += '  '
-            if label in ('num_ports',):
-                tpl += '{{{la}:>{le}}}'.format(la=label, le=str_lengths[label])
+            if tpl != "":
+                tpl += "  "
+            if label in ("num_ports",):
+                tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
             else:
-                tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+                tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug(_('Line template: {}').format(tpl))
+            LOG.debug(_("Line template: {}").format(tpl))
 
         if not self.quiet:
             print()
             print(tpl.format(**labels))
-            print('-' * max_len)
+            print("-" * max_len)
 
         for dvpg in all_dvpgs:
             count += 1
@@ -419,25 +444,25 @@ class GetNetworkListApp(BaseVmwareApplication):
         all_networks = []
 
         print()
-        title = _('Virtual Networks')
-        print(self.colored(title, 'cyan'))
-        print(self.colored('=' * len(title), 'cyan'))
+        title = _("Virtual Networks")
+        print(self.colored(title, "cyan"))
+        print(self.colored("=" * len(title), "cyan"))
 
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].networks.keys():
                 this_network = self.vsphere[vsphere_name].networks[name]
-                network = '~'
+                network = "~"
                 if this_network.network:
                     network = str(this_network.network)
-                accessible = 'No'
+                accessible = "No"
                 if this_network.accessible:
-                    accessible = _('Yes')
+                    accessible = _("Yes")
 
                 net = {
-                    'vsphere': vsphere_name,
-                    'name': name,
-                    'network': network,
-                    'accessible': accessible,
+                    "vsphere": vsphere_name,
+                    "name": name,
+                    "network": network,
+                    "accessible": accessible,
                 }
                 all_networks.append(net)
 
@@ -446,18 +471,18 @@ class GetNetworkListApp(BaseVmwareApplication):
             return
 
         print()
-        print(_('No Virtual Networks found.'))
+        print(_("No Virtual Networks found."))
 
     # -------------------------------------------------------------------------
     def _print_networks(self, all_networks):
 
         labels = {
-            'vsphere': 'VSPhere',
-            'name': _('Name'),
-            'network': _('Network'),
-            'accessible': _('Accessible'),
+            "vsphere": "VSPhere",
+            "name": _("Name"),
+            "network": _("Network"),
+            "accessible": _("Accessible"),
         }
-        label_list = ('name', 'vsphere', 'network', 'accessible')
+        label_list = ("name", "vsphere", "network", "accessible")
 
         str_lengths = {}
         for label in labels:
@@ -469,7 +494,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             for label in labels.keys():
                 val = net[label]
                 if val is None:
-                    val = '-'
+                    val = "-"
                     net[label] = val
                 if len(val) > str_lengths[label]:
                     str_lengths[label] = len(val)
@@ -480,21 +505,21 @@ class GetNetworkListApp(BaseVmwareApplication):
             max_len += str_lengths[label]
 
         if self.verbose > 1:
-            LOG.debug('Label length:\n' + pp(str_lengths))
-            LOG.debug('Max line length: {} chars'.format(max_len))
+            LOG.debug("Label length:\n" + pp(str_lengths))
+            LOG.debug("Max line length: {} chars".format(max_len))
 
-        tpl = ''
+        tpl = ""
         for label in label_list:
-            if tpl != '':
-                tpl += '  '
-            tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+            if tpl != "":
+                tpl += "  "
+            tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug(_('Line template: {}').format(tpl))
+            LOG.debug(_("Line template: {}").format(tpl))
 
         if not self.quiet:
             print()
             print(tpl.format(**labels))
-            print('-' * max_len)
+            print("-" * max_len)
 
         for net in all_networks:
             count += 1
@@ -521,7 +546,7 @@ def main():
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     main()
 

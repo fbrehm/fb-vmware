@@ -12,6 +12,7 @@ from __future__ import absolute_import
 # Standard modules
 import functools
 import logging
+
 try:
     from collections.abc import MutableMapping
 except ImportError:
@@ -23,7 +24,7 @@ from fb_tools.obj import FbGenericBaseObject
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '0.1.1'
+__version__ = "0.1.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -37,10 +38,10 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     It works like a dict.
     """
 
-    msg_invalid_item_type = _('Invalid item type {got!r} to set, only {expected} allowed.')
-    msg_none_type_error = _('None type as key is not allowed.')
-    msg_empty_key_error = _('Empty key {!r} is not allowed.')
-    msg_no_typed_object = _('Object {got!r} is not a {expected} object.')
+    msg_invalid_item_type = _("Invalid item type {got!r} to set, only {expected} allowed.")
+    msg_none_type_error = _("None type as key is not allowed.")
+    msg_empty_key_error = _("Empty key {!r} is not allowed.")
+    msg_no_typed_object = _("Object {got!r} is not a {expected} object.")
 
     value_class = FbGenericBaseObject
 
@@ -71,13 +72,14 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
         """
         if not isinstance(item, self.value_class):
             msg = self.msg_invalid_item_type.format(
-                got=item.__class__.__name__, expected=self.value_class.__name__)
+                got=item.__class__.__name__, expected=self.value_class.__name__
+            )
             raise TypeError(msg)
 
         self.check_key_by_item(key, item)
 
         stripped_key = str(key).strip()
-        if stripped_key == '':
+        if stripped_key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         self._map[stripped_key] = item
@@ -96,7 +98,8 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
         """Set the given network in the current dict with its name as key."""
         if not isinstance(item, self.value_class):
             msg = self.msg_invalid_item_type.format(
-                got=item.__class__.__name__, expected=self.value_class.__name__)
+                got=item.__class__.__name__, expected=self.value_class.__name__
+            )
             raise TypeError(msg)
 
         key = self.get_key_from_item(item)
@@ -109,7 +112,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         stripped_key = str(key).strip()
-        if stripped_key == '':
+        if stripped_key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map[key]
@@ -126,7 +129,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         stripped_key = str(key).strip()
-        if stripped_key == '':
+        if stripped_key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not strict and stripped_key not in self._map:
@@ -170,10 +173,9 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Transform into a string for reproduction."""
-        return '{}, {}({})'.format(
-            super(TypedDict, self).__repr__(),
-            self.__class__.__name__,
-            self._map)
+        return "{}, {}({})".format(
+            super(TypedDict, self).__repr__(), self.__class__.__name__, self._map
+        )
 
     # -------------------------------------------------------------------------
     def __contains__(self, key):
@@ -182,7 +184,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         stripped_key = str(key).strip()
-        if stripped_key == '':
+        if stripped_key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return stripped_key in self._map
@@ -209,9 +211,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def keys(self):
         """Return all items of this dict in a sorted manner."""
-        return sorted(
-            self._map.keys(),
-            key=functools.cmp_to_key(self.compare))
+        return sorted(self._map.keys(), key=functools.cmp_to_key(self.compare))
 
     # -------------------------------------------------------------------------
     def items(self):
@@ -235,8 +235,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if not isinstance(other, self.__class__):
-            msg = self.msg_no_typed_object.format(
-                got=other, expected=self.__class__.__name__)
+            msg = self.msg_no_typed_object.format(got=other, expected=self.__class__.__name__)
             raise TypeError(msg)
 
         return self._map == other._map
@@ -245,8 +244,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
     def __ne__(self, other):
         """Magic method for using it as the '!='-operator."""
         if not isinstance(other, self.__class__):
-            msg = self.msg_no_typed_object.format(
-                got=other, expected=self.__class__.__name__)
+            msg = self.msg_no_typed_object.format(got=other, expected=self.__class__.__name__)
             raise TypeError(msg)
 
         return self._map != other._map
@@ -258,7 +256,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         # key = self.get_key_from_item(item)
-        if key == '':
+        if key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map.pop(key, *args)
@@ -290,12 +288,13 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         stripped_key = str(key).strip()
-        if stripped_key == '':
+        if stripped_key == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not isinstance(default, self.value_class):
             msg = self.msg_invalid_item_type.format(
-                got=default.__class__.__name__, expected=self.value_class.__name__)
+                got=default.__class__.__name__, expected=self.value_class.__name__
+            )
             raise TypeError(msg)
 
         if stripped_key in self._map:
@@ -335,7 +334,7 @@ class TypedDict(MutableMapping, FbGenericBaseObject):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

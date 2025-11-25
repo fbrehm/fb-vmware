@@ -30,7 +30,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = '1.8.0'
+__version__ = "1.8.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -48,19 +48,28 @@ class GetVmListAppError(VmwareAppError):
 class GetVmListApplication(BaseVmwareApplication):
     """Class for the application objects."""
 
-    default_vm_pattern = r'.*'
-    avail_sort_keys = ('name', 'vsphere', 'cluster', 'path', 'type', 'onl_str', 'cfg_ver', 'os')
-    default_sort_keys = ['name', 'vsphere']
+    default_vm_pattern = r".*"
+    avail_sort_keys = ("name", "vsphere", "cluster", "path", "type", "onl_str", "cfg_ver", "os")
+    default_sort_keys = ["name", "vsphere"]
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
-            initialized=False, usage=None, description=None,
-            argparse_epilog=None, argparse_prefix_chars='-', env_prefix=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=GLOBAL_VERSION,
+        base_dir=None,
+        initialized=False,
+        usage=None,
+        description=None,
+        argparse_epilog=None,
+        argparse_prefix_chars="-",
+        env_prefix=None,
+    ):
         """Initialize a GetVmListApplication object."""
         desc = _(
-            'Tries to get a list of all virtual machines in '
-            'VMWare VSphere and print it out.')
+            "Tries to get a list of all virtual machines in " "VMWare VSphere and print it out."
+        )
 
         self._vm_pattern = self.default_vm_pattern
         self._details = False
@@ -73,8 +82,12 @@ class GetVmListApplication(BaseVmwareApplication):
         self.vms = []
 
         super(GetVmListApplication, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            description=desc, initialized=False,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+            description=desc,
+            initialized=False,
         )
 
         self.initialized = True
@@ -107,9 +120,9 @@ class GetVmListApplication(BaseVmwareApplication):
         @rtype:  dict
         """
         res = super(GetVmListApplication, self).as_dict(short=short)
-        res['details'] = self.details
-        res['vm_pattern'] = self.vm_pattern
-        res['default_vm_pattern'] = self.default_vm_pattern
+        res["details"] = self.details
+        res["vm_pattern"] = self.vm_pattern
+        res["default_vm_pattern"] = self.default_vm_pattern
 
         return res
 
@@ -130,66 +143,105 @@ class GetVmListApplication(BaseVmwareApplication):
         """Initiate the argument parser."""
         super(GetVmListApplication, self).init_arg_parser()
 
-        filter_group = self.arg_parser.add_argument_group(_('Filter options'))
+        filter_group = self.arg_parser.add_argument_group(_("Filter options"))
 
         filter_group.add_argument(
-            '-p', '--pattern', '--search-pattern',
-            dest='vm_pattern', metavar='REGEX', action=RegexOptionAction,
-            topic=_('for names of VMs'), re_options=re.IGNORECASE,
+            "-p",
+            "--pattern",
+            "--search-pattern",
+            dest="vm_pattern",
+            metavar="REGEX",
+            action=RegexOptionAction,
+            topic=_("for names of VMs"),
+            re_options=re.IGNORECASE,
             help=_(
-                'A regular expression to filter the output list of VMs by their name '
-                '(Default: {!r}).').format(self.default_vm_pattern)
+                "A regular expression to filter the output list of VMs by their name "
+                "(Default: {!r})."
+            ).format(self.default_vm_pattern),
         )
 
-        valid_vm_types = ('all', 'vm', 'template')
+        valid_vm_types = ("all", "vm", "template")
         filter_group.add_argument(
-            '-T', '--type', metavar=_('TYPE'), dest='vm_type', choices=valid_vm_types,
-            default='all', help=_(
-                'Filter output for the type of the VM. Valid values are {li} '
-                '(Default: {dflt!r}).').format(
-                dflt='all', li=format_list(valid_vm_types, do_repr=True))
+            "-T",
+            "--type",
+            metavar=_("TYPE"),
+            dest="vm_type",
+            choices=valid_vm_types,
+            default="all",
+            help=_(
+                "Filter output for the type of the VM. Valid values are {li} "
+                "(Default: {dflt!r})."
+            ).format(dflt="all", li=format_list(valid_vm_types, do_repr=True)),
         )
 
         online_filter = filter_group.add_mutually_exclusive_group()
         online_filter.add_argument(
-            '--on', '--online', action='store_true', dest='online',
-            help=_('Filter output for online VMs.')
+            "--on",
+            "--online",
+            action="store_true",
+            dest="online",
+            help=_("Filter output for online VMs."),
         )
         online_filter.add_argument(
-            '--off', '--offline', action='store_true', dest='offline',
-            help=_('Filter output for offline VMs and templates.')
+            "--off",
+            "--offline",
+            action="store_true",
+            dest="offline",
+            help=_("Filter output for offline VMs and templates."),
         )
 
         filter_group.add_argument(
-            '-H', '--hw', '--hardware-config', metavar='REGEX', action=RegexOptionAction,
-            dest='hw', topic=_('for VMWare hardware config version'), re_options=re.IGNORECASE,
+            "-H",
+            "--hw",
+            "--hardware-config",
+            metavar="REGEX",
+            action=RegexOptionAction,
+            dest="hw",
+            topic=_("for VMWare hardware config version"),
+            re_options=re.IGNORECASE,
             help=_(
-                'A regular expression to filter the output list of VMs by the VMWare hardware '
-                "configuration version (e.g. '{}').").format(r'vmx-0\d$'),
+                "A regular expression to filter the output list of VMs by the VMWare hardware "
+                "configuration version (e.g. '{}')."
+            ).format(r"vmx-0\d$"),
         )
 
         filter_group.add_argument(
-            '--os', metavar='REGEX', action=RegexOptionAction, dest='os',
-            topic=_('for the Operating System version'), re_options=re.IGNORECASE,
+            "--os",
+            metavar="REGEX",
+            action=RegexOptionAction,
+            dest="os",
+            topic=_("for the Operating System version"),
+            re_options=re.IGNORECASE,
             help=_(
-                'A regular expression to filter the output list of VMs by their Operating '
-                "System version, e.g. '{}'.").format('oracleLinux.*(_64)?Guest')
+                "A regular expression to filter the output list of VMs by their Operating "
+                "System version, e.g. '{}'."
+            ).format("oracleLinux.*(_64)?Guest"),
         )
 
-        output_options = self.arg_parser.add_argument_group(_('Output options'))
+        output_options = self.arg_parser.add_argument_group(_("Output options"))
 
         output_options.add_argument(
-            '-D', '--details', dest='details', action='store_true',
-            help=_('Detailed output list (quering data needs some time longer).')
+            "-D",
+            "--details",
+            dest="details",
+            action="store_true",
+            help=_("Detailed output list (quering data needs some time longer)."),
         )
 
         output_options.add_argument(
-            '-S', '--sort', metavar='KEY', nargs='+', dest='sort_keys',
-            choices=self.avail_sort_keys, help=_(
-                'The keys for sorting the output. Available keys are: {avail}. '
-                'The default sorting keys are: {default}.').format(
+            "-S",
+            "--sort",
+            metavar="KEY",
+            nargs="+",
+            dest="sort_keys",
+            choices=self.avail_sort_keys,
+            help=_(
+                "The keys for sorting the output. Available keys are: {avail}. "
+                "The default sorting keys are: {default}."
+            ).format(
                 avail=format_list(self.avail_sort_keys, do_repr=True),
-                default=format_list(self.default_sort_keys, do_repr=True))
+                default=format_list(self.default_sort_keys, do_repr=True),
+            ),
         )
 
     # -------------------------------------------------------------------------
@@ -203,17 +255,23 @@ class GetVmListApplication(BaseVmwareApplication):
         if self.args.vm_pattern:
             try:
                 re_name = re.compile(self.args.vm_pattern, re.IGNORECASE)
-                LOG.debug(_('Regular expression for filtering: {!r}').format(re_name.pattern))
+                LOG.debug(_("Regular expression for filtering: {!r}").format(re_name.pattern))
                 self._vm_pattern = self.args.vm_pattern
             except Exception as e:
-                msg = _('Got a {c} for pattern {p!r}: {e}').format(
-                    c=e.__class__.__name__, p=self.args.vm_pattern, e=e)
+                msg = _("Got a {c} for pattern {p!r}: {e}").format(
+                    c=e.__class__.__name__, p=self.args.vm_pattern, e=e
+                )
                 LOG.error(msg)
 
         if not self.details:
-            if self.args.online or self.args.offline or self.args.hw or self.args.os or \
-                    self.args.vm_type != 'all':
-                LOG.info(_('Detailed output is required because of your given options.'))
+            if (
+                self.args.online
+                or self.args.offline
+                or self.args.hw
+                or self.args.os
+                or self.args.vm_type != "all"
+            ):
+                LOG.info(_("Detailed output is required because of your given options."))
                 self.details = True
 
         if self.args.sort_keys:
@@ -222,16 +280,20 @@ class GetVmListApplication(BaseVmwareApplication):
             else:
                 self.sort_keys = []
                 for key in self.args.sort_keys:
-                    if key in ('name', 'vsphere', 'path'):
+                    if key in ("name", "vsphere", "path"):
                         self.sort_keys.append(key)
                     else:
-                        LOG.warn(_(
-                            'Sorting key {!r} not usable, if not detailed output '
-                            'was given.').format(key))
+                        LOG.warn(
+                            _(
+                                "Sorting key {!r} not usable, if not detailed output " "was given."
+                            ).format(key)
+                        )
                 if not self.sort_keys:
-                    LOG.warn(_(
-                        'No usable sorting keys found, using default sorting keys {}.').format(
-                        format_list(self.default_sort_keys, do_repr=True)))
+                    LOG.warn(
+                        _("No usable sorting keys found, using default sorting keys {}.").format(
+                            format_list(self.default_sort_keys, do_repr=True)
+                        )
+                    )
                     self.sort_keys = self.default_sort_keys
 
         if self.args.hw:
@@ -242,8 +304,7 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _run(self):
 
-        LOG.debug(_('Starting {a!r}, version {v!r} ...').format(
-            a=self.appname, v=self.version))
+        LOG.debug(_("Starting {a!r}, version {v!r} ...").format(a=self.appname, v=self.version))
 
         ret = 0
         try:
@@ -268,17 +329,17 @@ class GetVmListApplication(BaseVmwareApplication):
             for vsphere_name in self.vsphere:
                 all_vms += self.get_vms(vsphere_name, re_name)
         elif not self.quiet:
-            spin_prompt = _('Getting all VSPhere VMs ...') + ' '
+            spin_prompt = _("Getting all VSPhere VMs ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
                 for vsphere_name in self.vsphere:
                     all_vms += self.get_vms(vsphere_name, re_name)
-            sys.stdout.write(' ' * len(spin_prompt))
-            sys.stdout.write('\r')
+            sys.stdout.write(" " * len(spin_prompt))
+            sys.stdout.write("\r")
             sys.stdout.flush()
 
         if self.verbose > 1:
-            LOG.debug(_('Using sorting keys:') + ' ' + format_list(self.sort_keys, do_repr=True))
+            LOG.debug(_("Using sorting keys:") + " " + format_list(self.sort_keys, do_repr=True))
 
         if self.details:
             self.print_vms_detailed(all_vms)
@@ -290,11 +351,11 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_vms(self, all_vms):
         """Print out on STDOUT the list of found VMs."""
-        label_list = ('name', 'vsphere', 'path')
+        label_list = ("name", "vsphere", "path")
         labels = {
-            'name': 'Host',
-            'vsphere': 'VSphere',
-            'path': 'Path',
+            "name": "Host",
+            "vsphere": "VSphere",
+            "path": "Path",
         }
 
         self._print_vms(all_vms, label_list, labels)
@@ -304,14 +365,14 @@ class GetVmListApplication(BaseVmwareApplication):
         """Print out on STDOUT the list of found VMs in a detailled way."""
         label_list = self.avail_sort_keys
         labels = {
-            'name': 'VM/Template',
-            'vsphere': 'VSphere',
-            'cluster': 'Cluster',
-            'path': 'Path',
-            'type': 'Type',
-            'onl_str': 'Online Status',
-            'cfg_ver': 'Config Version',
-            'os': 'Operating System',
+            "name": "VM/Template",
+            "vsphere": "VSphere",
+            "cluster": "Cluster",
+            "path": "Path",
+            "type": "Type",
+            "onl_str": "Online Status",
+            "cfg_ver": "Config Version",
+            "os": "Operating System",
         }
 
         self._print_vms(all_vms, label_list, labels)
@@ -326,9 +387,9 @@ class GetVmListApplication(BaseVmwareApplication):
         max_len = 0
         count = 0
         for cdata in all_vms:
-            for field in ('cluster', 'path', 'type', 'cfg_ver', 'os'):
+            for field in ("cluster", "path", "type", "cfg_ver", "os"):
                 if field in labels and cdata[field] is None:
-                    cdata[field] = '-'
+                    cdata[field] = "-"
             for label in labels.keys():
                 val = cdata[label]
                 if len(val) > str_lengths[label]:
@@ -340,21 +401,21 @@ class GetVmListApplication(BaseVmwareApplication):
             max_len += str_lengths[label]
 
         if self.verbose > 1:
-            LOG.debug('Label length:\n' + pp(str_lengths))
-            LOG.debug('Max line length: {} chars'.format(max_len))
+            LOG.debug("Label length:\n" + pp(str_lengths))
+            LOG.debug("Max line length: {} chars".format(max_len))
 
-        tpl = ''
+        tpl = ""
         for label in label_list:
-            if tpl != '':
-                tpl += '  '
-            tpl += '{{{la}:<{le}}}'.format(la=label, le=str_lengths[label])
+            if tpl != "":
+                tpl += "  "
+            tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
         if self.verbose > 1:
-            LOG.debug(_('Line template: {}').format(tpl))
+            LOG.debug(_("Line template: {}").format(tpl))
 
         if not self.quiet:
             print()
             print(tpl.format(**labels))
-            print('-' * max_len)
+            print("-" * max_len)
 
         all_vms.sort(key=itemgetter(*self.sort_keys))
 
@@ -366,11 +427,9 @@ class GetVmListApplication(BaseVmwareApplication):
         if not self.quiet:
             print()
             if count == 0:
-                msg = _('Found no VMWare VMs.')
+                msg = _("Found no VMWare VMs.")
             else:
-                msg = ngettext(
-                    'Found one VMWare VM.',
-                    'Found {} VMWare VMs.', count).format(count)
+                msg = ngettext("Found one VMWare VM.", "Found {} VMWare VMs.", count).format(count)
             print(msg)
             print()
 
@@ -396,7 +455,7 @@ class GetVmListApplication(BaseVmwareApplication):
     def mangle_vmlist_no_details(self, vm_list, vsphere_name):
         """Prepare the non-detailled data about found VMs for output."""
         if self.verbose > 3:
-            LOG.debug('Mangling VM list:\n' + pp(vm_list))
+            LOG.debug("Mangling VM list:\n" + pp(vm_list))
 
         vms = []
         first = True
@@ -404,21 +463,21 @@ class GetVmListApplication(BaseVmwareApplication):
         for vm in sorted(vm_list, key=itemgetter(0, 1)):
 
             if self.verbose > 2 and first:
-                LOG.debug('VM:\n' + pp(vm))
+                LOG.debug("VM:\n" + pp(vm))
 
             cdata = {
-                'vsphere': vsphere_name,
-                'name': vm[0],
-                'path': vm[1],
+                "vsphere": vsphere_name,
+                "name": vm[0],
+                "path": vm[1],
             }
 
-            if cdata['path']:
-                cdata['path'] = '/' + cdata['path']
+            if cdata["path"]:
+                cdata["path"] = "/" + cdata["path"]
             else:
-                cdata['path'] = '/'
+                cdata["path"] = "/"
 
             if self.verbose > 2 and first:
-                LOG.debug('Mangled VM:\n' + pp(cdata))
+                LOG.debug("Mangled VM:\n" + pp(cdata))
 
             first = False
 
@@ -432,20 +491,20 @@ class GetVmListApplication(BaseVmwareApplication):
         vms = []
 
         first = True
-        for vm in sorted(vm_list, key=attrgetter('name', 'path')):
+        for vm in sorted(vm_list, key=attrgetter("name", "path")):
 
             if not isinstance(vm, VsphereVm):
-                msg = _('Found a {} object:').format(vm.__class__.__name__)
-                msg += '\n' + pp(vm)
+                msg = _("Found a {} object:").format(vm.__class__.__name__)
+                msg += "\n" + pp(vm)
                 LOG.error(msg)
                 continue
 
             if self.verbose > 2 and first:
-                LOG.debug('VM:\n' + pp(vm.as_dict()))
+                LOG.debug("VM:\n" + pp(vm.as_dict()))
 
             cdata = self._mangle_vm_details(vm, vsphere_name)
             if self.verbose > 2 and first and cdata:
-                LOG.debug('Mangled VM:\n' + pp(cdata))
+                LOG.debug("Mangled VM:\n" + pp(cdata))
 
             first = False
 
@@ -461,8 +520,8 @@ class GetVmListApplication(BaseVmwareApplication):
 
         cdata = None
 
-        if self.args.vm_type != 'all':
-            if self.args.vm_type == 'vm':
+        if self.args.vm_type != "all":
+            if self.args.vm_type == "vm":
                 if vm.template:
                     return None
             else:
@@ -485,35 +544,36 @@ class GetVmListApplication(BaseVmwareApplication):
                 return None
 
         cdata = {
-            'vsphere': vsphere_name,
-            'cluster': vm.cluster_name,
-            'name': vm.name,
-            'path': vm.path,
-            'type': 'Virtual Machine',
-            'online': vm.online,
-            'onl_str': 'Online',
-            'cfg_ver': vm.config_version,
-            'os': vm.guest_id,
+            "vsphere": vsphere_name,
+            "cluster": vm.cluster_name,
+            "name": vm.name,
+            "path": vm.path,
+            "type": "Virtual Machine",
+            "online": vm.online,
+            "onl_str": "Online",
+            "cfg_ver": vm.config_version,
+            "os": vm.guest_id,
         }
 
-        if cdata['path']:
-            cdata['path'] = '/' + cdata['path']
+        if cdata["path"]:
+            cdata["path"] = "/" + cdata["path"]
         else:
-            cdata['path'] = '/'
+            cdata["path"] = "/"
 
-        if not cdata['cluster']:
-            cdata['cluster'] = None
+        if not cdata["cluster"]:
+            cdata["cluster"] = None
 
-        if not cdata['os']:
-            cdata['os'] = None
+        if not cdata["os"]:
+            cdata["os"] = None
 
         if not vm.online:
-            cdata['onl_str'] = 'Offline'
+            cdata["onl_str"] = "Offline"
 
         if vm.template:
-            cdata['type'] = 'VMWare Template'
+            cdata["type"] = "VMWare Template"
 
         return cdata
+
 
 # =============================================================================
 def main():
@@ -534,9 +594,8 @@ def main():
     sys.exit(0)
 
 
-
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

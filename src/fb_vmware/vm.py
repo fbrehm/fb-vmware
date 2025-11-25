@@ -14,6 +14,7 @@ import copy
 import logging
 import re
 import uuid
+
 try:
     from collections.abc import MutableSequence
 except ImportError:
@@ -36,7 +37,7 @@ from .obj import OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -46,15 +47,24 @@ _ = XLATOR.gettext
 class VsphereVm(VsphereObject):
     """This is a wrapper for a vim.VirtualMachine object."""
 
-    re_vm_path_storage = re.compile(r'^\s*\[\s*([^\s\]]+)')
-    re_vm_path_rel = re.compile(r'^\s*\[[^\]]*]\s*(\S.*)\s*$')
+    re_vm_path_storage = re.compile(r"^\s*\[\s*([^\s\]]+)")
+    re_vm_path_rel = re.compile(r"^\s*\[[^\]]*]\s*(\S.*)\s*$")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            vsphere=None, name=None, status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        vsphere=None,
+        name=None,
+        status=DEFAULT_OBJ_STATUS,
+        config_status=DEFAULT_OBJ_STATUS,
+    ):
         """Initialize a VsphereVm object."""
-        self.repr_fields = ('name', 'vsphere')
+        self.repr_fields = ("name", "vsphere")
         self._vsphere = None
         self._cluster_name = None
         self._path = None
@@ -79,19 +89,29 @@ class VsphereVm(VsphereObject):
         self.vm_tools = None
 
         super(VsphereVm, self).__init__(
-            name=name, obj_type='vsphere_vm', name_prefix='vm', status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type="vsphere_vm",
+            name_prefix="vm",
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         if vsphere is not None:
             self.vsphere = vsphere
 
         self.disks = VsphereDiskList(
-            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True)
+            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True
+        )
         self.interfaces = VsphereEthernetcardList(
-            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True)
+            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True
+        )
         self.controllers = VsphereDiskControllerList(
-            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True)
+            appname=appname, verbose=verbose, base_dir=base_dir, initialized=True
+        )
 
     # -----------------------------------------------------------
     @property
@@ -106,8 +126,8 @@ class VsphereVm(VsphereObject):
             return
 
         val = str(value).strip()
-        if val == '':
-            msg = _('The name of the vsphere may not be empty.')
+        if val == "":
+            msg = _("The name of the vsphere may not be empty.")
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
@@ -124,7 +144,7 @@ class VsphereVm(VsphereObject):
             self._cluster_name = None
             return
         v = str(value).strip().lower()
-        if v == '':
+        if v == "":
             self._cluster_name = None
         else:
             self._cluster_name = v
@@ -141,7 +161,7 @@ class VsphereVm(VsphereObject):
             self._host = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._host = None
         else:
             self._host = v
@@ -158,7 +178,7 @@ class VsphereVm(VsphereObject):
             self._path = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._path = None
         else:
             self._path = v
@@ -245,7 +265,7 @@ class VsphereVm(VsphereObject):
             self._guest_fullname = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._guest_fullname = None
         else:
             self._guest_fullname = v
@@ -262,7 +282,7 @@ class VsphereVm(VsphereObject):
             self._guest_id = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._guest_id = None
         else:
             self._guest_id = v
@@ -279,7 +299,7 @@ class VsphereVm(VsphereObject):
             self._uuid = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._uuid = None
         else:
             self._uuid = uuid.UUID(v)
@@ -296,7 +316,7 @@ class VsphereVm(VsphereObject):
             self._instance_uuid = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._instance_uuid = None
         else:
             self._instance_uuid = uuid.UUID(v)
@@ -309,7 +329,7 @@ class VsphereVm(VsphereObject):
             return False
         if self.power_state is None:
             return False
-        if self.power_state.lower() in ('poweredoff', 'suspended'):
+        if self.power_state.lower() in ("poweredoff", "suspended"):
             return False
         return True
 
@@ -325,7 +345,7 @@ class VsphereVm(VsphereObject):
             self._config_path = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._config_path = None
         else:
             self._config_path = v
@@ -364,7 +384,7 @@ class VsphereVm(VsphereObject):
             self._config_version = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._config_version = None
         else:
             self._config_version = v
@@ -384,52 +404,52 @@ class VsphereVm(VsphereObject):
         """
         if bare:
             res = {
-                'vsphere': self.vsphere,
-                'cluster_name': self.cluster_name,
-                'config_path': self.config_path,
-                'config_path_relative': self.config_path_relative,
-                'config_path_storage': self.config_path_storage,
-                'config_version': self.config_version,
-                'host': self.host,
-                'path': self.path,
-                'template': self.template,
-                'online': self.online,
-                'memory_mb': self.memory_mb,
-                'memory_gb': self.memory_gb,
-                'num_cpu': self.num_cpu,
-                'num_ethernet': self.num_ethernet,
-                'num_vdisk': self.num_vdisk,
-                'guest_fullname': self.guest_fullname,
-                'guest_id': self.guest_id,
-                'uuid': self.uuid,
-                'instance_uuid': self.instance_uuid,
-                'power_state': self.power_state,
-                'disks': self.disks.as_dict(bare=True),
-                'interfaces': self.interfaces.as_dict(bare=True),
-                'controllers': self.controllers.as_dict(bare=True),
+                "vsphere": self.vsphere,
+                "cluster_name": self.cluster_name,
+                "config_path": self.config_path,
+                "config_path_relative": self.config_path_relative,
+                "config_path_storage": self.config_path_storage,
+                "config_version": self.config_version,
+                "host": self.host,
+                "path": self.path,
+                "template": self.template,
+                "online": self.online,
+                "memory_mb": self.memory_mb,
+                "memory_gb": self.memory_gb,
+                "num_cpu": self.num_cpu,
+                "num_ethernet": self.num_ethernet,
+                "num_vdisk": self.num_vdisk,
+                "guest_fullname": self.guest_fullname,
+                "guest_id": self.guest_id,
+                "uuid": self.uuid,
+                "instance_uuid": self.instance_uuid,
+                "power_state": self.power_state,
+                "disks": self.disks.as_dict(bare=True),
+                "interfaces": self.interfaces.as_dict(bare=True),
+                "controllers": self.controllers.as_dict(bare=True),
             }
             return res
 
         res = super(VsphereVm, self).as_dict(short=short)
-        res['vsphere'] = self.vsphere
-        res['cluster_name'] = self.cluster_name
-        res['config_path'] = self.config_path
-        res['config_path_relative'] = self.config_path_relative
-        res['config_path_storage'] = self.config_path_storage
-        res['config_version'] = self.config_version
-        res['host'] = self.cluster_name
-        res['path'] = self.path
-        res['template'] = self.template
-        res['online'] = self.online
-        res['memory_mb'] = self.memory_mb
-        res['memory_gb'] = self.memory_gb
-        res['num_cpu'] = self.num_cpu
-        res['num_ethernet'] = self.num_ethernet
-        res['num_vdisk'] = self.num_vdisk
-        res['guest_fullname'] = self.guest_fullname
-        res['guest_id'] = self.guest_id
-        res['uuid'] = self.uuid
-        res['instance_uuid'] = self.instance_uuid
+        res["vsphere"] = self.vsphere
+        res["cluster_name"] = self.cluster_name
+        res["config_path"] = self.config_path
+        res["config_path_relative"] = self.config_path_relative
+        res["config_path_storage"] = self.config_path_storage
+        res["config_version"] = self.config_version
+        res["host"] = self.cluster_name
+        res["path"] = self.path
+        res["template"] = self.template
+        res["online"] = self.online
+        res["memory_mb"] = self.memory_mb
+        res["memory_gb"] = self.memory_gb
+        res["num_cpu"] = self.num_cpu
+        res["num_ethernet"] = self.num_ethernet
+        res["num_vdisk"] = self.num_vdisk
+        res["guest_fullname"] = self.guest_fullname
+        res["guest_id"] = self.guest_id
+        res["uuid"] = self.uuid
+        res["instance_uuid"] = self.instance_uuid
 
         return res
 
@@ -437,9 +457,15 @@ class VsphereVm(VsphereObject):
     def __copy__(self):
         """Return a new VsphereVm as a deep copy of the current object."""
         vm = VsphereVm(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, name=self.name, status=self.status,
-            vsphere=self.vsphere, config_status=self.config_status)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            name=self.name,
+            status=self.status,
+            vsphere=self.vsphere,
+            config_status=self.config_status,
+        )
 
         vm.cluster_name = self.cluster_name
         vm.config_path = self.config_path
@@ -466,7 +492,7 @@ class VsphereVm(VsphereObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereVm):
             return False
@@ -483,30 +509,31 @@ class VsphereVm(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(
-            cls, data, cur_path, vsphere=None, appname=None, verbose=0,
-            base_dir=None, test_mode=False):
+        cls, data, cur_path, vsphere=None, appname=None, verbose=0, base_dir=None, test_mode=False
+    ):
         """Create a new VsphereVm object based on the data given from pyvmomi."""
         if test_mode:
             cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.VirtualMachine):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
-                    t='data', e='vim.VirtualMachine', v=data, vt=data.__class__.__name__)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                    t="data", e="vim.VirtualMachine", v=data, vt=data.__class__.__name__
+                )
                 raise TypeError(msg)
 
         params = {
-            'vsphere': vsphere,
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'name': data.summary.config.name,
-            'status': DEFAULT_OBJ_STATUS,
-            'config_status': OBJ_STATUS_GREEN,
+            "vsphere": vsphere,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "name": data.summary.config.name,
+            "status": DEFAULT_OBJ_STATUS,
+            "config_status": OBJ_STATUS_GREEN,
         }
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         vm = cls(**params)
 
@@ -532,62 +559,72 @@ class VsphereVm(VsphereObject):
         vm.config_path = data.summary.config.vmPathName
         vm.config_version = data.config.version
 
-        if hasattr(data.summary, 'customValue'):
+        if hasattr(data.summary, "customValue"):
             for custom_data in data.summary.customValue:
                 custom_key = custom_data.key
-                custom_value = ''
+                custom_value = ""
 
-                if hasattr(custom_data, 'value'):
+                if hasattr(custom_data, "value"):
                     custom_value = custom_data.value
 
-                vm.custom_data.append({custom_key: custom_value, })
+                vm.custom_data.append(
+                    {
+                        custom_key: custom_value,
+                    }
+                )
 
         if data.guest:
 
             vm.vm_tools = {}
 
-            vm.vm_tools['install_type'] = None
-            vm.vm_tools['state'] = None
-            vm.vm_tools['version'] = data.guest.toolsVersion
-            vm.vm_tools['version_state'] = None
+            vm.vm_tools["install_type"] = None
+            vm.vm_tools["state"] = None
+            vm.vm_tools["version"] = data.guest.toolsVersion
+            vm.vm_tools["version_state"] = None
 
-            if hasattr(data.guest, 'toolsInstallType'):
-                vm.vm_tools['install_type'] = data.guest.toolsInstallType
+            if hasattr(data.guest, "toolsInstallType"):
+                vm.vm_tools["install_type"] = data.guest.toolsInstallType
 
-            if hasattr(data.guest, 'toolsRunningStatus'):
-                vm.vm_tools['state'] = data.guest.toolsRunningStatus
+            if hasattr(data.guest, "toolsRunningStatus"):
+                vm.vm_tools["state"] = data.guest.toolsRunningStatus
             else:
-                vm.vm_tools['state'] = data.guest.toolsStatus
+                vm.vm_tools["state"] = data.guest.toolsStatus
 
-            if hasattr(data.guest, 'toolsVersionStatus2'):
-                vm.vm_tools['version_state'] = data.guest.toolsVersionStatus2
+            if hasattr(data.guest, "toolsVersionStatus2"):
+                vm.vm_tools["version_state"] = data.guest.toolsVersionStatus2
             else:
-                vm.vm_tools['version_state'] = data.guest.toolsVersionStatus
+                vm.vm_tools["version_state"] = data.guest.toolsVersionStatus
 
         if data.config and data.config.hardware:
             for device in data.config.hardware.device:
                 if isinstance(device, vim.vm.device.VirtualDisk):
                     disk = VsphereDisk.from_summary(
-                        device, appname=appname, verbose=verbose, base_dir=base_dir)
+                        device, appname=appname, verbose=verbose, base_dir=base_dir
+                    )
                     vm.disks.append(disk)
                 elif isinstance(device, vim.vm.device.VirtualEthernetCard):
                     iface = VsphereEthernetcard.from_summary(
-                        device, appname=appname, verbose=verbose, base_dir=base_dir)
+                        device, appname=appname, verbose=verbose, base_dir=base_dir
+                    )
                     vm.interfaces.append(iface)
                 elif isinstance(device, vim.vm.device.VirtualController):
                     ctrl = VsphereDiskController.from_summary(
-                        device, appname=appname, verbose=verbose, base_dir=base_dir)
+                        device, appname=appname, verbose=verbose, base_dir=base_dir
+                    )
                     vm.controllers.append(ctrl)
                 elif verbose > 2:
-                    LOG.debug(_('Unknown hardware device of type {}.').format(
-                        device.__class__.__name__))
+                    LOG.debug(
+                        _("Unknown hardware device of type {}.").format(device.__class__.__name__)
+                    )
         else:
-            LOG.error(_(
-                'There is something wrong wit VM {n!r} in cluster {c!r} and '
-                'path {p!r} ...').format(n=vm.name, c=vm.cluster_name, p=vm.path))
+            LOG.error(
+                _(
+                    "There is something wrong wit VM {n!r} in cluster {c!r} and " "path {p!r} ..."
+                ).format(n=vm.name, c=vm.cluster_name, p=vm.path)
+            )
 
         if verbose > 2:
-            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(vm.as_dict()))
+            LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(vm.as_dict()))
 
         return vm
 
@@ -595,11 +632,20 @@ class VsphereVm(VsphereObject):
     @classmethod
     def _check_summary_data(cls, data):
 
-        necessary_fields = ('summary', 'resourcePool', 'runtime', 'config', 'guest')
+        necessary_fields = ("summary", "resourcePool", "runtime", "config", "guest")
         summary_cfg_fields = (
-            'template', 'memorySizeMB', 'numCpu', 'numEthernetCards', 'numVirtualDisks',
-            'guestFullName', 'guestId', 'uuid', 'instanceUuid', 'powerState',
-            'vmPathName')
+            "template",
+            "memorySizeMB",
+            "numCpu",
+            "numEthernetCards",
+            "numVirtualDisks",
+            "guestFullName",
+            "guestId",
+            "uuid",
+            "instanceUuid",
+            "powerState",
+            "vmPathName",
+        )
 
         failing_fields = []
 
@@ -607,40 +653,40 @@ class VsphereVm(VsphereObject):
             if not hasattr(data, field):
                 failing_fields.append(field)
 
-        if hasattr(data, 'resourcePool') and data.resourcePool:
-            if hasattr(data.resourcePool, 'owner'):
-                if not hasattr(data.resourcePool.owner, 'name'):
-                    failing_fields.append('resourcePool.owner.name')
+        if hasattr(data, "resourcePool") and data.resourcePool:
+            if hasattr(data.resourcePool, "owner"):
+                if not hasattr(data.resourcePool.owner, "name"):
+                    failing_fields.append("resourcePool.owner.name")
             else:
-                failing_fields.append('resourcePool.owner')
+                failing_fields.append("resourcePool.owner")
 
-        if hasattr(data, 'runtime'):
-            if not hasattr(data.runtime, 'host'):
-                failing_fields.append('runtime.host')
+        if hasattr(data, "runtime"):
+            if not hasattr(data.runtime, "host"):
+                failing_fields.append("runtime.host")
 
-        if hasattr(data, 'summary'):
-            if hasattr(data.summary, 'config'):
+        if hasattr(data, "summary"):
+            if hasattr(data.summary, "config"):
                 for field in summary_cfg_fields:
                     if not hasattr(data.summary.config, field):
-                        failing_fields.append('summary.config.' + field)
+                        failing_fields.append("summary.config." + field)
             else:
-                failing_fields.append('summary.config')
+                failing_fields.append("summary.config")
 
-        if hasattr(data, 'config') and data.config:
-            if not hasattr(data.config, 'version'):
-                failing_fields.append('config.version')
-            if hasattr(data.config, 'hardware'):
+        if hasattr(data, "config") and data.config:
+            if not hasattr(data.config, "version"):
+                failing_fields.append("config.version")
+            if hasattr(data.config, "hardware"):
                 if data.config.hardware:
-                    if not hasattr(data.config.hardware, 'device'):
-                        failing_fields.append('config.hardware.device')
+                    if not hasattr(data.config.hardware, "device"):
+                        failing_fields.append("config.hardware.device")
             else:
-                failing_fields.append('config.hardware')
+                failing_fields.append("config.hardware")
 
         if len(failing_fields):
             msg = _(
-                'The given parameter {p!r} on calling method {m}() has failing '
-                'attributes').format(p='data', m='from_summary')
-            msg += ': ' + format_list(failing_fields, do_repr=True)
+                "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+            ).format(p="data", m="from_summary")
+            msg += ": " + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
@@ -648,18 +694,18 @@ class VsphereVm(VsphereObject):
 class VsphereVmList(FbBaseObject, MutableSequence):
     """A list containing VsphereVm objects."""
 
-    msg_no_vm = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
+    msg_no_vm = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            initialized=None, *vms):
+        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None, *vms
+    ):
         """Initialize a VsphereVmList object."""
         self._list = []
 
         super(VsphereVmList, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         for vm in vms:
             self.append(vm)
@@ -687,10 +733,10 @@ class VsphereVmList(FbBaseObject, MutableSequence):
             return res
 
         res = super(VsphereVmList, self).as_dict(short=short)
-        res['_list'] = []
+        res["_list"] = []
 
         for vm in self:
-            res['_list'].append(vm.as_dict(short=short))
+            res["_list"].append(vm.as_dict(short=short))
 
         return res
 
@@ -698,8 +744,8 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def __copy__(self):
         """Return a new VsphereVmList as a deep copy of the current object."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for vm in self:
             new_list.append(copy.copy(vm))
@@ -715,8 +761,11 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
-                    m='index()', max=3, n=len(args) + 1))
+                raise TypeError(
+                    _("{m} takes at most {max} arguments ({n} given).").format(
+                        m="index()", max=3, n=len(args) + 1
+                    )
+                )
             i = int(args[0])
             if len(args) > 1:
                 j = int(args[1])
@@ -754,15 +803,18 @@ class VsphereVmList(FbBaseObject, MutableSequence):
             if item == vm:
                 return index
 
-        msg = _('VM is not in VM list.')
+        msg = _("VM is not in VM list.")
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, vm):
         """Return whether the given VM is contained in current list."""
         if not isinstance(vm, VsphereVm):
-            raise TypeError(self.msg_no_vm.format(
-                t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
+            raise TypeError(
+                self.msg_no_vm.format(
+                    t=vm.__class__.__name__, c=self.__class__.__name__, o="VsphereVm"
+                )
+            )
 
         if not self._list:
             return False
@@ -777,8 +829,11 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def count(self, vm):
         """Return the number of VMs which are equal to the given one in current list."""
         if not isinstance(vm, VsphereVm):
-            raise TypeError(self.msg_no_vm.format(
-                t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
+            raise TypeError(
+                self.msg_no_vm.format(
+                    t=vm.__class__.__name__, c=self.__class__.__name__, o="VsphereVm"
+                )
+            )
 
         if not self._list:
             return 0
@@ -809,8 +864,8 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def __reversed__(self):
         """Reverse the VMs in list in place."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for vm in reversed(self._list):
             new_list.append(copy.copy(vm))
@@ -822,8 +877,11 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def __setitem__(self, key, vm):
         """Replace the VM at the given numeric index by the given one."""
         if not isinstance(vm, VsphereVm):
-            raise TypeError(self.msg_no_vm.format(
-                t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
+            raise TypeError(
+                self.msg_no_vm.format(
+                    t=vm.__class__.__name__, c=self.__class__.__name__, o="VsphereVm"
+                )
+            )
 
         self._list.__setitem__(key, vm)
 
@@ -836,8 +894,11 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def append(self, vm):
         """Append the given VM to the current list."""
         if not isinstance(vm, VsphereVm):
-            raise TypeError(self.msg_no_vm.format(
-                t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
+            raise TypeError(
+                self.msg_no_vm.format(
+                    t=vm.__class__.__name__, c=self.__class__.__name__, o="VsphereVm"
+                )
+            )
 
         self._list.append(vm)
 
@@ -845,8 +906,11 @@ class VsphereVmList(FbBaseObject, MutableSequence):
     def insert(self, index, vm):
         """Insert the given VM in current list at given index."""
         if not isinstance(vm, VsphereVm):
-            raise TypeError(self.msg_no_vm.format(
-                t=vm.__class__.__name__, c=self.__class__.__name__, o='VsphereVm'))
+            raise TypeError(
+                self.msg_no_vm.format(
+                    t=vm.__class__.__name__, c=self.__class__.__name__, o="VsphereVm"
+                )
+            )
 
         self._list.insert(index, vm)
 
@@ -857,7 +921,7 @@ class VsphereVmList(FbBaseObject, MutableSequence):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

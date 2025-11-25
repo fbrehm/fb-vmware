@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.3.0'
+__version__ = "1.3.0"
 
 _ = XLATOR.gettext
 
@@ -59,7 +59,7 @@ class VSphereNoDatastoresFoundError(FbHandlerError):
     def __init__(self, msg=None):
         """Initialize the VSphereNoDatastoresFoundError object."""
         if not msg:
-            msg = _('No VSphere datastores found.')
+            msg = _("No VSphere datastores found.")
         self.msg = msg
 
     # -------------------------------------------------------------------------
@@ -94,12 +94,13 @@ class VSphereUnsufficientCredentials(VSphereExpectedError):
         """Typecast into a string."""
         if self.user:
             msg = _(
-                'Invalid credentials to connect to Vsphere as user {!r}: '
-                'no password given.').format(self.user)
+                "Invalid credentials to connect to Vsphere as user {!r}: " "no password given."
+            ).format(self.user)
         else:
-            msg = _('Invalid credentials to connect to Vsphere: no user given.')
+            msg = _("Invalid credentials to connect to Vsphere: no user given.")
 
         return msg
+
 
 # =============================================================================
 class VSphereDiskCtrlrTypeNotFoudError(VSphereExpectedError):
@@ -113,9 +114,10 @@ class VSphereDiskCtrlrTypeNotFoudError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('The given disk controller type {!r} could not be found.').format(self.type_name)
+        msg = _("The given disk controller type {!r} could not be found.").format(self.type_name)
 
         return msg
+
 
 # =============================================================================
 class VSphereNameError(VSphereExpectedError):
@@ -131,10 +133,11 @@ class VSphereNameError(VSphereExpectedError):
     def __str__(self):
         """Typecast into a string."""
         if self.obj_type:
-            msg = _('Invalid name {n!r} for a {o} VSphere object.').format(
-                n=self.name, o=self.obj_type)
+            msg = _("Invalid name {n!r} for a {o} VSphere object.").format(
+                n=self.name, o=self.obj_type
+            )
         else:
-            msg = _('Invalid name {!r} for a VSphere object.').format(self.name)
+            msg = _("Invalid name {!r} for a VSphere object.").format(self.name)
 
         return msg
 
@@ -151,7 +154,7 @@ class VSphereDatacenterNotFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('The VSphere datacenter {!r} is not existing.').format(self.dc)
+        msg = _("The VSphere datacenter {!r} is not existing.").format(self.dc)
         return msg
 
 
@@ -167,7 +170,7 @@ class VSphereVmNotFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('The VSphere Virtual machine {!r} was not found.').format(self.vm)
+        msg = _("The VSphere Virtual machine {!r} was not found.").format(self.vm)
         return msg
 
 
@@ -187,8 +190,9 @@ class VSphereNoDatastoreFoundError(VSphereExpectedError):
         gb = mb / 1024.0
 
         msg = _(
-            'No SAN based datastore found with at least {m:0.0f} MiB == {g:0.1f} GiB '
-            'available space found.').format(m=mb, g=gb)
+            "No SAN based datastore found with at least {m:0.0f} MiB == {g:0.1f} GiB "
+            "available space found."
+        ).format(m=mb, g=gb)
         return msg
 
 
@@ -204,7 +208,7 @@ class VSphereNetworkNotExistingError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('The network {!r} is not existing.').format(self.net_name)
+        msg = _("The network {!r} is not existing.").format(self.net_name)
         return msg
 
 
@@ -220,8 +224,9 @@ class VSphereCannotConnectError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('Could not connect to the vSphere {!r}.').format(self.url)
+        msg = _("Could not connect to the vSphere {!r}.").format(self.url)
         return msg
+
 
 # =============================================================================
 class VSphereVimFault(VSphereExpectedError):
@@ -236,12 +241,13 @@ class VSphereVimFault(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('Got a {c} on connecting to vSphere {url!r}:').format(
-            c=self.fault.__class__.__name__, url=self.url)
-        if hasattr(self.fault, 'msg'):
-            msg += ' ' + self.fault.msg
+        msg = _("Got a {c} on connecting to vSphere {url!r}:").format(
+            c=self.fault.__class__.__name__, url=self.url
+        )
+        if hasattr(self.fault, "msg"):
+            msg += " " + self.fault.msg
         else:
-            msg += ' ' + str(self.fault)
+            msg += " " + str(self.fault)
         return msg
 
 
@@ -263,10 +269,11 @@ class TimeoutCreateVmError(VSphereExpectedError):
     def __str__(self):
         """Typecast into a string."""
         if self.timeout is not None:
-            msg = _('Timeout on creating VM {vm!r} after {to:0.1f} seconds.').format(
-                vm=self.vm, to=self.timeout)
+            msg = _("Timeout on creating VM {vm!r} after {to:0.1f} seconds.").format(
+                vm=self.vm, to=self.timeout
+            )
         else:
-            msg = _('Timeout on creating VM {!r}.').format(self.vm)
+            msg = _("Timeout on creating VM {!r}.").format(self.vm)
         return msg
 
 
@@ -283,19 +290,20 @@ class WrongPortTypeError(FbVMWareError, TypeError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _('Invalid type of {!r} for a port of a VSPhere server').format(self.port)
+        msg = _("Invalid type of {!r} for a port of a VSPhere server").format(self.port)
         if self.emesg:
-            msg += ': ' + self.emesg
+            msg += ": " + self.emesg
         else:
-            msg += '.'
+            msg += "."
 
         return msg
+
 
 # =============================================================================
 class WrongPortValueError(FbVMWareError, ValueError):
     """Exception when a wrong port number was given."""
 
-    default_max_port = (2 ** 16) - 1
+    default_max_port = (2**16) - 1
 
     # -------------------------------------------------------------------------
     def __init__(self, port, max_port=None):
@@ -309,15 +317,15 @@ class WrongPortValueError(FbVMWareError, ValueError):
     def __str__(self):
         """Typecast into a string."""
         msg = _(
-            'Invalid port number {port!r} for the VSphere server, '
-            'PORT must be greater than zero and less or equal to {max}.').format(
-            port=self.port, max=self.max_port)
+            "Invalid port number {port!r} for the VSphere server, "
+            "PORT must be greater than zero and less or equal to {max}."
+        ).format(port=self.port, max=self.max_port)
 
         return msg
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

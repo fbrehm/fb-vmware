@@ -23,7 +23,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.4.4'
+__version__ = "1.4.4"
 LOG = logging.getLogger(__name__)
 
 
@@ -36,14 +36,38 @@ class VsphereCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, status=DEFAULT_OBJ_STATUS, cpu_cores=0, cpu_threads=0,
-            config_status=DEFAULT_OBJ_STATUS, hosts_effective=0, hosts_total=0,
-            mem_mb_effective=0, mem_total=0, standalone=False):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        status=DEFAULT_OBJ_STATUS,
+        cpu_cores=0,
+        cpu_threads=0,
+        config_status=DEFAULT_OBJ_STATUS,
+        hosts_effective=0,
+        hosts_total=0,
+        mem_mb_effective=0,
+        mem_total=0,
+        standalone=False,
+    ):
         """Initialize a VsphereCluster object."""
         self.repr_fields = (
-            'name', 'status', 'config_status', 'cpu_cores', 'cpu_threads', 'hosts_effective',
-            'hosts_total', 'mem_mb_effective', 'mem_total', 'appname', 'verbose', 'version')
+            "name",
+            "status",
+            "config_status",
+            "cpu_cores",
+            "cpu_threads",
+            "hosts_effective",
+            "hosts_total",
+            "mem_mb_effective",
+            "mem_total",
+            "appname",
+            "verbose",
+            "version",
+        )
 
         self._status = None
         self._cpu_cores = None
@@ -58,9 +82,16 @@ class VsphereCluster(VsphereObject):
         self.resource_pool = None
 
         super(VsphereCluster, self).__init__(
-            name=name, obj_type='vsphere_cluster', name_prefix='cluster', status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type="vsphere_cluster",
+            name_prefix="cluster",
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         self.cpu_cores = cpu_cores
         self.cpu_threads = cpu_threads
@@ -77,13 +108,13 @@ class VsphereCluster(VsphereObject):
     @property
     def resource_pool_name(self):
         """Return the name of the default resource pool of this cluster."""
-        return self.name + '/Resources'
+        return self.name + "/Resources"
 
     # -----------------------------------------------------------
     @property
     def resource_pool_var(self):
         """Return the variable name of the default resource pool used for terraform."""
-        return 'pool_' + self.tf_name
+        return "pool_" + self.tf_name
 
     # -----------------------------------------------------------
     @property
@@ -222,25 +253,26 @@ class VsphereCluster(VsphereObject):
         """
         res = super(VsphereCluster, self).as_dict(short=short)
 
-        res['resource_pool_name'] = self.resource_pool_name
-        res['resource_pool_var'] = self.resource_pool_var
-        res['cpu_cores'] = self.cpu_cores
-        res['cpu_threads'] = self.cpu_threads
-        res['hosts_effective'] = self.hosts_effective
-        res['hosts_total'] = self.hosts_total
-        res['mem_mb_effective'] = self.mem_mb_effective
-        res['mem_gb_effective'] = self.mem_gb_effective
-        res['mem_total'] = self.mem_total
-        res['mem_mb_total'] = self.mem_mb_total
-        res['mem_gb_total'] = self.mem_gb_total
-        res['standalone'] = self.standalone
-        res['resource_pool.summary'] = None
+        res["resource_pool_name"] = self.resource_pool_name
+        res["resource_pool_var"] = self.resource_pool_var
+        res["cpu_cores"] = self.cpu_cores
+        res["cpu_threads"] = self.cpu_threads
+        res["hosts_effective"] = self.hosts_effective
+        res["hosts_total"] = self.hosts_total
+        res["mem_mb_effective"] = self.mem_mb_effective
+        res["mem_gb_effective"] = self.mem_gb_effective
+        res["mem_total"] = self.mem_total
+        res["mem_mb_total"] = self.mem_mb_total
+        res["mem_gb_total"] = self.mem_gb_total
+        res["standalone"] = self.standalone
+        res["resource_pool.summary"] = None
         if self.resource_pool:
             if self.verbose > 3:
-                res['resource_pool.summary'] = self.resource_pool.summary
+                res["resource_pool.summary"] = self.resource_pool.summary
             else:
-                res['resource_pool.summary'] = '{} object'.format(
-                    self.resource_pool.summary.__class__.__name__)
+                res["resource_pool.summary"] = "{} object".format(
+                    self.resource_pool.summary.__class__.__name__
+                )
 
         return res
 
@@ -248,17 +280,26 @@ class VsphereCluster(VsphereObject):
     def __copy__(self):
         """Magic method to return a deep copy of the current object."""
         return VsphereCluster(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, name=self.name, standalone=self.standalone,
-            status=self.status, cpu_cores=self.cpu_cores, cpu_threads=self.cpu_threads,
-            hosts_effective=self.hosts_effective, hosts_total=self.hosts_total,
-            mem_mb_effective=self.mem_mb_effective, mem_total=self.mem_total)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            name=self.name,
+            standalone=self.standalone,
+            status=self.status,
+            cpu_cores=self.cpu_cores,
+            cpu_threads=self.cpu_threads,
+            hosts_effective=self.hosts_effective,
+            hosts_total=self.hosts_total,
+            mem_mb_effective=self.mem_mb_effective,
+            mem_total=self.mem_total,
+        )
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
         """Use this magic method as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereCluster):
             return False
@@ -277,31 +318,31 @@ class VsphereCluster(VsphereObject):
         else:
             if not isinstance(data, (vim.ClusterComputeResource, vim.ComputeResource)):
                 msg = _(
-                    'Parameter {t!r} must be a {e} object, a {v} object was given '
-                    'instead.').format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    "Parameter {t!r} must be a {e} object, a {v} object was given " "instead."
+                ).format(t="data", e="vim.AboutInfo", v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'name': data.name,
-            'status': data.overallStatus,
-            'config_status': data.configStatus,
-            'cpu_cores': data.summary.numCpuCores,
-            'cpu_threads': data.summary.numCpuThreads,
-            'hosts_effective': data.summary.numEffectiveHosts,
-            'hosts_total': data.summary.numHosts,
-            'mem_mb_effective': data.summary.effectiveMemory,
-            'mem_total': data.summary.totalMemory,
-            'standalone': False,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "name": data.name,
+            "status": data.overallStatus,
+            "config_status": data.configStatus,
+            "cpu_cores": data.summary.numCpuCores,
+            "cpu_threads": data.summary.numCpuThreads,
+            "hosts_effective": data.summary.numEffectiveHosts,
+            "hosts_total": data.summary.numHosts,
+            "mem_mb_effective": data.summary.effectiveMemory,
+            "mem_total": data.summary.totalMemory,
+            "standalone": False,
         }
         if isinstance(data, vim.ComputeResource):
-            params['standalone'] = True
+            params["standalone"] = True
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         cluster = cls(**params)
 
@@ -309,15 +350,17 @@ class VsphereCluster(VsphereObject):
             nname = network.name
             if nname not in cluster.networks:
                 if verbose > 2:
-                    LOG.debug(_('Cluster {c!r} has network {n!r}.').format(
-                        c=cluster.name, n=nname))
+                    LOG.debug(
+                        _("Cluster {c!r} has network {n!r}.").format(c=cluster.name, n=nname)
+                    )
                 cluster.networks.append(nname)
 
         for ds in data.datastore:
             if ds.name not in cluster.datastores:
                 if verbose > 2:
-                    LOG.debug(_('Cluster {c!r} has datastore {d!r}.').format(
-                        c=cluster.name, d=ds.name))
+                    LOG.debug(
+                        _("Cluster {c!r} has datastore {d!r}.").format(c=cluster.name, d=ds.name)
+                    )
                 cluster.datastores.append(ds.name)
 
         cluster.resource_pool = data.resourcePool
@@ -329,51 +372,62 @@ class VsphereCluster(VsphereObject):
     def _check_summary_data(cls, data):
 
         necessary_fields = (
-            'datastore', 'name', 'network', 'overallStatus', 'configStatus',
-            'summary', 'resourcePool')
+            "datastore",
+            "name",
+            "network",
+            "overallStatus",
+            "configStatus",
+            "summary",
+            "resourcePool",
+        )
         summary_fields = (
-            'numCpuCores', 'numCpuThreads', 'numEffectiveHosts', 'numHosts',
-            'effectiveMemory', 'totalMemory')
+            "numCpuCores",
+            "numCpuThreads",
+            "numEffectiveHosts",
+            "numHosts",
+            "effectiveMemory",
+            "totalMemory",
+        )
         failing_fields = []
 
         for field in necessary_fields:
             if not hasattr(data, field):
                 failing_fields.append(field)
 
-        if hasattr(data, 'summary'):
+        if hasattr(data, "summary"):
             summary = data.summary
             for field in summary_fields:
                 if not hasattr(summary, field):
-                    failing_fields.append('summary.{}'.format(field))
+                    failing_fields.append("summary.{}".format(field))
 
-        if hasattr(data, 'datastore'):
+        if hasattr(data, "datastore"):
             if not is_sequence(data.datastore):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() is not a sequence '
-                    'type.').format(p='data.datastore', m='from_summary')
+                    "The given parameter {p!r} on calling method {m}() is not a sequence " "type."
+                ).format(p="data.datastore", m="from_summary")
                 raise AssertionError(msg)
 
-        if hasattr(data, 'network'):
+        if hasattr(data, "network"):
             if not is_sequence(data.network):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() is not a sequence '
-                    'type.').format(p='data.network', m='from_summary')
+                    "The given parameter {p!r} on calling method {m}() is not a sequence " "type."
+                ).format(p="data.network", m="from_summary")
                 raise AssertionError(msg)
 
-        if hasattr(data, 'resourcePool') and data.resourcePool:
-            if not hasattr(data.resourcePool, 'summary'):
-                failing_fields.append('data.resourcePool.summary')
+        if hasattr(data, "resourcePool") and data.resourcePool:
+            if not hasattr(data.resourcePool, "summary"):
+                failing_fields.append("data.resourcePool.summary")
 
         if len(failing_fields):
             msg = _(
-                'The given parameter {p!r} on calling method {m}() has failing '
-                'attributes').format(p='data', m='from_summary')
-            msg += ': ' + format_list(failing_fields, do_repr=True)
+                "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+            ).format(p="data", m="from_summary")
+            msg += ": " + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

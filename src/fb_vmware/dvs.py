@@ -27,110 +27,129 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '0.4.2'
+__version__ = "0.4.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
 
 # =============================================================================
 class VsphereDVS(VsphereObject):
     """Wrapper class for a VSphere Distributed Virtual Switch (vim.DistributedVirtualSwitch)."""
 
     properties = [
-        'contact_info',
-        'contact_name',
-        'create_time',
-        'def_proxy_switch_max_num_ports',
-        'description',
-        'extension_key',
-        'ip_address',
-        'max_ports',
-        'net_resource_mgmt_enabled',
-        'num_hosts',
-        'num_ports',
-        'num_standalone_ports',
-        'pnic_cap_ratio_reservation',
-        'product_name',
-        'product_vendor',
-        'product_version',
-        'uuid',
+        "contact_info",
+        "contact_name",
+        "create_time",
+        "def_proxy_switch_max_num_ports",
+        "description",
+        "extension_key",
+        "ip_address",
+        "max_ports",
+        "net_resource_mgmt_enabled",
+        "num_hosts",
+        "num_ports",
+        "num_standalone_ports",
+        "pnic_cap_ratio_reservation",
+        "product_name",
+        "product_vendor",
+        "product_version",
+        "uuid",
     ]
 
     prop_source = {
-        'uuid': 'uuid',
+        "uuid": "uuid",
     }
 
     prop_source_config = {
-        'create_time': 'createTime',
-        'def_proxy_switch_max_num_ports': 'defaultProxySwitchMaxNumPorts',
-        'description': 'description',
-        'extension_key': 'extensionKey',
-        'ip_address': 'switchIpAddress',
-        'max_ports': 'maxPorts',
-        'name': 'name',
-        'net_resource_mgmt_enabled': 'networkResourceManagementEnabled',
-        'num_ports': 'numPorts',
-        'num_standalone_ports': 'numStandalonePorts',
-        'pnic_cap_ratio_reservation': 'pnicCapacityRatioForReservation',
+        "create_time": "createTime",
+        "def_proxy_switch_max_num_ports": "defaultProxySwitchMaxNumPorts",
+        "description": "description",
+        "extension_key": "extensionKey",
+        "ip_address": "switchIpAddress",
+        "max_ports": "maxPorts",
+        "name": "name",
+        "net_resource_mgmt_enabled": "networkResourceManagementEnabled",
+        "num_ports": "numPorts",
+        "num_standalone_ports": "numStandalonePorts",
+        "pnic_cap_ratio_reservation": "pnicCapacityRatioForReservation",
     }
 
     prop_source_contact = {
-        'contact_info': 'contact',
-        'contact_name': 'name',
+        "contact_info": "contact",
+        "contact_name": "name",
     }
 
     prop_source_product = {
-        'product_name': 'name',
-        'product_vendor': 'vendor',
-        'product_version': 'version',
+        "product_name": "name",
+        "product_vendor": "vendor",
+        "product_version": "version",
     }
 
     prop_source_summary = {
-        'num_hosts': 'numHosts',
+        "num_hosts": "numHosts",
     }
 
     necessary_fields = [
-        'uuid',
+        "uuid",
     ]
 
     necessary_config_fields = [
-        'createTime',
-        'maxPorts',
-        'numPorts',
-        'numStandalonePorts',
+        "createTime",
+        "maxPorts",
+        "numPorts",
+        "numStandalonePorts",
     ]
 
-    repr_fields = ['name'] + properties + ['appname', 'verbose']
+    repr_fields = ["name"] + properties + ["appname", "verbose"]
 
     # -------------------------------------------------------------------------
     def __init__(
-            self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, obj_type='vsphere_vds', name_prefix='vds', status=DEFAULT_OBJ_STATUS,
-            config_status=DEFAULT_OBJ_STATUS, **kwargs):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        obj_type="vsphere_vds",
+        name_prefix="vds",
+        status=DEFAULT_OBJ_STATUS,
+        config_status=DEFAULT_OBJ_STATUS,
+        **kwargs,
+    ):
         """Initialize a VsphereDVS object."""
         for prop in self.properties:
-            setattr(self, '_' + prop, None)
+            setattr(self, "_" + prop, None)
 
         self._dvs = None
 
         super(VsphereDVS, self).__init__(
-            name=name, obj_type=obj_type, name_prefix=name_prefix, status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type=obj_type,
+            name_prefix=name_prefix,
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         for argname in kwargs:
             if argname not in self.properties:
-                msg = _('Invalid Argument {arg!r} on {what} given.').format(
-                    arg=argname, what='VsphereDVS.init()')
+                msg = _("Invalid Argument {arg!r} on {what} given.").format(
+                    arg=argname, what="VsphereDVS.init()"
+                )
                 raise AttributeError(msg)
             if kwargs[argname] is not None:
-                setattr(self, '_' + argname, kwargs[argname])
+                setattr(self, "_" + argname, kwargs[argname])
 
         if initialized is not None:
             self.initialized = initialized
 
         if self.verbose > 3:
-            LOG.debug(_('Initialized Distributed Virtual Switch:') + '\n' + pp(self.as_dict()))
+            LOG.debug(_("Initialized Distributed Virtual Switch:") + "\n" + pp(self.as_dict()))
 
     # -----------------------------------------------------------
     @property
@@ -260,7 +279,7 @@ class VsphereDVS(VsphereObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDVS):
             return False
@@ -274,8 +293,9 @@ class VsphereDVS(VsphereObject):
     def search_port_keys(self, portgroup_key):
         """Search usable ports in the current DVS by a Port Group key."""
         if not self._dvs:
-            msg = _('No {o} reference found in VDS {n!r}.').format(
-                o='vim.DistributedVirtualSwitch', n=self.name)
+            msg = _("No {o} reference found in VDS {n!r}.").format(
+                o="vim.DistributedVirtualSwitch", n=self.name
+            )
             raise RuntimeError(msg)
 
         port_keys = []
@@ -288,8 +308,8 @@ class VsphereDVS(VsphereObject):
         for port in ports:
             port_keys.append(port.key)
         if self.verbose > 1:
-            msg = _('Found usable port keys for DVS {!r}:').format(self.name)
-            msg += ' ' + pp(port_keys)
+            msg = _("Found usable port keys for DVS {!r}:").format(self.name)
+            msg += " " + pp(port_keys)
 
         return port_keys
 
@@ -297,8 +317,9 @@ class VsphereDVS(VsphereObject):
     def find_port_by_portkey(self, port_key):
         """Find a port object by a given port key."""
         if not self._dvs:
-            msg = _('No {o} reference found in VDS {n!r}.').format(
-                o='vim.DistributedVirtualSwitch', n=self.name)
+            msg = _("No {o} reference found in VDS {n!r}.").format(
+                o="vim.DistributedVirtualSwitch", n=self.name
+            )
             raise RuntimeError(msg)
 
         obj = None
@@ -347,10 +368,10 @@ class VsphereDVS(VsphereObject):
         #         raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
         }
 
         for prop in cls.prop_source:
@@ -385,10 +406,13 @@ class VsphereDVS(VsphereObject):
 
         if verbose > 1:
             if verbose > 2:
-                LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+                LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
             else:
-                LOG.debug(_('Creating {cls} object {name!r}.').format(
-                    cls=cls.__name__, name=data.summary.name))
+                LOG.debug(
+                    _("Creating {cls} object {name!r}.").format(
+                        cls=cls.__name__, name=data.summary.name
+                    )
+                )
 
         vds = cls(**params)
 
@@ -402,69 +426,103 @@ class VsphereDvPortGroup(VsphereNetwork):
     """Wrapper class for a Network definition in VSPhere (vim.dvs.DistributedVirtualPortgroup)."""
 
     repr_fields = (
-        'name', 'obj_type', 'status', 'config_status', 'accessible',
-        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose')
+        "name",
+        "obj_type",
+        "status",
+        "config_status",
+        "accessible",
+        "ip_pool_id",
+        "ip_pool_name",
+        "appname",
+        "verbose",
+    )
 
     dvpg_properties = [
-        'auto_expand',
-        'backing_type',
-        'description',
-        'dvs_uuid',
-        'key',
-        'num_ports',
-        'port_keys',
-        'port_name_format',
-        'segment_id',
-        'pg_type',
-        'uplink',
+        "auto_expand",
+        "backing_type",
+        "description",
+        "dvs_uuid",
+        "key",
+        "num_ports",
+        "port_keys",
+        "port_name_format",
+        "segment_id",
+        "pg_type",
+        "uplink",
     ]
 
     repr_fields = [
-        'name', 'obj_type', 'status', 'config_status', 'accessible',
-        'ip_pool_id', 'ip_pool_name', 'appname', 'verbose',
-        'auto_expand', 'backing_type', 'description', 'dvs_uuid', 'key',
-        'num_ports', 'port_keys', 'port_name_format', 'segment_id', 'pg_type', 'uplink',
+        "name",
+        "obj_type",
+        "status",
+        "config_status",
+        "accessible",
+        "ip_pool_id",
+        "ip_pool_name",
+        "appname",
+        "verbose",
+        "auto_expand",
+        "backing_type",
+        "description",
+        "dvs_uuid",
+        "key",
+        "num_ports",
+        "port_keys",
+        "port_name_format",
+        "segment_id",
+        "pg_type",
+        "uplink",
     ]
 
     dvpg_prop_source = {
-        'key': 'key',
-        'port_keys': 'portKeys',
+        "key": "key",
+        "port_keys": "portKeys",
     }
 
     dvpg_prop_source_config = {
-        'auto_expand': 'autoExpand',
-        'backing_type': 'backingType',
-        'description': 'description',
-        'num_ports': 'numPorts',
-        'port_name_format': 'portNameFormat',
-        'segment_id': 'segmentId',
-        'pg_type': 'type',
-        'uplink': 'uplink',
+        "auto_expand": "autoExpand",
+        "backing_type": "backingType",
+        "description": "description",
+        "num_ports": "numPorts",
+        "port_name_format": "portNameFormat",
+        "segment_id": "segmentId",
+        "pg_type": "type",
+        "uplink": "uplink",
     }
 
-    obj_desc_singular = _('Distrubuted Virtual Port Group')
-    obj_desc_plural = _('Distrubuted Virtual Port Groups')
+    obj_desc_singular = _("Distrubuted Virtual Port Group")
+    obj_desc_plural = _("Distrubuted Virtual Port Groups")
 
     # -------------------------------------------------------------------------
     def __init__(
-            self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, obj_type='vsphere_dvportgroup', name_prefix='dvpg',
-            status=DEFAULT_OBJ_STATUS, config_status=DEFAULT_OBJ_STATUS, **kwargs):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        obj_type="vsphere_dvportgroup",
+        name_prefix="dvpg",
+        status=DEFAULT_OBJ_STATUS,
+        config_status=DEFAULT_OBJ_STATUS,
+        **kwargs,
+    ):
         """Initialize a VsphereDvPortGroup object."""
         for prop in self.dvpg_properties:
-            setattr(self, '_' + prop, None)
+            setattr(self, "_" + prop, None)
 
         init_args = {
-            'name': name,
-            'obj_type': obj_type,
-            'name_prefix': name_prefix,
-            'status': status,
-            'config_status': config_status,
-            'appname': appname,
-            'verbose': verbose,
-            'version': version,
-            'base_dir': base_dir,
-            'initialized': initialized,
+            "name": name,
+            "obj_type": obj_type,
+            "name_prefix": name_prefix,
+            "status": status,
+            "config_status": config_status,
+            "appname": appname,
+            "verbose": verbose,
+            "version": version,
+            "base_dir": base_dir,
+            "initialized": initialized,
         }
 
         for arg in kwargs:
@@ -477,8 +535,9 @@ class VsphereDvPortGroup(VsphereNetwork):
 
         for arg in kwargs:
             if arg not in self.net_properties and arg not in self.dvpg_properties:
-                msg = _('Invalid Argument {arg!r} on {what} given.').format(
-                    arg=arg, what='VsphereNetwork.init()')
+                msg = _("Invalid Argument {arg!r} on {what} given.").format(
+                    arg=arg, what="VsphereNetwork.init()"
+                )
                 raise AttributeError(msg)
             if arg in self.dvpg_properties and kwargs[arg] is not None:
                 setattr(self, arg, kwargs[arg])
@@ -487,7 +546,7 @@ class VsphereDvPortGroup(VsphereNetwork):
             self.initialized = initialized
 
         if self.verbose > 3:
-            LOG.debug(_('Initialized network object:') + '\n' + pp(self.as_dict()))
+            LOG.debug(_("Initialized network object:") + "\n" + pp(self.as_dict()))
 
     # -----------------------------------------------------------
     @property
@@ -644,8 +703,8 @@ class VsphereDvPortGroup(VsphereNetwork):
             if value is not None:
                 params[prop] = value
 
-        if hasattr(data.config, 'distributedVirtualSwitch'):
-            params['dvs_uuid'] = data.config.distributedVirtualSwitch.uuid
+        if hasattr(data.config, "distributedVirtualSwitch"):
+            params["dvs_uuid"] = data.config.distributedVirtualSwitch.uuid
 
         return params
 
@@ -665,8 +724,9 @@ class VsphereDvPortGroup(VsphereNetwork):
         """Return a backing device for a new virtual network interface."""
         if self.verbose > 1:
             msg = _(
-                'Creating network device backing specification with a '
-                'Distributed Virtual Port Group.')
+                "Creating network device backing specification with a "
+                "Distributed Virtual Port Group."
+            )
             LOG.debug(msg)
 
         backing_device = vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo()
@@ -677,14 +737,14 @@ class VsphereDvPortGroup(VsphereNetwork):
         backing_device.port.portKey = port.key
 
         if self.verbose > 0:
-            msg = _('Got Backing device for port group {!r}:').format(self.name)
-            LOG.debug(msg + ' ' + pp(backing_device))
+            msg = _("Got Backing device for port group {!r}:").format(self.name)
+            LOG.debug(msg + " " + pp(backing_device))
 
         return backing_device
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

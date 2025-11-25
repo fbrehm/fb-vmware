@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 # Standard modules
 import logging
+
 try:
     from collections.abc import MutableMapping
 except ImportError:
@@ -27,7 +28,7 @@ from pyVmomi import vim
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.3.4'
+__version__ = "1.3.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -39,12 +40,29 @@ class VsphereDsCluster(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, status='gray', config_status='gray', capacity=None, free_space=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        status="gray",
+        config_status="gray",
+        capacity=None,
+        free_space=None,
+    ):
         """Initialize a VsphereDsCluster object."""
         self.repr_fields = (
-            'name', 'status', 'config_status', 'capacity', 'free_space',
-            'appname', 'verbose', 'version')
+            "name",
+            "status",
+            "config_status",
+            "capacity",
+            "free_space",
+            "appname",
+            "verbose",
+            "version",
+        )
 
         self._capacity = int(capacity)
         self._free_space = int(free_space)
@@ -52,9 +70,16 @@ class VsphereDsCluster(VsphereObject):
         self._calculated_usage = 0.0
 
         super(VsphereDsCluster, self).__init__(
-            name=name, obj_type='vsphere_datastore_cluster', name_prefix='dspod',
-            status=status, config_status=config_status,
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir)
+            name=name,
+            obj_type="vsphere_datastore_cluster",
+            name_prefix="dspod",
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         if initialized is not None:
             self.initialized = initialized
@@ -110,8 +135,8 @@ class VsphereDsCluster(VsphereObject):
         """Create a new VsphereDsCluster object based on the data given from pyvmomi."""
         if test_mode:
 
-            necessary_fields = ('summary', 'overallStatus', 'configStatus')
-            summary_fields = ('capacity', 'freeSpace', 'name')
+            necessary_fields = ("summary", "overallStatus", "configStatus")
+            summary_fields = ("capacity", "freeSpace", "name")
 
             failing_fields = []
 
@@ -119,40 +144,41 @@ class VsphereDsCluster(VsphereObject):
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
-            if hasattr(data, 'summary') and data.summary:
+            if hasattr(data, "summary") and data.summary:
                 summary = data.summary
                 for field in summary_fields:
                     if not hasattr(summary, field):
-                        failing_fields.append('summary.' + field)
+                        failing_fields.append("summary." + field)
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.StoragePod):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} was given.').format(
-                    t='data', e='vim.StoragePod', v=data)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} was given.").format(
+                    t="data", e="vim.StoragePod", v=data
+                )
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'capacity': data.summary.capacity,
-            'free_space': data.summary.freeSpace,
-            'name': data.summary.name,
-            'status': data.overallStatus,
-            'config_status': data.configStatus,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "capacity": data.summary.capacity,
+            "free_space": data.summary.freeSpace,
+            "name": data.summary.name,
+            "status": data.overallStatus,
+            "config_status": data.configStatus,
         }
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         cluster = cls(**params)
         return cluster
@@ -169,12 +195,12 @@ class VsphereDsCluster(VsphereObject):
         @rtype:  dict
         """
         res = super(VsphereDsCluster, self).as_dict(short=short)
-        res['capacity'] = self.capacity
-        res['capacity_gb'] = self.capacity_gb
-        res['free_space'] = self.free_space
-        res['free_space_gb'] = self.free_space_gb
-        res['calculated_usage'] = self.calculated_usage
-        res['avail_space_gb'] = self.avail_space_gb
+        res["capacity"] = self.capacity
+        res["capacity_gb"] = self.capacity_gb
+        res["free_space"] = self.free_space
+        res["free_space_gb"] = self.free_space_gb
+        res["calculated_usage"] = self.calculated_usage
+        res["avail_space_gb"] = self.avail_space_gb
 
         return res
 
@@ -182,15 +208,22 @@ class VsphereDsCluster(VsphereObject):
     def __copy__(self):
         """Return a new VsphereDsCluster as a deep copy of the current object."""
         return VsphereDsCluster(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, name=self.name, status=self.status,
-            config_status=self.config_status, capacity=self.capacity, free_space=self.free_space,)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            name=self.name,
+            status=self.status,
+            config_status=self.config_status,
+            capacity=self.capacity,
+            free_space=self.free_space,
+        )
 
     # -------------------------------------------------------------------------
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDsCluster):
             return False
@@ -209,12 +242,13 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     It works like a dict.
     """
 
-    msg_invalid_cluster_type = _('Invalid item type {{!r}} to set, only {} allowed.').format(
-        'VsphereDsCluster')
-    msg_key_not_name = _('The key {k!r} must be equal to the datastore cluster name {n!r}.')
-    msg_none_type_error = _('None type as key is not allowed.')
-    msg_empty_key_error = _('Empty key {!r} is not allowed.')
-    msg_no_cluster_dict = _('Object {{!r}} is not a {} object.').format('VsphereDsClusterDict.')
+    msg_invalid_cluster_type = _("Invalid item type {{!r}} to set, only {} allowed.").format(
+        "VsphereDsCluster"
+    )
+    msg_key_not_name = _("The key {k!r} must be equal to the datastore cluster name {n!r}.")
+    msg_none_type_error = _("None type as key is not allowed.")
+    msg_empty_key_error = _("Empty key {!r} is not allowed.")
+    msg_no_cluster_dict = _("Object {{!r}} is not a {} object.").format("VsphereDsClusterDict.")
 
     # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
@@ -250,7 +284,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         cluster_name = str(key).strip()
-        if cluster_name == '':
+        if cluster_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map[cluster_name]
@@ -267,7 +301,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         cluster_name = str(key).strip()
-        if cluster_name == '':
+        if cluster_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not strict and cluster_name not in self._map:
@@ -311,10 +345,9 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Transform into a string for reproduction."""
-        return '{}, {}({})'.format(
-            super(VsphereDsClusterDict, self).__repr__(),
-            self.__class__.__name__,
-            self._map)
+        return "{}, {}({})".format(
+            super(VsphereDsClusterDict, self).__repr__(), self.__class__.__name__, self._map
+        )
 
     # -------------------------------------------------------------------------
     def __contains__(self, key):
@@ -323,7 +356,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         cluster_name = str(key).strip()
-        if cluster_name == '':
+        if cluster_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return cluster_name in self._map
@@ -374,7 +407,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         cluster_name = str(key).strip()
-        if cluster_name == '':
+        if cluster_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         return self._map.pop(cluster_name, *args)
@@ -406,7 +439,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             raise TypeError(self.msg_none_type_error)
 
         cluster_name = str(key).strip()
-        if cluster_name == '':
+        if cluster_name == "":
             raise ValueError(self.msg_empty_key_error.format(key))
 
         if not isinstance(default, VsphereDsCluster):
@@ -450,7 +483,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
 
 # =============================================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

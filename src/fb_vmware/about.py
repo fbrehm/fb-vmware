@@ -24,7 +24,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -36,7 +36,8 @@ class VsphereAboutInfo(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-            self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None):
+        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None
+    ):
         """Initialize the VsphereAboutInfo object."""
         self._api_type = None
         self._api_version = None
@@ -50,7 +51,8 @@ class VsphereAboutInfo(FbBaseObject):
         self._lic_prodversion = None
 
         super(VsphereAboutInfo, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir
+        )
 
         if initialized is not None:
             self.initialized = initialized
@@ -68,7 +70,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._api_type = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._api_type = None
         else:
             self._api_type = v
@@ -86,7 +88,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._api_version = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._api_version = None
         else:
             self._api_version = v
@@ -104,7 +106,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._name = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._name = None
         else:
             self._name = v
@@ -122,7 +124,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._full_name = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._full_name = None
         else:
             self._full_name = v
@@ -140,7 +142,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._vendor = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._vendor = None
         else:
             self._vendor = v
@@ -158,7 +160,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._os_version = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._os_version = None
         else:
             self._os_version = v
@@ -176,7 +178,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._os_type = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._os_type = None
         else:
             self._os_type = v
@@ -194,7 +196,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._instance_uuid = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._instance_uuid = None
         else:
             try:
@@ -216,7 +218,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._lic_prodname = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._lic_prodname = None
         else:
             self._lic_prodname = v
@@ -234,7 +236,7 @@ class VsphereAboutInfo(FbBaseObject):
             self._lic_prodversion = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._lic_prodversion = None
         else:
             self._lic_prodversion = v
@@ -251,16 +253,16 @@ class VsphereAboutInfo(FbBaseObject):
         @rtype:  dict
         """
         res = super(VsphereAboutInfo, self).as_dict(short=short)
-        res['api_type'] = self.api_type
-        res['api_version'] = self.api_version
-        res['name'] = self.name
-        res['full_name'] = self.full_name
-        res['vendor'] = self.vendor
-        res['os_version'] = self.os_version
-        res['os_type'] = self.os_type
-        res['instance_uuid'] = self.instance_uuid
-        res['lic_prodname'] = self.lic_prodname
-        res['lic_prodversion'] = self.lic_prodversion
+        res["api_type"] = self.api_type
+        res["api_version"] = self.api_version
+        res["name"] = self.name
+        res["full_name"] = self.full_name
+        res["vendor"] = self.vendor
+        res["os_version"] = self.os_version
+        res["os_type"] = self.os_type
+        res["instance_uuid"] = self.instance_uuid
+        res["lic_prodname"] = self.lic_prodname
+        res["lic_prodversion"] = self.lic_prodversion
 
         return res
 
@@ -271,8 +273,17 @@ class VsphereAboutInfo(FbBaseObject):
         if test_mode:
 
             necessary_fields = (
-                'apiType', 'apiVersion', 'name', 'fullName', 'vendor', 'version',
-                'osType', 'instanceUuid', 'licenseProductName', 'licenseProductVersion')
+                "apiType",
+                "apiVersion",
+                "name",
+                "fullName",
+                "vendor",
+                "version",
+                "osType",
+                "instanceUuid",
+                "licenseProductName",
+                "licenseProductVersion",
+            )
             failing_fields = []
 
             for field in necessary_fields:
@@ -281,47 +292,47 @@ class VsphereAboutInfo(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.AboutInfo):
                 msg = _(
-                    'Parameter {t!r} must be a {e} object, a {v} object was given '
-                    'instead.').format(t='data', e='vim.AboutInfo', v=data.__class__.__qualname__)
+                    "Parameter {t!r} must be a {e} object, a {v} object was given " "instead."
+                ).format(t="data", e="vim.AboutInfo", v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': False,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": False,
         }
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
         info = cls(**params)
 
-#        'about': (vim.AboutInfo) {
-#               dynamicType = <unset>,
-#               dynamicProperty = (vmodl.DynamicProperty) [],
-#               name = 'VMware vCenter Server',
-#               fullName = 'VMware vCenter Server 6.5.0 build-8024368',
-#               vendor = 'VMware, Inc.',
-#               version = '6.5.0',
-#               build = '8024368',
-#               localeVersion = 'INTL',
-#               localeBuild = '000',
-#               osType = 'linux-x64',
-#               productLineId = 'vpx',
-#               apiType = 'VirtualCenter',
-#               apiVersion = '6.5',
-#               instanceUuid = 'ea1b28ca-0d17-4292-ab04-189e57ec9629',
-#               licenseProductName = 'VMware VirtualCenter Server',
-#               licenseProductVersion = '6.0'
-#        },
+        #        'about': (vim.AboutInfo) {
+        #               dynamicType = <unset>,
+        #               dynamicProperty = (vmodl.DynamicProperty) [],
+        #               name = 'VMware vCenter Server',
+        #               fullName = 'VMware vCenter Server 6.5.0 build-8024368',
+        #               vendor = 'VMware, Inc.',
+        #               version = '6.5.0',
+        #               build = '8024368',
+        #               localeVersion = 'INTL',
+        #               localeBuild = '000',
+        #               osType = 'linux-x64',
+        #               productLineId = 'vpx',
+        #               apiType = 'VirtualCenter',
+        #               apiVersion = '6.5',
+        #               instanceUuid = 'ea1b28ca-0d17-4292-ab04-189e57ec9629',
+        #               licenseProductName = 'VMware VirtualCenter Server',
+        #               licenseProductVersion = '6.0'
+        #        },
 
         info.api_type = data.apiType
         info.api_version = data.apiVersion
@@ -337,7 +348,7 @@ class VsphereAboutInfo(FbBaseObject):
         info.initialized = True
 
         if verbose > 2:
-            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(info.as_dict()))
+            LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(info.as_dict()))
 
         return info
 
@@ -345,8 +356,8 @@ class VsphereAboutInfo(FbBaseObject):
     def __copy__(self):
         """Return a new VsphereAboutInfo object with data from current object copied in."""
         info = VsphereAboutInfo(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         info.api_type = self.api_type
         info.api_version = self.api_version
@@ -365,7 +376,7 @@ class VsphereAboutInfo(FbBaseObject):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

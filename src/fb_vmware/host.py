@@ -15,6 +15,7 @@ import datetime
 import ipaddress
 import logging
 import uuid
+
 try:
     from collections.abc import MutableSequence
 except ImportError:
@@ -35,7 +36,7 @@ from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -47,9 +48,20 @@ class VsphereHostBiosInfo(FbBaseObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, bios_version=None, fw_major=None, fw_minor=None, major=None, minor=None,
-            release_date=None, vendor=None, appname=None, verbose=0, version=__version__,
-            base_dir=None, initialized=None):
+        self,
+        bios_version=None,
+        fw_major=None,
+        fw_minor=None,
+        major=None,
+        minor=None,
+        release_date=None,
+        vendor=None,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+    ):
         """Initialize a VsphereHostBiosInfo object."""
         self._bios_version = None
         self._fw_major = None
@@ -60,7 +72,8 @@ class VsphereHostBiosInfo(FbBaseObject):
         self._vendor = None
 
         super(VsphereHostBiosInfo, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir
+        )
 
         self.bios_version = bios_version
         self.fw_major = fw_major
@@ -85,7 +98,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._bios_version = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._bios_version = None
         else:
             self._bios_version = v
@@ -102,7 +115,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._fw_major = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._fw_major = None
         else:
             self._fw_major = v
@@ -119,7 +132,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._fw_minor = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._fw_minor = None
         else:
             self._fw_minor = v
@@ -136,7 +149,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._major = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._major = None
         else:
             self._major = v
@@ -153,7 +166,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._minor = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._minor = None
         else:
             self._minor = v
@@ -173,7 +186,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._release_date = value
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._release_date = None
         else:
             self._release_date = v
@@ -190,7 +203,7 @@ class VsphereHostBiosInfo(FbBaseObject):
             self._vendor = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._vendor = None
         else:
             self._vendor = v
@@ -208,13 +221,13 @@ class VsphereHostBiosInfo(FbBaseObject):
         """
         res = super(VsphereHostBiosInfo, self).as_dict(short=short)
 
-        res['bios_version'] = self.bios_version
-        res['fw_major'] = self.fw_major
-        res['fw_minor'] = self.fw_minor
-        res['major'] = self.major
-        res['minor'] = self.minor
-        res['release_date'] = self.release_date
-        res['vendor'] = self.vendor
+        res["bios_version"] = self.bios_version
+        res["fw_major"] = self.fw_major
+        res["fw_minor"] = self.fw_minor
+        res["major"] = self.major
+        res["minor"] = self.minor
+        res["release_date"] = self.release_date
+        res["vendor"] = self.vendor
 
         return res
 
@@ -222,10 +235,18 @@ class VsphereHostBiosInfo(FbBaseObject):
     def __copy__(self):
         """Return a new VsphereHostBiosInfo as a deep copy of the current object."""
         info = VsphereHostBiosInfo(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, bios_version=self.bios_version,
-            fw_major=self.fw_major, fw_minor=self.fw_minor, major=self.major, minor=self.minor,
-            release_date=self.release_date, vendor=self.vendor)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            bios_version=self.bios_version,
+            fw_major=self.fw_major,
+            fw_minor=self.fw_minor,
+            major=self.major,
+            minor=self.minor,
+            release_date=self.release_date,
+            vendor=self.vendor,
+        )
 
         return info
 
@@ -235,7 +256,7 @@ class VsphereHostBiosInfo(FbBaseObject):
         """Create a new VsphereDiskController object based on the data given from pyvmomi."""
         if test_mode:
 
-            necessary_fields = ('biosVersion', 'releaseDate')
+            necessary_fields = ("biosVersion", "releaseDate")
 
             failing_fields = []
 
@@ -245,38 +266,39 @@ class VsphereHostBiosInfo(FbBaseObject):
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
             if not isinstance(data, vim.host.BIOSInfo):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
-                    t='data', e='vim.host.BIOSInfo', v=data, vt=data.__class__.__name__)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                    t="data", e="vim.host.BIOSInfo", v=data, vt=data.__class__.__name__
+                )
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'bios_version': data.biosVersion,
-            'release_date': data.releaseDate,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "bios_version": data.biosVersion,
+            "release_date": data.releaseDate,
         }
-        if hasattr(data, 'firmwareMajorRelease'):
-            params['fw_major'] = data.firmwareMajorRelease
-        if hasattr(data, 'firmwareMinorRelease'):
-            params['fw_minor'] = data.firmwareMinorRelease
-        if hasattr(data, 'majorRelease'):
-            params['major'] = data.majorRelease
-        if hasattr(data, 'minorRelease'):
-            params['minor'] = data.minorRelease
-        if hasattr(data, 'vendor'):
-            params['vendor'] = data.vendor
+        if hasattr(data, "firmwareMajorRelease"):
+            params["fw_major"] = data.firmwareMajorRelease
+        if hasattr(data, "firmwareMinorRelease"):
+            params["fw_minor"] = data.firmwareMinorRelease
+        if hasattr(data, "majorRelease"):
+            params["major"] = data.majorRelease
+        if hasattr(data, "minorRelease"):
+            params["minor"] = data.minorRelease
+        if hasattr(data, "vendor"):
+            params["vendor"] = data.vendor
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         bios = cls(**params)
 
@@ -289,11 +311,20 @@ class VsphereHost(VsphereObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            name=None, cluster_name=None, vsphere=None, status=DEFAULT_OBJ_STATUS,
-            config_status=DEFAULT_OBJ_STATUS):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        name=None,
+        cluster_name=None,
+        vsphere=None,
+        status=DEFAULT_OBJ_STATUS,
+        config_status=DEFAULT_OBJ_STATUS,
+    ):
         """Initialize a VsphereHost object."""
-        self.repr_fields = ('name', 'vsphere')
+        self.repr_fields = ("name", "vsphere")
         self._vsphere = None
         self._cluster_name = None
         self.bios = None
@@ -320,9 +351,16 @@ class VsphereHost(VsphereObject):
         self.product = None
 
         super(VsphereHost, self).__init__(
-            name=name, obj_type='vsphere_host', name_prefix='host', status=status,
-            config_status=config_status, appname=appname, verbose=verbose,
-            version=version, base_dir=base_dir)
+            name=name,
+            obj_type="vsphere_host",
+            name_prefix="host",
+            status=status,
+            config_status=config_status,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+        )
 
         if vsphere is not None:
             self.vsphere = vsphere
@@ -342,8 +380,8 @@ class VsphereHost(VsphereObject):
             return
 
         val = str(value).strip()
-        if val == '':
-            msg = _('The name of the vsphere may not be empty.')
+        if val == "":
+            msg = _("The name of the vsphere may not be empty.")
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
@@ -360,7 +398,7 @@ class VsphereHost(VsphereObject):
             self._cluster_name = None
             return
         v = str(value).strip().lower()
-        if v == '':
+        if v == "":
             self._cluster_name = None
         else:
             self._cluster_name = v
@@ -377,7 +415,7 @@ class VsphereHost(VsphereObject):
             self._mgmt_ip = None
             return
         v = str(value).strip().lower()
-        if v == '':
+        if v == "":
             self._mgmt_ip = None
         else:
             try:
@@ -438,7 +476,7 @@ class VsphereHost(VsphereObject):
         """Return, whether this host generally online or not."""
         if self.power_state is None:
             return False
-        if self.power_state.lower() in ('poweredoff', 'unknown'):
+        if self.power_state.lower() in ("poweredoff", "unknown"):
             return False
         return True
 
@@ -457,7 +495,7 @@ class VsphereHost(VsphereObject):
             self._boot_time = value
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._boot_time = None
         else:
             self._boot_time = v
@@ -475,46 +513,53 @@ class VsphereHost(VsphereObject):
         """
         res = super(VsphereHost, self).as_dict(short=short)
 
-        res['vsphere'] = self.vsphere
-        res['cluster_name'] = self.cluster_name
-        res['memory_mb'] = self.memory_mb
-        res['memory_gb'] = self.memory_gb
-        res['boot_time'] = self.boot_time
-        res['maintenance'] = self.maintenance
-        res['quarantaine'] = self.quarantaine
-        res['reboot_required'] = self.reboot_required
-        res['mgmt_ip'] = self.mgmt_ip
-        res['online'] = self.online
-        res['portgroups'] = None
+        res["vsphere"] = self.vsphere
+        res["cluster_name"] = self.cluster_name
+        res["memory_mb"] = self.memory_mb
+        res["memory_gb"] = self.memory_gb
+        res["boot_time"] = self.boot_time
+        res["maintenance"] = self.maintenance
+        res["quarantaine"] = self.quarantaine
+        res["reboot_required"] = self.reboot_required
+        res["mgmt_ip"] = self.mgmt_ip
+        res["online"] = self.online
+        res["portgroups"] = None
         if self.portgroups:
-            res['portgroups'] = self.portgroups.as_dict(short=short)
+            res["portgroups"] = self.portgroups.as_dict(short=short)
         if self.bios is not None:
-            res['bios'] = self.bios.as_dict(short=short)
+            res["bios"] = self.bios.as_dict(short=short)
 
         return res
 
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Typecast into a string for reproduction."""
-        out = '<%s(' % (self.__class__.__name__)
+        out = "<%s(" % (self.__class__.__name__)
 
         fields = []
-        fields.append('appname={!r}'.format(self.appname))
-        fields.append('verbose={!r}'.format(self.verbose))
-        fields.append('name={!r}'.format(self.name))
-        fields.append('cluster_name={!r}'.format(self.cluster_name))
-        fields.append('initialized={!r}'.format(self.initialized))
+        fields.append("appname={!r}".format(self.appname))
+        fields.append("verbose={!r}".format(self.verbose))
+        fields.append("name={!r}".format(self.name))
+        fields.append("cluster_name={!r}".format(self.cluster_name))
+        fields.append("initialized={!r}".format(self.initialized))
 
-        out += ', '.join(fields) + ')>'
+        out += ", ".join(fields) + ")>"
         return out
 
     # -------------------------------------------------------------------------
     def __copy__(self):
         """Return a new VsphereHost as a deep copy of the current object."""
         host = VsphereHost(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, vsphere=self.vsphere, name=self.name, status=self.status,
-            config_status=self.config_status, cluster_name=self.cluster_name)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            vsphere=self.vsphere,
+            name=self.name,
+            status=self.status,
+            config_status=self.config_status,
+            cluster_name=self.cluster_name,
+        )
 
         if self.bios:
             host.bios = copy.copy(self.bios)
@@ -543,7 +588,7 @@ class VsphereHost(VsphereObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereHost):
             return False
@@ -558,40 +603,52 @@ class VsphereHost(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(
-            cls, data, vsphere=None, appname=None, verbose=0, base_dir=None,
-            cluster_name=None, test_mode=False):
+        cls,
+        data,
+        vsphere=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        cluster_name=None,
+        test_mode=False,
+    ):
         """Create a new VsphereHost object based on the data given from pyvmomi."""
         if test_mode:
             cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.HostSystem):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
-                    t='data', e='vim.HostSystem', v=data, vt=data.__class__.__name__)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                    t="data", e="vim.HostSystem", v=data, vt=data.__class__.__name__
+                )
                 raise TypeError(msg)
 
         if not data.config:
-            LOG.error(_('Host {!r} seems to be offline!').format(data.summary.config.name))
+            LOG.error(_("Host {!r} seems to be offline!").format(data.summary.config.name))
 
         params = {
-            'vsphere': vsphere,
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'name': data.summary.config.name,
-            'cluster_name': cluster_name,
-            'status': DEFAULT_OBJ_STATUS,
-            'config_status': OBJ_STATUS_GREEN,
+            "vsphere": vsphere,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "name": data.summary.config.name,
+            "cluster_name": cluster_name,
+            "status": DEFAULT_OBJ_STATUS,
+            "config_status": OBJ_STATUS_GREEN,
         }
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         host = cls(**params)
 
         host.bios = VsphereHostBiosInfo.from_summary(
-            data.hardware.biosInfo, appname=appname, verbose=verbose, base_dir=base_dir,
-            test_mode=test_mode)
+            data.hardware.biosInfo,
+            appname=appname,
+            verbose=verbose,
+            base_dir=base_dir,
+            test_mode=test_mode,
+        )
 
         host.cpu_speed = data.hardware.cpuInfo.hz
         host.cpu_cores = data.hardware.cpuInfo.numCpuCores
@@ -619,17 +676,27 @@ class VsphereHost(VsphereObject):
         host.product = None
         if data.config:
             host.product = VsphereAboutInfo.from_summary(
-                data.config.product, appname=appname, verbose=verbose, base_dir=base_dir,
-                test_mode=test_mode)
+                data.config.product,
+                appname=appname,
+                verbose=verbose,
+                base_dir=base_dir,
+                test_mode=test_mode,
+            )
             if data.config.network:
                 host.ipv6_enabled = data.config.network.ipV6Enabled
                 host.atboot_ipv6_enabled = data.config.network.atBootIpV6Enabled
                 host.portgroups = VsphereHostPortgroupList(
-                    appname=appname, verbose=verbose, base_dir=base_dir, hostname=host.name)
+                    appname=appname, verbose=verbose, base_dir=base_dir, hostname=host.name
+                )
                 for pg_data in data.config.network.portgroup:
                     pgroup = VsphereHostPortgroup.from_summary(
-                        pg_data, hostname=host.name, appname=appname, verbose=verbose,
-                        base_dir=base_dir, test_mode=test_mode)
+                        pg_data,
+                        hostname=host.name,
+                        appname=appname,
+                        verbose=verbose,
+                        base_dir=base_dir,
+                        test_mode=test_mode,
+                    )
                     host.portgroups.append(pgroup)
 
         return host
@@ -638,11 +705,16 @@ class VsphereHost(VsphereObject):
     @classmethod
     def _check_summary_data(cls, data):
 
-        necessary_fields = ('summary', 'hardware', 'runtime', 'config')
+        necessary_fields = ("summary", "hardware", "runtime", "config")
         runtime_fields = (
-            'bootTime', 'connectionState', 'powerState',
-            'standbyMode', 'inMaintenanceMode', 'inQuarantineMode')
-        summary_fields = ('managementServerIp', 'rebootRequired')
+            "bootTime",
+            "connectionState",
+            "powerState",
+            "standbyMode",
+            "inMaintenanceMode",
+            "inQuarantineMode",
+        )
+        summary_fields = ("managementServerIp", "rebootRequired")
 
         failing_fields = []
 
@@ -650,51 +722,51 @@ class VsphereHost(VsphereObject):
             if not hasattr(data, field):
                 failing_fields.append(field)
 
-        if hasattr(data, 'hardware'):
+        if hasattr(data, "hardware"):
             failing_fields += cls._check_hardware_data(data.hardware)
 
-        if hasattr(data, 'runtime'):
+        if hasattr(data, "runtime"):
             for field in runtime_fields:
                 if not hasattr(data.runtime, field):
-                    failing_fields.append('runtime.' + field)
+                    failing_fields.append("runtime." + field)
 
-        if hasattr(data, 'summary'):
+        if hasattr(data, "summary"):
             for field in summary_fields:
                 if not hasattr(data.summary, field):
-                    failing_fields.append('summary.' + field)
+                    failing_fields.append("summary." + field)
 
-        if hasattr(data, 'config') and data.config:
+        if hasattr(data, "config") and data.config:
             failing_fields += cls._check_config_data(data.config)
 
         if len(failing_fields):
             msg = _(
-                'The given parameter {p!r} on calling method {m}() has failing '
-                'attributes').format(p='data', m='from_summary')
-            msg += ': ' + format_list(failing_fields, do_repr=True)
+                "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+            ).format(p="data", m="from_summary")
+            msg += ": " + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
     # -------------------------------------------------------------------------
     @classmethod
     def _check_hardware_data(cls, hardware):
 
-        hardware_fields = ('biosInfo', 'cpuInfo', 'memorySize', 'systemInfo')
-        cpu_fields = ('hz', 'numCpuCores', 'numCpuPackages', 'numCpuThreads')
+        hardware_fields = ("biosInfo", "cpuInfo", "memorySize", "systemInfo")
+        cpu_fields = ("hz", "numCpuCores", "numCpuPackages", "numCpuThreads")
         failing_fields = []
 
         for field in hardware_fields:
             if not hasattr(hardware, field):
-                failing_fields.append('hardware.' + field)
+                failing_fields.append("hardware." + field)
 
-        if hasattr(hardware, 'cpuInfo'):
+        if hasattr(hardware, "cpuInfo"):
             for field in cpu_fields:
                 if not hasattr(hardware.cpuInfo, field):
-                    failing_fields.append('hardware.cpuInfo.' + field)
+                    failing_fields.append("hardware.cpuInfo." + field)
 
-        if hasattr(hardware, 'systemInfo'):
-            if not hasattr(hardware.systemInfo, 'model'):
-                failing_fields.append('hardware.systemInfo.model')
-            if not hasattr(hardware.systemInfo, 'vendor'):
-                failing_fields.append('hardware.systemInfo.vendor')
+        if hasattr(hardware, "systemInfo"):
+            if not hasattr(hardware.systemInfo, "model"):
+                failing_fields.append("hardware.systemInfo.model")
+            if not hasattr(hardware.systemInfo, "vendor"):
+                failing_fields.append("hardware.systemInfo.vendor")
 
         return failing_fields
 
@@ -704,14 +776,14 @@ class VsphereHost(VsphereObject):
 
         failing_fields = []
 
-        if not hasattr(config, 'product'):
-            failing_fields.append('config.product')
-        if not hasattr(config, 'network'):
-            failing_fields.append('config.network')
+        if not hasattr(config, "product"):
+            failing_fields.append("config.product")
+        if not hasattr(config, "network"):
+            failing_fields.append("config.network")
         elif config.network:
-            for field in ('ipV6Enabled', 'atBootIpV6Enabled', 'portgroup'):
+            for field in ("ipV6Enabled", "atBootIpV6Enabled", "portgroup"):
                 if not hasattr(config.network, field):
-                    failing_fields.append('config.network.' + field)
+                    failing_fields.append("config.network." + field)
 
         return failing_fields
 
@@ -721,19 +793,19 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     """A list containing VsphereHost objects."""
 
     msg_no_host = _(
-        'Invalid type {{t!r}} as an item of a {{c}}, only {} objects are allowed.').format(
-            'VsphereHost')
+        "Invalid type {{t!r}} as an item of a {{c}}, only {} objects are allowed."
+    ).format("VsphereHost")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            initialized=None, *hosts):
+        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None, *hosts
+    ):
         """Initialize a VsphereHostList object."""
         self._list = []
 
         super(VsphereHostList, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         for host in hosts:
             self.append(host)
@@ -761,10 +833,10 @@ class VsphereHostList(FbBaseObject, MutableSequence):
             return res
 
         res = super(VsphereHostList, self).as_dict(short=short)
-        res['_list'] = []
+        res["_list"] = []
 
         for host in self:
-            res['_list'].append(host.as_dict(short=short))
+            res["_list"].append(host.as_dict(short=short))
 
         return res
 
@@ -772,8 +844,8 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def __copy__(self):
         """Return a new VsphereHostList as a deep copy of the current object."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for host in self:
             new_list.append(copy.copy(host))
@@ -789,8 +861,11 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
-                    m='index()', max=3, n=len(args) + 1))
+                raise TypeError(
+                    _("{m} takes at most {max} arguments ({n} given).").format(
+                        m="index()", max=3, n=len(args) + 1
+                    )
+                )
             i = int(args[0])
             if len(args) > 1:
                 j = int(args[1])
@@ -828,15 +903,16 @@ class VsphereHostList(FbBaseObject, MutableSequence):
             if item == host:
                 return index
 
-        msg = _('host is not in host list.')
+        msg = _("host is not in host list.")
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, host):
         """Return whether the given host is contained in current list."""
         if not isinstance(host, VsphereHost):
-            raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__))
+            raise TypeError(
+                self.msg_no_host.format(t=host.__class__.__name__, c=self.__class__.__name__)
+            )
 
         if not self._list:
             return False
@@ -851,8 +927,9 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def count(self, host):
         """Return the number of hosts which are equal to the given one in current list."""
         if not isinstance(host, VsphereHost):
-            raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__))
+            raise TypeError(
+                self.msg_no_host.format(t=host.__class__.__name__, c=self.__class__.__name__)
+            )
 
         if not self._list:
             return 0
@@ -883,8 +960,8 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def __reversed__(self):
         """Reverse the hosts in list in place."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for host in reversed(self._list):
             new_list.append(copy.copy(host))
@@ -896,8 +973,9 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def __setitem__(self, key, host):
         """Replace the host at the given numeric index by the given one."""
         if not isinstance(host, VsphereHost):
-            raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__))
+            raise TypeError(
+                self.msg_no_host.format(t=host.__class__.__name__, c=self.__class__.__name__)
+            )
 
         self._list.__setitem__(key, host)
 
@@ -910,8 +988,9 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def append(self, host):
         """Append the given host to the current list."""
         if not isinstance(host, VsphereHost):
-            raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__))
+            raise TypeError(
+                self.msg_no_host.format(t=host.__class__.__name__, c=self.__class__.__name__)
+            )
 
         self._list.append(host)
 
@@ -919,8 +998,9 @@ class VsphereHostList(FbBaseObject, MutableSequence):
     def insert(self, index, host):
         """Insert the given host in current list at given index."""
         if not isinstance(host, VsphereHost):
-            raise TypeError(self.msg_no_host.format(
-                t=host.__class__.__name__, c=self.__class__.__name__))
+            raise TypeError(
+                self.msg_no_host.format(t=host.__class__.__name__, c=self.__class__.__name__)
+            )
 
         self._list.insert(index, host)
 
@@ -940,7 +1020,7 @@ class VsphereHostList(FbBaseObject, MutableSequence):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

@@ -38,9 +38,9 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = '1.3.0'
+__version__ = "1.3.0"
 LOG = logging.getLogger(__name__)
-TZ = pytz.timezone('Europe/Berlin')
+TZ = pytz.timezone("Europe/Berlin")
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
@@ -59,12 +59,25 @@ class BaseVmwareApplication(FbConfigApplication):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
-            cfg_class=VmwareConfiguration, initialized=False, usage=None, description=None,
-            argparse_epilog=None, argparse_prefix_chars='-', env_prefix=None,
-            append_appname_to_stems=True, config_dir=None, additional_stems=None,
-            additional_cfgdirs=None, cfg_encoding=DEFAULT_ENCODING,
-            use_chardet=True):
+        self,
+        appname=None,
+        verbose=0,
+        version=GLOBAL_VERSION,
+        base_dir=None,
+        cfg_class=VmwareConfiguration,
+        initialized=False,
+        usage=None,
+        description=None,
+        argparse_epilog=None,
+        argparse_prefix_chars="-",
+        env_prefix=None,
+        append_appname_to_stems=True,
+        config_dir=None,
+        additional_stems=None,
+        additional_cfgdirs=None,
+        cfg_encoding=DEFAULT_ENCODING,
+        use_chardet=True,
+    ):
         """Initialize a BaseVmwareApplication object."""
         self.req_vspheres = None
         self.do_vspheres = []
@@ -76,11 +89,19 @@ class BaseVmwareApplication(FbConfigApplication):
         self.vsphere = {}
 
         super(BaseVmwareApplication, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            description=description, cfg_class=cfg_class,
-            append_appname_to_stems=append_appname_to_stems, config_dir=config_dir,
-            additional_stems=additional_stems, additional_cfgdirs=additional_cfgdirs,
-            cfg_encoding=cfg_encoding, use_chardet=use_chardet, initialized=False,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+            description=description,
+            cfg_class=cfg_class,
+            append_appname_to_stems=append_appname_to_stems,
+            config_dir=config_dir,
+            additional_stems=additional_stems,
+            additional_cfgdirs=additional_cfgdirs,
+            cfg_encoding=cfg_encoding,
+            use_chardet=use_chardet,
+            initialized=False,
         )
 
     # -------------------------------------------------------------------------
@@ -130,10 +151,10 @@ class BaseVmwareApplication(FbConfigApplication):
         super(BaseVmwareApplication, self).post_init()
 
         if self.verbose > 2:
-            LOG.debug(_('{what} of {app} ...').format(what='post_init()', app=self.appname))
+            LOG.debug(_("{what} of {app} ...").format(what="post_init()", app=self.appname))
 
         if not self.cfg.vsphere.keys():
-            msg = _('Did not found any configured Vsphere environments.')
+            msg = _("Did not found any configured Vsphere environments.")
             LOG.error(msg)
             self.exit(3)
 
@@ -141,13 +162,13 @@ class BaseVmwareApplication(FbConfigApplication):
             self.req_vspheres = []
             all_found = True
             for vs_name in self.args.req_vsphere:
-                LOG.debug(_('Checking for configured VSPhere instance {!r} ...').format(vs_name))
+                LOG.debug(_("Checking for configured VSPhere instance {!r} ...").format(vs_name))
                 vs = vs_name.strip().lower()
                 if vs not in self.cfg.vsphere.keys():
                     all_found = False
                     msg = _(
-                        'VSPhere {!r} not found in list of configured VSPhere instances.').format(
-                            vs_name)
+                        "VSPhere {!r} not found in list of configured VSPhere instances."
+                    ).format(vs_name)
                     LOG.error(msg)
                 else:
                     if vs not in self.req_vspheres:
@@ -169,22 +190,24 @@ class BaseVmwareApplication(FbConfigApplication):
         super(BaseVmwareApplication, self).init_arg_parser()
 
         self.arg_parser.add_argument(
-            '--vs', '--vsphere', dest='req_vsphere', nargs='*',
-            help=_(
-                'The VSPhere names from configuration, in which the VMs should be searched.')
+            "--vs",
+            "--vsphere",
+            dest="req_vsphere",
+            nargs="*",
+            help=_("The VSPhere names from configuration, in which the VMs should be searched."),
         )
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
         """Evaluate the command line parameters. Maybe overridden."""
         if self.verbose > 2:
-            LOG.debug(_('Got command line arguments:') + '\n' + pp(self.args))
+            LOG.debug(_("Got command line arguments:") + "\n" + pp(self.args))
 
     # -------------------------------------------------------------------------
     def init_vsphere_handlers(self):
         """Initialize all VSphere handlers."""
         if self.verbose > 1:
-            LOG.debug(_('Initializing VSphere handlers ...'))
+            LOG.debug(_("Initializing VSphere handlers ..."))
 
         try:
             for vsphere_name in self.do_vspheres:
@@ -197,21 +220,28 @@ class BaseVmwareApplication(FbConfigApplication):
     def init_vsphere_handler(self, vsphere_name):
         """Initialize the given VSphere handler."""
         if self.verbose > 2:
-            LOG.debug(_('Initializing handler for VSPhere {!r} ...').format(vsphere_name))
+            LOG.debug(_("Initializing handler for VSPhere {!r} ...").format(vsphere_name))
 
         vsphere_data = self.cfg.vsphere[vsphere_name]
 
         vsphere = VsphereConnection(
-            vsphere_data, auto_close=True, simulate=self.simulate, force=self.force,
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            terminal_has_colors=self.terminal_has_colors, initialized=False)
+            vsphere_data,
+            auto_close=True,
+            simulate=self.simulate,
+            force=self.force,
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            terminal_has_colors=self.terminal_has_colors,
+            initialized=False,
+        )
 
         if vsphere:
             self.vsphere[vsphere_name] = vsphere
             vsphere.initialized = True
         else:
-            msg = _('Could not initialize {} object from:').format('VsphereConnection')
-            msg += '\n' + str(vsphere_data)
+            msg = _("Could not initialize {} object from:").format("VsphereConnection")
+            msg += "\n" + str(vsphere_data)
             LOG.error(msg)
 
         vsphere._check_credentials()
@@ -220,11 +250,11 @@ class BaseVmwareApplication(FbConfigApplication):
     def cleaning_up(self):
         """Close all VSPhere connections and remove all VSphere handlers."""
         if self.verbose > 1:
-            LOG.debug(_('Cleaning up ...'))
+            LOG.debug(_("Cleaning up ..."))
 
         for vsphere_name in self.do_vspheres:
             if vsphere_name in self.vsphere:
-                LOG.debug(_('Closing VSPhere object {!r} ...').format(vsphere_name))
+                LOG.debug(_("Closing VSPhere object {!r} ...").format(vsphere_name))
                 self.vsphere[vsphere_name].disconnect()
                 del self.vsphere[vsphere_name]
 
@@ -238,7 +268,7 @@ class BaseVmwareApplication(FbConfigApplication):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

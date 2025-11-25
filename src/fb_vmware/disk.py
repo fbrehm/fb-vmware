@@ -13,6 +13,7 @@ from __future__ import absolute_import
 import logging
 import re
 import uuid
+
 try:
     from collections.abc import MutableSequence
 except ImportError:
@@ -28,7 +29,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.0.1'
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -38,14 +39,27 @@ _ = XLATOR.gettext
 class VsphereDisk(FbBaseObject):
     """Encapsulation of a VSphere disk object, which can be assigned to a VM."""
 
-    re_file_storage = re.compile(r'^\s*\[\s*([^\s\]]+)')
-    re_file_rel = re.compile(r'^\s*\[[^\]]*]\s*(\S.*)\s*$')
+    re_file_storage = re.compile(r"^\s*\[\s*([^\s\]]+)")
+    re_file_rel = re.compile(r"^\s*\[[^\]]*]\s*(\S.*)\s*$")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            uuid=None, file_name=None, unit_nr=None, label=None, key=None, controller_key=None,
-            size=None, disk_id=None, summary=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        uuid=None,
+        file_name=None,
+        unit_nr=None,
+        label=None,
+        key=None,
+        controller_key=None,
+        size=None,
+        disk_id=None,
+        summary=None,
+    ):
         """Initialize a VsphereDisk object."""
         # self.repr_fields = (
         #     'uuid', 'file_name', 'unit_nr', 'label', 'key', 'controller_key',
@@ -61,8 +75,8 @@ class VsphereDisk(FbBaseObject):
         self._disk_id = None
 
         super(VsphereDisk, self).__init__(
-            appname=appname, verbose=verbose, version=version,
-            base_dir=base_dir, initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         self.uuid = uuid
         self.file_name = file_name
@@ -89,7 +103,7 @@ class VsphereDisk(FbBaseObject):
             self._uuid = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._uuid = None
             return
         try:
@@ -109,7 +123,7 @@ class VsphereDisk(FbBaseObject):
             self._file_name = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._file_name = None
             return
         self._file_name = v
@@ -166,7 +180,7 @@ class VsphereDisk(FbBaseObject):
             self._label = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._label = None
             return
         self._label = v
@@ -183,7 +197,7 @@ class VsphereDisk(FbBaseObject):
             self._summary = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._summary = None
             return
         self._summary = v
@@ -263,7 +277,7 @@ class VsphereDisk(FbBaseObject):
             self._disk_id = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._disk_id = None
             return
         self._disk_id = v
@@ -272,7 +286,7 @@ class VsphereDisk(FbBaseObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDisk):
             return False
@@ -313,38 +327,38 @@ class VsphereDisk(FbBaseObject):
         """
         if bare:
             res = {
-                'uuid': self.uuid,
-                'file_name': self.file_name,
-                'file_rel': self.file_rel,
-                'file_storage': self.file_storage,
-                'unit_nr': self.unit_nr,
-                'label': self.label,
-                'summary': self.summary,
-                'key': self.key,
-                'size': self.size,
-                'size_kb': self.size_kb,
-                'size_mb': self.size_mb,
-                'size_gb': self.size_gb,
-                'controller_key': self.controller_key,
-                'disk_id': self.disk_id,
+                "uuid": self.uuid,
+                "file_name": self.file_name,
+                "file_rel": self.file_rel,
+                "file_storage": self.file_storage,
+                "unit_nr": self.unit_nr,
+                "label": self.label,
+                "summary": self.summary,
+                "key": self.key,
+                "size": self.size,
+                "size_kb": self.size_kb,
+                "size_mb": self.size_mb,
+                "size_gb": self.size_gb,
+                "controller_key": self.controller_key,
+                "disk_id": self.disk_id,
             }
             return res
 
         res = super(VsphereDisk, self).as_dict(short=short)
-        res['uuid'] = self.uuid
-        res['file_name'] = self.file_name
-        res['file_rel'] = self.file_rel
-        res['file_storage'] = self.file_storage
-        res['unit_nr'] = self.unit_nr
-        res['label'] = self.label
-        res['summary'] = self.summary
-        res['key'] = self.key
-        res['size'] = self.size
-        res['size_kb'] = self.size_kb
-        res['size_mb'] = self.size_mb
-        res['size_gb'] = self.size_gb
-        res['controller_key'] = self.controller_key
-        res['disk_id'] = self.disk_id
+        res["uuid"] = self.uuid
+        res["file_name"] = self.file_name
+        res["file_rel"] = self.file_rel
+        res["file_storage"] = self.file_storage
+        res["unit_nr"] = self.unit_nr
+        res["label"] = self.label
+        res["summary"] = self.summary
+        res["key"] = self.key
+        res["size"] = self.size
+        res["size_kb"] = self.size_kb
+        res["size_mb"] = self.size_mb
+        res["size_gb"] = self.size_gb
+        res["controller_key"] = self.controller_key
+        res["disk_id"] = self.disk_id
 
         return res
 
@@ -352,10 +366,20 @@ class VsphereDisk(FbBaseObject):
     def __copy__(self):
         """Return a new VsphereDisk as a deep copy of the current object."""
         disk = VsphereDisk(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, uuid=self.uuid, file_name=self.file_name,
-            unit_nr=self.unit_nr, label=self.label, key=self.key, size=self.size,
-            controller_key=self.controller_key, disk_id=self.disk_id, summary=self.summary)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            uuid=self.uuid,
+            file_name=self.file_name,
+            unit_nr=self.unit_nr,
+            label=self.label,
+            key=self.key,
+            size=self.size,
+            controller_key=self.controller_key,
+            disk_id=self.disk_id,
+            summary=self.summary,
+        )
 
         return disk
 
@@ -366,8 +390,14 @@ class VsphereDisk(FbBaseObject):
         if test_mode:
 
             necessary_fields = (
-                'unitNumber', 'deviceInfo', 'capacityInBytes', 'key', 'backing',
-                'controllerKey', 'vDiskId')
+                "unitNumber",
+                "deviceInfo",
+                "capacityInBytes",
+                "key",
+                "backing",
+                "controllerKey",
+                "vDiskId",
+            )
 
             failing_fields = []
 
@@ -375,53 +405,52 @@ class VsphereDisk(FbBaseObject):
                 if not hasattr(data, field):
                     failing_fields.append(field)
 
-            if hasattr(data, 'deviceInfo'):
+            if hasattr(data, "deviceInfo"):
                 dev_info = data.deviceInfo
-                for field in ('label', 'summary'):
+                for field in ("label", "summary"):
                     if not hasattr(dev_info, field):
-                        failing_fields.append('deviceInfo.' + field)
+                        failing_fields.append("deviceInfo." + field)
 
-            if hasattr(data, 'backing') and not hasattr(data.backing, 'fileName'):
-                failing_fields.append('backing.fileName')
+            if hasattr(data, "backing") and not hasattr(data.backing, "fileName"):
+                failing_fields.append("backing.fileName")
 
             if len(failing_fields):
                 msg = _(
-                    'The given parameter {p!r} on calling method {m}() has failing '
-                    'attributes').format(p='data', m='from_summary')
-                msg += ': ' + format_list(failing_fields, do_repr=True)
+                    "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+                ).format(p="data", m="from_summary")
+                msg += ": " + format_list(failing_fields, do_repr=True)
                 raise AssertionError(msg)
 
         else:
 
             if not isinstance(data, vim.vm.device.VirtualDisk):
                 msg = _(
-                    'Parameter {t!r} must be a {e} object, a {v} object was given '
-                    'instead.').format(
-                        t='data', e='vim.vm.device.VirtualDisk', v=data.__class__.__qualname__)
+                    "Parameter {t!r} must be a {e} object, a {v} object was given " "instead."
+                ).format(t="data", e="vim.vm.device.VirtualDisk", v=data.__class__.__qualname__)
                 raise TypeError(msg)
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'unit_nr': data.unitNumber,
-            'label': data.deviceInfo.label,
-            'summary': data.deviceInfo.summary,
-            'size': data.capacityInBytes,
-            'key': data.key,
-            'file_name': data.backing.fileName,
-            'controller_key': data.controllerKey,
-            'disk_id': data.vDiskId,
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "unit_nr": data.unitNumber,
+            "label": data.deviceInfo.label,
+            "summary": data.deviceInfo.summary,
+            "size": data.capacityInBytes,
+            "key": data.key,
+            "file_name": data.backing.fileName,
+            "controller_key": data.controllerKey,
+            "disk_id": data.vDiskId,
         }
 
         if verbose > 2:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         disk = cls(**params)
 
         if verbose > 2:
-            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(disk.as_dict()))
+            LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(disk.as_dict()))
 
         return disk
 
@@ -430,18 +459,18 @@ class VsphereDisk(FbBaseObject):
 class VsphereDiskList(FbBaseObject, MutableSequence):
     """A list containing VsphereDisk objects."""
 
-    msg_no_disk = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
+    msg_no_disk = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            initialized=None, *disks):
+        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None, *disks
+    ):
         """Initialize a VsphereDiskList object."""
         self._list = []
 
         super(VsphereDiskList, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         for disk in disks:
             self.append(disk)
@@ -469,10 +498,10 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
             return res
 
         res = super(VsphereDiskList, self).as_dict(short=short)
-        res['_list'] = []
+        res["_list"] = []
 
         for disk in self:
-            res['_list'].append(disk.as_dict(short=short))
+            res["_list"].append(disk.as_dict(short=short))
 
         return res
 
@@ -480,8 +509,8 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     def __copy__(self):
         """Return a new VsphereDiskList as a deep copy of the current object."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for disk in self:
             new_list.append(disk)
@@ -497,8 +526,11 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
-                    m='index()', max=3, n=len(args) + 1))
+                raise TypeError(
+                    _("{m} takes at most {max} arguments ({n} given).").format(
+                        m="index()", max=3, n=len(args) + 1
+                    )
+                )
             i = int(args[0])
             if len(args) > 1:
                 j = int(args[1])
@@ -537,15 +569,18 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
             if item == disk:
                 return index
 
-        msg = _('Disk is not in disk list.')
+        msg = _("Disk is not in disk list.")
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, disk):
         """Return whether the given disk is contained in current list."""
         if not isinstance(disk, VsphereDisk):
-            raise TypeError(self.msg_no_disk.format(
-                t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
+            raise TypeError(
+                self.msg_no_disk.format(
+                    t=disk.__class__.__name__, c=self.__class__.__name__, o="VsphereDisk"
+                )
+            )
 
         if not self._list:
             return False
@@ -560,8 +595,11 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     def count(self, disk):
         """Return the number of disks which are equal to the given one in current list."""
         if not isinstance(disk, VsphereDisk):
-            raise TypeError(self.msg_no_disk.format(
-                t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
+            raise TypeError(
+                self.msg_no_disk.format(
+                    t=disk.__class__.__name__, c=self.__class__.__name__, o="VsphereDisk"
+                )
+            )
 
         if not self._list:
             return 0
@@ -597,8 +635,11 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     def __setitem__(self, key, disk):
         """Replace the disk at the given numeric index by the given one."""
         if not isinstance(disk, VsphereDisk):
-            raise TypeError(self.msg_no_disk.format(
-                t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
+            raise TypeError(
+                self.msg_no_disk.format(
+                    t=disk.__class__.__name__, c=self.__class__.__name__, o="VsphereDisk"
+                )
+            )
 
         self._list.__setitem__(key, disk)
 
@@ -611,8 +652,11 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     def append(self, disk):
         """Append the given disk to the current list."""
         if not isinstance(disk, VsphereDisk):
-            raise TypeError(self.msg_no_disk.format(
-                t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
+            raise TypeError(
+                self.msg_no_disk.format(
+                    t=disk.__class__.__name__, c=self.__class__.__name__, o="VsphereDisk"
+                )
+            )
 
         self._list.append(disk)
 
@@ -620,8 +664,11 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
     def insert(self, index, disk):
         """Insert the given disk in current list at given index."""
         if not isinstance(disk, VsphereDisk):
-            raise TypeError(self.msg_no_disk.format(
-                t=disk.__class__.__name__, c=self.__class__.__name__, o='VsphereDisk'))
+            raise TypeError(
+                self.msg_no_disk.format(
+                    t=disk.__class__.__name__, c=self.__class__.__name__, o="VsphereDisk"
+                )
+            )
 
         self._list.insert(index, disk)
 
@@ -632,7 +679,7 @@ class VsphereDiskList(FbBaseObject, MutableSequence):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

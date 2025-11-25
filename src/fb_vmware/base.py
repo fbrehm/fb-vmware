@@ -38,13 +38,13 @@ from .errors import VSphereUnsufficientCredentials
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = '1.1.2'
+__version__ = "1.1.2"
 
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 
-DEFAULT_TZ_NAME = 'Europe/Berlin'
+DEFAULT_TZ_NAME = "Europe/Berlin"
 DEFAULT_MAX_SEARCH_DEPTH = 10
 
 
@@ -61,9 +61,20 @@ class BaseVsphereHandler(HandlingObject):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, connect_info, appname=None, verbose=0, version=__version__, base_dir=None,
-            cluster=DEFAULT_VSPHERE_CLUSTER, auto_close=False, simulate=None,
-            force=None, terminal_has_colors=False, initialized=False, tz=DEFAULT_TZ_NAME):
+        self,
+        connect_info,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        cluster=DEFAULT_VSPHERE_CLUSTER,
+        auto_close=False,
+        simulate=None,
+        force=None,
+        terminal_has_colors=False,
+        initialized=False,
+        tz=DEFAULT_TZ_NAME,
+    ):
         """Initialize a BaseVsphereHandler object."""
         self._cluster = cluster
         self._auto_close = False
@@ -73,23 +84,30 @@ class BaseVsphereHandler(HandlingObject):
         self.service_instance = None
 
         super(BaseVsphereHandler, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            simulate=simulate, force=force, terminal_has_colors=terminal_has_colors,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+            simulate=simulate,
+            force=force,
+            terminal_has_colors=terminal_has_colors,
             initialized=False,
         )
 
         if not isinstance(connect_info, VSPhereConfigInfo):
-            msg = _('The given parameter {pc!r} ({pv!r}) is not a {o} object.').format(
-                pc='connect_info', pv=connect_info, o='VSPhereConfigInfo')
+            msg = _("The given parameter {pc!r} ({pv!r}) is not a {o} object.").format(
+                pc="connect_info", pv=connect_info, o="VSPhereConfigInfo"
+            )
             raise BaseVSphereHandlerError(msg)
 
         if not connect_info.host:
-            msg = _('No VSPhere host name or address given in {w}.').format(w='connect_info')
+            msg = _("No VSPhere host name or address given in {w}.").format(w="connect_info")
             raise BaseVSphereHandlerError(msg)
 
         if not connect_info.initialized:
-            msg = _('The {c} object given as {w} is not initialized.').format(
-                c='VSPhereConfigInfo', w='connect_info')
+            msg = _("The {c} object given as {w} is not initialized.").format(
+                c="VSPhereConfigInfo", w="connect_info"
+            )
             raise BaseVSphereHandlerError(msg)
 
         self.connect_info = connect_info
@@ -103,7 +121,7 @@ class BaseVsphereHandler(HandlingObject):
     @property
     def auto_close(self):
         """Return wether existing connection should be closed on destroying the current object."""
-        return getattr(self, '_auto_close', False)
+        return getattr(self, "_auto_close", False)
 
     @auto_close.setter
     def auto_close(self, value):
@@ -113,7 +131,7 @@ class BaseVsphereHandler(HandlingObject):
     @property
     def dc(self):
         """Return the name of the VSphere datacenter to use."""
-        connect_info = getattr(self, 'connect_info', None)
+        connect_info = getattr(self, "connect_info", None)
         if connect_info:
             return connect_info.dc
         return None
@@ -141,22 +159,22 @@ class BaseVsphereHandler(HandlingObject):
     @abstractmethod
     def __repr__(self):
         """Typecasting into a string for reproduction."""
-        out = '<%s()>' % (self.__class__.__name__)
+        out = "<%s()>" % (self.__class__.__name__)
         return out
 
     # -------------------------------------------------------------------------
     def _repr(self):
 
-        out = '<%s(' % (self.__class__.__name__)
+        out = "<%s(" % (self.__class__.__name__)
 
         fields = []
-        fields.append('connect_info={}'.format(self.connect_info._repr()))
-        fields.append('cluster={!r}'.format(self.cluster))
-        fields.append('auto_close={!r}'.format(self.auto_close))
-        fields.append('simulate={!r}'.format(self.simulate))
-        fields.append('force={!r}'.format(self.force))
+        fields.append("connect_info={}".format(self.connect_info._repr()))
+        fields.append("cluster={!r}".format(self.cluster))
+        fields.append("auto_close={!r}".format(self.auto_close))
+        fields.append("simulate={!r}".format(self.simulate))
+        fields.append("force={!r}".format(self.force))
 
-        out += ', '.join(fields) + ')>'
+        out += ", ".join(fields) + ")>"
         return out
 
     # -------------------------------------------------------------------------
@@ -171,20 +189,20 @@ class BaseVsphereHandler(HandlingObject):
         @rtype:  dict
         """
         res = super(BaseVsphereHandler, self).as_dict(short=short)
-        res['dc'] = self.dc
-        res['tz'] = None
+        res["dc"] = self.dc
+        res["tz"] = None
         if self.tz:
-            res['tz'] = self.tz.zone
-        res['cluster'] = self.cluster
-        res['auto_close'] = self.auto_close
-        res['max_search_depth'] = self.max_search_depth
+            res["tz"] = self.tz.zone
+        res["cluster"] = self.cluster
+        res["auto_close"] = self.auto_close
+        res["max_search_depth"] = self.max_search_depth
 
         return res
 
     # -------------------------------------------------------------------------
     def connect(self):
         """Connect to the the configured VSPhere instance."""
-        LOG.debug(_('Connecting to vSphere {!r} ...').format(self.connect_info.full_url))
+        LOG.debug(_("Connecting to vSphere {!r} ...").format(self.connect_info.full_url))
 
         if not self.connect_info.user:
             raise VSphereUnsufficientCredentials()
@@ -196,19 +214,27 @@ class BaseVsphereHandler(HandlingObject):
             if self.connect_info.use_https:
 
                 ssl_context = None
-                if hasattr(ssl, '_create_unverified_context'):
+                if hasattr(ssl, "_create_unverified_context"):
                     ssl_context = ssl._create_unverified_context()
 
                 self.service_instance = SmartConnect(
-                    protocol='https', host=self.connect_info.host, port=self.connect_info.port,
-                    user=self.connect_info.user, pwd=self.connect_info.password,
-                    sslContext=ssl_context)
+                    protocol="https",
+                    host=self.connect_info.host,
+                    port=self.connect_info.port,
+                    user=self.connect_info.user,
+                    pwd=self.connect_info.password,
+                    sslContext=ssl_context,
+                )
 
             else:
 
                 self.service_instance = SmartConnect(
-                    protocol='http', host=self.connect_info.host, port=self.connect_info.port,
-                    user=self.connect_info.user, pwd=self.connect_info.password)
+                    protocol="http",
+                    host=self.connect_info.host,
+                    port=self.connect_info.port,
+                    user=self.connect_info.user,
+                    pwd=self.connect_info.password,
+                )
 
         except (gaierror, vim.fault.VimFault, vim.fault.InvalidLogin) as e:
             raise VSphereVimFault(e, self.connect_info.full_url)
@@ -220,17 +246,18 @@ class BaseVsphereHandler(HandlingObject):
     def _check_credentials(self, repeated_password=False):
 
         if not self.connect_info.user:
-            prompt = _('Please enter the user name for logging in to {}:').format(
-                self.connect_info.url)
-            prompt = self.colored(prompt, 'cyan') + ' '
+            prompt = _("Please enter the user name for logging in to {}:").format(
+                self.connect_info.url
+            )
+            prompt = self.colored(prompt, "cyan") + " "
             try:
                 user = input(prompt)
             except (KeyboardInterrupt, EOFError) as e:
-                msg = _('Got a {}').format(e.__class__.__name__)
+                msg = _("Got a {}").format(e.__class__.__name__)
                 if str(e):
-                    msg += ': ' + str(e)
+                    msg += ": " + str(e)
                 else:
-                    msg += '.'
+                    msg += "."
                 raise VSphereExpectedError(msg)
             if not user:
                 raise VSphereUnsufficientCredentials()
@@ -242,17 +269,18 @@ class BaseVsphereHandler(HandlingObject):
 
         if not self.connect_info.password:
             first_prompt = _(
-                'Please enter the password for {user!r} for logging in to {url}:').format(
-                user=self.connect_info.user, url=self.connect_info.url)
-            first_prompt = self.colored(first_prompt, 'cyan') + ' '
+                "Please enter the password for {user!r} for logging in to {url}:"
+            ).format(user=self.connect_info.user, url=self.connect_info.url)
+            first_prompt = self.colored(first_prompt, "cyan") + " "
 
             second_prompt = _(
-                'Please repeat the password for {user!r} for logging in to {url}:').format(
-                user=self.connect_info.user, url=self.connect_info.url)
-            second_prompt = self.colored(second_prompt, 'cyan') + ' '
+                "Please repeat the password for {user!r} for logging in to {url}:"
+            ).format(user=self.connect_info.user, url=self.connect_info.url)
+            second_prompt = self.colored(second_prompt, "cyan") + " "
 
             password = self.get_password(
-                first_prompt, second_prompt, may_empty=False, repeat=repeated_password)
+                first_prompt, second_prompt, may_empty=False, repeat=repeated_password
+            )
 
             if not password:
                 raise VSphereUnsufficientCredentials(self.connect_info.user)
@@ -263,7 +291,7 @@ class BaseVsphereHandler(HandlingObject):
     def disconnect(self):
         """Disconnect from the the configured VSPhere instance."""
         if self.service_instance:
-            LOG.debug(_('Disconnecting from VSPhere {!r}.').format(self.connect_info.url))
+            LOG.debug(_("Disconnecting from VSPhere {!r}.").format(self.connect_info.url))
             Disconnect(self.service_instance)
 
         self.service_instance = None
@@ -289,7 +317,7 @@ class BaseVsphereHandler(HandlingObject):
 
 # =============================================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

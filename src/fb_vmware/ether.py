@@ -12,6 +12,7 @@ from __future__ import absolute_import
 # Standard modules
 import copy
 import logging
+
 try:
     from collections.abc import MutableSequence
 except ImportError:
@@ -27,7 +28,7 @@ from pyVmomi import vim
 # Own modules
 from .xlate import XLATOR
 
-__version__ = '1.1.2'
+__version__ = "1.1.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -38,23 +39,39 @@ class VsphereEthernetcard(FbBaseObject):
     """Wrapper class for a vim.vm.device.VirtualEthernetCard object and for its descendants."""
 
     ether_types = {
-        'e1000e': 'Virtual E1000e Ethernet adapter',
-        'e1000': 'Virtual E1000 Ethernet adapter',
-        'pcnet32': 'Virtual AMD Lance PCNet32 Ethernet adapter',
-        'sriov': 'Virtual SR-IOV enabled Ethernet adapter',
-        'vmxnet2': 'Virtual Vmxnet2 Ethernet adapter',
-        'vmxnet3_rdma': 'Virtual VRDMA Remote Direct Memory Access adapter',
-        'vmxnet3': 'Virtual Vmxnet3 Ethernet adapter',
-        'vmxnet': 'Virtual Vmxnet Ethernet adapter',
+        "e1000e": "Virtual E1000e Ethernet adapter",
+        "e1000": "Virtual E1000 Ethernet adapter",
+        "pcnet32": "Virtual AMD Lance PCNet32 Ethernet adapter",
+        "sriov": "Virtual SR-IOV enabled Ethernet adapter",
+        "vmxnet2": "Virtual Vmxnet2 Ethernet adapter",
+        "vmxnet3_rdma": "Virtual VRDMA Remote Direct Memory Access adapter",
+        "vmxnet3": "Virtual Vmxnet3 Ethernet adapter",
+        "vmxnet": "Virtual Vmxnet Ethernet adapter",
     }
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None,
-            unit_nr=None, key=None, address_type=None, external_id=None, mac_address=None,
-            wake_on_lan=False, backing_device=None, backing_type=None, connected=False,
-            connect_status=None, connect_on_start=False, allow_guest_control=False,
-            ether_type=None, label=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=__version__,
+        base_dir=None,
+        initialized=None,
+        unit_nr=None,
+        key=None,
+        address_type=None,
+        external_id=None,
+        mac_address=None,
+        wake_on_lan=False,
+        backing_device=None,
+        backing_type=None,
+        connected=False,
+        connect_status=None,
+        connect_on_start=False,
+        allow_guest_control=False,
+        ether_type=None,
+        label=None,
+    ):
         """Initialize the VsphereEthernetcard object."""
         self._unit_nr = None
         self._key = None
@@ -72,8 +89,8 @@ class VsphereEthernetcard(FbBaseObject):
         self._label = None
 
         super(VsphereEthernetcard, self).__init__(
-            appname=appname, verbose=verbose, version=version,
-            base_dir=base_dir, initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         self.unit_nr = unit_nr
         self.key = key
@@ -140,7 +157,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._address_type = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._address_type = None
             return
         self._address_type = v
@@ -161,7 +178,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._external_id = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._external_id = None
             return
         self._external_id = v
@@ -178,7 +195,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._mac_address = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._mac_address = None
             return
         self._mac_address = v
@@ -205,7 +222,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._backing_device = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._backing_device = None
             return
         self._backing_device = v
@@ -222,7 +239,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._backing_type = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._backing_type = None
             return
         self._backing_type = v
@@ -249,7 +266,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._connect_status = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._connect_status = None
             return
         self._connect_status = v
@@ -286,7 +303,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._ether_type = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._ether_type = None
             return
         self._ether_type = v
@@ -303,7 +320,7 @@ class VsphereEthernetcard(FbBaseObject):
             self._label = None
             return
         v = str(value).strip()
-        if v == '':
+        if v == "":
             self._label = None
             return
         self._label = v
@@ -312,7 +329,7 @@ class VsphereEthernetcard(FbBaseObject):
     def __eq__(self, other):
         """Magic method for using it as the '=='-operator."""
         if self.verbose > 4:
-            LOG.debug(_('Comparing {} objects ...').format(self.__class__.__name__))
+            LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereEthernetcard):
             return False
@@ -363,38 +380,38 @@ class VsphereEthernetcard(FbBaseObject):
         """
         if bare:
             res = {
-                'unit_nr': self.unit_nr,
-                'key': self.key,
-                'address_type': self.address_type,
-                'external_id': self.external_id,
-                'mac_address': self.mac_address,
-                'wake_on_lan': self.wake_on_lan,
-                'backing_device': self.backing_device,
-                'backing_type': self.backing_type,
-                'connected': self.connected,
-                'connect_status': self.connect_status,
-                'connect_on_start': self.connect_on_start,
-                'allow_guest_control': self.allow_guest_control,
-                'ether_type': self.ether_type,
-                'label': self.label,
+                "unit_nr": self.unit_nr,
+                "key": self.key,
+                "address_type": self.address_type,
+                "external_id": self.external_id,
+                "mac_address": self.mac_address,
+                "wake_on_lan": self.wake_on_lan,
+                "backing_device": self.backing_device,
+                "backing_type": self.backing_type,
+                "connected": self.connected,
+                "connect_status": self.connect_status,
+                "connect_on_start": self.connect_on_start,
+                "allow_guest_control": self.allow_guest_control,
+                "ether_type": self.ether_type,
+                "label": self.label,
             }
             return res
 
         res = super(VsphereEthernetcard, self).as_dict(short=short)
-        res['unit_nr'] = self.unit_nr
-        res['key'] = self.key
-        res['address_type'] = self.address_type
-        res['external_id'] = self.external_id
-        res['mac_address'] = self.mac_address
-        res['wake_on_lan'] = self.wake_on_lan
-        res['backing_device'] = self.backing_device
-        res['backing_type'] = self.backing_type
-        res['connected'] = self.connected
-        res['connect_status'] = self.connect_status
-        res['connect_on_start'] = self.connect_on_start
-        res['allow_guest_control'] = self.allow_guest_control
-        res['ether_type'] = self.ether_type
-        res['label'] = self.label
+        res["unit_nr"] = self.unit_nr
+        res["key"] = self.key
+        res["address_type"] = self.address_type
+        res["external_id"] = self.external_id
+        res["mac_address"] = self.mac_address
+        res["wake_on_lan"] = self.wake_on_lan
+        res["backing_device"] = self.backing_device
+        res["backing_type"] = self.backing_type
+        res["connected"] = self.connected
+        res["connect_status"] = self.connect_status
+        res["connect_on_start"] = self.connect_on_start
+        res["allow_guest_control"] = self.allow_guest_control
+        res["ether_type"] = self.ether_type
+        res["label"] = self.label
 
         return res
 
@@ -402,14 +419,25 @@ class VsphereEthernetcard(FbBaseObject):
     def __copy__(self):
         """Return a new VsphereEthernetcard as a deep copy of the current object."""
         card = VsphereEthernetcard(
-            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir,
-            initialized=self.initialized, unit_nr=self.unit_nr, key=self.key,
-            address_type=self.address_type, external_id=self.external_id,
-            mac_address=self.mac_address, wake_on_lan=self.wake_on_lan,
-            backing_device=self.backing_device, backing_type=self.backing_type,
-            connected=self.connected, connect_status=self.connect_status,
-            connect_on_start=self.connect_on_start, allow_guest_control=self.allow_guest_control,
-            ether_type=self.ether_type, label=self.label)
+            appname=self.appname,
+            verbose=self.verbose,
+            base_dir=self.base_dir,
+            initialized=self.initialized,
+            unit_nr=self.unit_nr,
+            key=self.key,
+            address_type=self.address_type,
+            external_id=self.external_id,
+            mac_address=self.mac_address,
+            wake_on_lan=self.wake_on_lan,
+            backing_device=self.backing_device,
+            backing_type=self.backing_type,
+            connected=self.connected,
+            connect_status=self.connect_status,
+            connect_on_start=self.connect_on_start,
+            allow_guest_control=self.allow_guest_control,
+            ether_type=self.ether_type,
+            label=self.label,
+        )
 
         return card
 
@@ -421,60 +449,64 @@ class VsphereEthernetcard(FbBaseObject):
             cls._check_summary_data(data)
         else:
             if not isinstance(data, vim.vm.device.VirtualEthernetCard):
-                msg = _('Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.').format(
-                    t='data', e='vim.vm.device.VirtualEthernetCard',
-                    v=data, vt=data.__class__.__name__)
+                msg = _("Parameter {t!r} must be a {e}, {v!r} ({vt}) was given.").format(
+                    t="data",
+                    e="vim.vm.device.VirtualEthernetCard",
+                    v=data,
+                    vt=data.__class__.__name__,
+                )
                 raise TypeError(msg)
 
         if verbose > 3:
-            LOG.debug('Given ethernet card data:\n' + pp(data))
+            LOG.debug("Given ethernet card data:\n" + pp(data))
 
         eth_class = data.__class__.__name__
         bclass = data.backing.__class__.__name__
-        bdev = '[unknown]'
-        if hasattr(data.backing, 'deviceName'):
+        bdev = "[unknown]"
+        if hasattr(data.backing, "deviceName"):
             bdev = data.backing.deviceName
         elif isinstance(
-                data.backing,
-                vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo):
-            bdev = 'Switch {}'.format(data.backing.port.switchUuid)
-            if hasattr(data.backing.port, 'portKey'):
-                bdev += ', port key {}'.format(data.backing.port.portKey)
+            data.backing, vim.vm.device.VirtualEthernetCard.DistributedVirtualPortBackingInfo
+        ):
+            bdev = "Switch {}".format(data.backing.port.switchUuid)
+            if hasattr(data.backing.port, "portKey"):
+                bdev += ", port key {}".format(data.backing.port.portKey)
         if verbose > 2:
             LOG.debug(
-                f'Got ethernet device type {eth_class} - backing device {bdev!r} ({bclass}).')
+                f"Got ethernet device type {eth_class} - backing device {bdev!r} ({bclass})."
+            )
 
         params = {
-            'appname': appname,
-            'verbose': verbose,
-            'base_dir': base_dir,
-            'initialized': True,
-            'unit_nr': data.unitNumber,
-            'key': data.key,
-            'address_type': data.addressType,
-            'external_id': data.externalId,
-            'mac_address': data.macAddress,
-            'wake_on_lan': data.wakeOnLanEnabled,
-            'backing_device': bdev,
-            'backing_type': bclass,
-            'connected': data.connectable.connected,
-            'connect_status': data.connectable.status,
-            'connect_on_start': data.connectable.startConnected,
-            'allow_guest_control': data.connectable.allowGuestControl,
-            'ether_type': 'unknown',
+            "appname": appname,
+            "verbose": verbose,
+            "base_dir": base_dir,
+            "initialized": True,
+            "unit_nr": data.unitNumber,
+            "key": data.key,
+            "address_type": data.addressType,
+            "external_id": data.externalId,
+            "mac_address": data.macAddress,
+            "wake_on_lan": data.wakeOnLanEnabled,
+            "backing_device": bdev,
+            "backing_type": bclass,
+            "connected": data.connectable.connected,
+            "connect_status": data.connectable.status,
+            "connect_on_start": data.connectable.startConnected,
+            "allow_guest_control": data.connectable.allowGuestControl,
+            "ether_type": "unknown",
         }
         if data.deviceInfo:
-            params['label'] = data.deviceInfo.label
+            params["label"] = data.deviceInfo.label
 
-        params['ether_type'] = cls._get_ethertype(data, verbose)
+        params["ether_type"] = cls._get_ethertype(data, verbose)
 
         if verbose > 3:
-            LOG.debug(_('Creating {} object from:').format(cls.__name__) + '\n' + pp(params))
+            LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         card = cls(**params)
 
         if verbose > 3:
-            LOG.debug(_('Created {} object:').format(cls.__name__) + '\n' + pp(card.as_dict()))
+            LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(card.as_dict()))
 
         return card
 
@@ -483,39 +515,44 @@ class VsphereEthernetcard(FbBaseObject):
     def _get_ethertype(cls, data, verbose=0):
 
         if verbose > 2:
-            LOG.debug(_('Checking class of ethernet card: {!r}').format(data.__class__.__name__))
+            LOG.debug(_("Checking class of ethernet card: {!r}").format(data.__class__.__name__))
 
         try:
             if isinstance(data, vim.vm.device.VirtualE1000e):
-                return 'e1000e'
+                return "e1000e"
             elif isinstance(data, vim.vm.device.VirtualE1000):
-                return 'e1000'
+                return "e1000"
             elif isinstance(data, vim.vm.device.VirtualPCNet32):
-                return 'pcnet32'
+                return "pcnet32"
             elif isinstance(data, vim.vm.device.VirtualSriovEthernetCard):
-                return 'sriov'
+                return "sriov"
             elif isinstance(data, vim.vm.device.VirtualVmxnet2):
-                return 'vmxnet2'
+                return "vmxnet2"
             elif isinstance(data, vim.vm.device.VirtualVmxnet3Vrdma):
-                return 'vmxnet3_rdma'
+                return "vmxnet3_rdma"
             elif isinstance(data, vim.vm.device.VirtualVmxnet3):
-                return 'vmxnet3'
+                return "vmxnet3"
             elif isinstance(data, vim.vm.device.VirtualVmxnet):
-                return 'vmxnet'
+                return "vmxnet"
         except Exception:
             pass
 
-        return 'unknown'
+        return "unknown"
 
     # -------------------------------------------------------------------------
     @classmethod
     def _check_summary_data(cls, data):
 
         necessary_fields = (
-            'unitNumber', 'key', 'addressType', 'externalId', 'macAddress', 'wakeOnLanEnabled'
-            'backing', 'connectable')
-        connectable_fields = (
-            'connected', 'status', 'startConnected', 'allowGuestControl')
+            "unitNumber",
+            "key",
+            "addressType",
+            "externalId",
+            "macAddress",
+            "wakeOnLanEnabled" "backing",
+            "connectable",
+        )
+        connectable_fields = ("connected", "status", "startConnected", "allowGuestControl")
 
         failing_fields = []
 
@@ -523,20 +560,20 @@ class VsphereEthernetcard(FbBaseObject):
             if not hasattr(data, field):
                 failing_fields.append(field)
 
-        if hasattr(data, 'backing') and not hasattr(data.backing, 'deviceName'):
-            failing_fields.append('backing.deviceName')
+        if hasattr(data, "backing") and not hasattr(data.backing, "deviceName"):
+            failing_fields.append("backing.deviceName")
 
-        if hasattr(data, 'connectable'):
+        if hasattr(data, "connectable"):
             connectable = data.connectable
             for field in connectable_fields:
                 if not hasattr(connectable, field):
-                    failing_fields.append('connectable.' + field)
+                    failing_fields.append("connectable." + field)
 
         if len(failing_fields):
             msg = _(
-                'The given parameter {p!r} on calling method {m}() has failing '
-                'attributes').format(p='data', m='from_summary')
-            msg += ': ' + format_list(failing_fields, do_repr=True)
+                "The given parameter {p!r} on calling method {m}() has failing " "attributes"
+            ).format(p="data", m="from_summary")
+            msg += ": " + format_list(failing_fields, do_repr=True)
             raise AssertionError(msg)
 
 
@@ -544,18 +581,18 @@ class VsphereEthernetcard(FbBaseObject):
 class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     """A list containing VsphereEthernetcard objects."""
 
-    msg_no_ether_card = _('Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.')
+    msg_no_ether_card = _("Invalid type {t!r} as an item of a {c}, only {o} objects are allowed.")
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=__version__, base_dir=None,
-            initialized=None, *cards):
+        self, appname=None, verbose=0, version=__version__, base_dir=None, initialized=None, *cards
+    ):
         """Initialize a VsphereEthernetcardList object."""
         self._list = []
 
         super(VsphereEthernetcardList, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            initialized=False)
+            appname=appname, verbose=verbose, version=version, base_dir=base_dir, initialized=False
+        )
 
         for card in cards:
             self.append(card)
@@ -583,10 +620,10 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
             return res
 
         res = super(VsphereEthernetcardList, self).as_dict(short=short)
-        res['_list'] = []
+        res["_list"] = []
 
         for card in self:
-            res['_list'].append(card.as_dict(short=short))
+            res["_list"].append(card.as_dict(short=short))
 
         return res
 
@@ -594,8 +631,8 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def __copy__(self):
         """Return a new VsphereEthernetcardList as a deep copy of the current object."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for card in self:
             new_list.append(copy.copy(card))
@@ -611,8 +648,11 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
         if len(args) > 0:
             if len(args) > 2:
-                raise TypeError(_('{m} takes at most {max} arguments ({n} given).').format(
-                    m='index()', max=3, n=len(args) + 1))
+                raise TypeError(
+                    _("{m} takes at most {max} arguments ({n} given).").format(
+                        m="index()", max=3, n=len(args) + 1
+                    )
+                )
             i = int(args[0])
             if len(args) > 1:
                 j = int(args[1])
@@ -650,15 +690,18 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
             if item == card:
                 return index
 
-        msg = _('card is not in card list.')
+        msg = _("card is not in card list.")
         raise ValueError(msg)
 
     # -------------------------------------------------------------------------
     def __contains__(self, card):
         """Return whether the given controller is contained in current list."""
         if not isinstance(card, VsphereEthernetcard):
-            raise TypeError(self.msg_no_ether_card.format(
-                t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
+            raise TypeError(
+                self.msg_no_ether_card.format(
+                    t=card.__class__.__name__, c=self.__class__.__name__, o="VsphereEthernetcard"
+                )
+            )
 
         if not self._list:
             return False
@@ -673,8 +716,11 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def count(self, card):
         """Return the number of controllers which are equal to the given one in current list."""
         if not isinstance(card, VsphereEthernetcard):
-            raise TypeError(self.msg_no_ether_card.format(
-                t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
+            raise TypeError(
+                self.msg_no_ether_card.format(
+                    t=card.__class__.__name__, c=self.__class__.__name__, o="VsphereEthernetcard"
+                )
+            )
 
         if not self._list:
             return 0
@@ -705,8 +751,8 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def __reversed__(self):
         """Reverse the controllers in list in place."""
         new_list = self.__class__(
-            appname=self.appname, verbose=self.verbose,
-            base_dir=self.base_dir, initialized=False)
+            appname=self.appname, verbose=self.verbose, base_dir=self.base_dir, initialized=False
+        )
 
         for card in reversed(self._list):
             new_list.append(copy.copy(card))
@@ -718,8 +764,11 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def __setitem__(self, key, card):
         """Replace the controller at the given numeric index by the given one."""
         if not isinstance(card, VsphereEthernetcard):
-            raise TypeError(self.msg_no_ether_card.format(
-                t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
+            raise TypeError(
+                self.msg_no_ether_card.format(
+                    t=card.__class__.__name__, c=self.__class__.__name__, o="VsphereEthernetcard"
+                )
+            )
 
         self._list.__setitem__(key, card)
 
@@ -732,8 +781,11 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def append(self, card):
         """Append the given controller to the current list."""
         if not isinstance(card, VsphereEthernetcard):
-            raise TypeError(self.msg_no_ether_card.format(
-                t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
+            raise TypeError(
+                self.msg_no_ether_card.format(
+                    t=card.__class__.__name__, c=self.__class__.__name__, o="VsphereEthernetcard"
+                )
+            )
 
         self._list.append(card)
 
@@ -741,8 +793,11 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
     def insert(self, index, card):
         """Insert the given controller in current list at given index."""
         if not isinstance(card, VsphereEthernetcard):
-            raise TypeError(self.msg_no_ether_card.format(
-                t=card.__class__.__name__, c=self.__class__.__name__, o='VsphereEthernetcard'))
+            raise TypeError(
+                self.msg_no_ether_card.format(
+                    t=card.__class__.__name__, c=self.__class__.__name__, o="VsphereEthernetcard"
+                )
+            )
 
         self._list.insert(index, card)
 
@@ -753,7 +808,7 @@ class VsphereEthernetcardList(FbBaseObject, MutableSequence):
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     pass
 

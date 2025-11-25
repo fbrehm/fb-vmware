@@ -24,7 +24,7 @@ from ..errors import VSphereExpectedError
 from ..ether import VsphereEthernetcard
 from ..xlate import XLATOR
 
-__version__ = '1.7.0'
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -44,19 +44,33 @@ class GetVmApplication(BaseVmwareApplication):
 
     # -------------------------------------------------------------------------
     def __init__(
-        self, appname=None, verbose=0, version=GLOBAL_VERSION, base_dir=None,
-            initialized=False, usage=None, description=None,
-            argparse_epilog=None, argparse_prefix_chars='-', env_prefix=None):
+        self,
+        appname=None,
+        verbose=0,
+        version=GLOBAL_VERSION,
+        base_dir=None,
+        initialized=False,
+        usage=None,
+        description=None,
+        argparse_epilog=None,
+        argparse_prefix_chars="-",
+        env_prefix=None,
+    ):
         """Initialize the GetVmApplication object."""
         desc = _(
-            'Tries to get information about the given virtual machines in '
-            'VMWare VSphere and print it out.')
+            "Tries to get information about the given virtual machines in "
+            "VMWare VSphere and print it out."
+        )
 
         self.vms = []
 
         super(GetVmApplication, self).__init__(
-            appname=appname, verbose=verbose, version=version, base_dir=base_dir,
-            description=desc, initialized=False,
+            appname=appname,
+            verbose=verbose,
+            version=version,
+            base_dir=base_dir,
+            description=desc,
+            initialized=False,
         )
 
         self.initialized = True
@@ -67,8 +81,11 @@ class GetVmApplication(BaseVmwareApplication):
         super(GetVmApplication, self).init_arg_parser()
 
         self.arg_parser.add_argument(
-            'vms', metavar='VM', type=str, nargs='+',
-            help=_('Names of the VM to get information.'),
+            "vms",
+            metavar="VM",
+            type=str,
+            nargs="+",
+            help=_("Names of the VM to get information."),
         )
 
     # -------------------------------------------------------------------------
@@ -82,8 +99,7 @@ class GetVmApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _run(self):
 
-        LOG.debug(_('Starting {a!r}, version {v!r} ...').format(
-            a=self.appname, v=self.version))
+        LOG.debug(_("Starting {a!r}, version {v!r} ...").format(a=self.appname, v=self.version))
 
         ret = 99
         try:
@@ -116,45 +132,50 @@ class GetVmApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def show_vm(self, vm_name):
         """Show a particular VM on STDOUT."""
-        print('\n{}: '.format(vm_name), end='')
+        print("\n{}: ".format(vm_name), end="")
         if self.verbose:
             print()
 
         vm = self._get_vm_data(vm_name)
         if not vm:
-            print(self.colored(_('NOT FOUND'), 'RED'))
+            print(self.colored(_("NOT FOUND"), "RED"))
             return False
 
         # print("{ok}\n{vm}".format(ok=self.colored("OK", 'GREEN'), vm=pp(vm.as_dict(bare=True))))
-        print('{ok}'.format(ok=self.colored('OK', 'GREEN')))
+        print("{ok}".format(ok=self.colored("OK", "GREEN")))
         print()
-        print('    State:    {s:<13} Config version: {v}'.format(
-            s=vm.power_state, v=vm.config_version))
-        msg = '    VSPhere:  {vs:<10}    Cluster: {cl:<20}    Path: {p}'.format(
-            vs=vm.vsphere, cl=vm.cluster_name, p=vm.path)
+        print(
+            "    State:    {s:<13} Config version: {v}".format(
+                s=vm.power_state, v=vm.config_version
+            )
+        )
+        msg = "    VSPhere:  {vs:<10}    Cluster: {cl:<20}    Path: {p}".format(
+            vs=vm.vsphere, cl=vm.cluster_name, p=vm.path
+        )
         print(msg)
 
-        no_cpu = '   -'
+        no_cpu = "   -"
         if vm.num_cpu is not None:
-            no_cpu = '{:4d}'.format(vm.num_cpu)
+            no_cpu = "{:4d}".format(vm.num_cpu)
 
-        ram = '        -'
+        ram = "        -"
         if vm.memory_gb is not None:
-            ram = '{:5.1f} GiB'.format(vm.memory_gb)
+            ram = "{:5.1f} GiB".format(vm.memory_gb)
 
-        msg = '    No. CPUs: {cp}          RAM: {m}                   Cfg-Path: {p}'.format(
-            cp=no_cpu, m=ram, p=vm.config_path)
+        msg = "    No. CPUs: {cp}          RAM: {m}                   Cfg-Path: {p}".format(
+            cp=no_cpu, m=ram, p=vm.config_path
+        )
         print(msg)
 
-        os_id = '{:<43}'.format('-')
+        os_id = "{:<43}".format("-")
         if vm.guest_id is not None:
-            os_id = '{:<43}'.format(vm.guest_id)
+            os_id = "{:<43}".format(vm.guest_id)
 
-        os_name = _('Unknown')
+        os_name = _("Unknown")
         if vm.guest_fullname is not None:
             os_name = vm.guest_fullname
 
-        print('    OS:       {id}    {os}'.format(id=os_id, os=os_name))
+        print("    OS:       {id}    {os}".format(id=os_id, os=os_name))
 
         self._print_ctrlrs(vm)
         self._print_disks(vm)
@@ -168,72 +189,74 @@ class GetVmApplication(BaseVmwareApplication):
 
         first = True
         for ctrlr in sorted(
-                filter(lambda x: x.scsi_ctrl_nr is not None, vm.controllers),
-                key=attrgetter('bus_nr')):
+            filter(lambda x: x.scsi_ctrl_nr is not None, vm.controllers), key=attrgetter("bus_nr")
+        ):
             if ctrlr.scsi_ctrl_nr is None:
                 continue
-            label = ''
+            label = ""
             if first:
-                label = 'Controller:'
+                label = "Controller:"
             first = False
-            ctype = _('Unknown')
+            ctype = _("Unknown")
             nr_disks = len(ctrlr.devices)
             if ctrlr.ctrl_type in VsphereDiskController.type_names.keys():
                 ctype = VsphereDiskController.type_names[ctrlr.ctrl_type]
-            no_disk = ngettext('{nr:>2} disk ", "{nr:>2} disks', nr_disks).format(
-                nr=nr_disks)
+            no_disk = ngettext('{nr:>2} disk ", "{nr:>2} disks', nr_disks).format(nr=nr_disks)
             # no_disk = _("{nr:>2} disks").format(nr=len(ctrlr.devices))
             # if len(ctrlr.devices) == 1:
             #     no_disk = _(" 1 disk ")
-            msg = '    {la:<15}  {nr:>2} - {di} - {ty}'.format(
-                la=label, nr=ctrlr.bus_nr, di=no_disk, ty=ctype)
+            msg = "    {la:<15}  {nr:>2} - {di} - {ty}".format(
+                la=label, nr=ctrlr.bus_nr, di=no_disk, ty=ctype
+            )
             print(msg)
 
     # -------------------------------------------------------------------------
     def _print_disks(self, vm):
 
         if not vm.disks:
-            print('    Disks:       {}'.format(_('None')))
+            print("    Disks:       {}".format(_("None")))
             return
 
         total_gb = 0.0
         first = True
         for disk in vm.disks:
             total_gb += disk.size_gb
-            label = ' ' * 15
+            label = " " * 15
             if first:
-                label = (ngettext('Disk', 'Disks', len(vm.disks)) + ':').ljust(15)
+                label = (ngettext("Disk", "Disks", len(vm.disks)) + ":").ljust(15)
             first = False
             ctrlr_nr = -1
             for ctrlr in vm.controllers:
                 if disk.key in ctrlr.devices:
                     ctrlr_nr = ctrlr.bus_nr
                     break
-            msg = '    {la}  {n:<15} - {s:7.1f} GiB - Controller {c:>2} - File {f}'.format(
-                la=label, n=disk.label, s=disk.size_gb, c=ctrlr_nr, f=disk.file_name)
+            msg = "    {la}  {n:<15} - {s:7.1f} GiB - Controller {c:>2} - File {f}".format(
+                la=label, n=disk.label, s=disk.size_gb, c=ctrlr_nr, f=disk.file_name
+            )
             print(msg)
         if len(vm.disks) > 1:
-            msg = (' ' * 21) + '{n:<15} - {s:7.1f} GiB'.format(n=_('Total'), s=total_gb)
+            msg = (" " * 21) + "{n:<15} - {s:7.1f} GiB".format(n=_("Total"), s=total_gb)
             print(msg)
 
     # -------------------------------------------------------------------------
     def _print_interfaces(self, vm):
 
         if not vm.interfaces:
-            print('    Ethernet:    {}'.format(_('None')))
+            print("    Ethernet:    {}".format(_("None")))
             return
 
         first = True
         for dev in vm.interfaces:
-            label = ' ' * 15
+            label = " " * 15
             if first:
-                label = 'Ethernet:'.ljust(15)
+                label = "Ethernet:".ljust(15)
             first = False
-            etype = _('Unknown')
+            etype = _("Unknown")
             if dev.ether_type in VsphereEthernetcard.ether_types.keys():
                 etype = VsphereEthernetcard.ether_types[dev.ether_type]
-            msg = '    {la}  {n:<15} - Network {nw:<20} - Connection: {c:<4} - {t}'.format(
-                la=label, n=dev.label, nw=dev.backing_device, c=dev.connect_status, t=etype)
+            msg = "    {la}  {n:<15} - Network {nw:<20} - Connection: {c:<4} - {t}".format(
+                la=label, n=dev.label, nw=dev.backing_device, c=dev.connect_status, t=etype
+            )
             print(msg)
 
     # -------------------------------------------------------------------------
@@ -244,8 +267,8 @@ class GetVmApplication(BaseVmwareApplication):
 
         no_vals = len(vm.custom_data)
 
-        label = ngettext('Custom Value', 'Custom Values', no_vals)
-        print('    {}:'.format(label))
+        label = ngettext("Custom Value", "Custom Values", no_vals)
+        print("    {}:".format(label))
 
         max_key_len = 1
         for custom_data in vm.full_custom_data:
@@ -256,16 +279,17 @@ class GetVmApplication(BaseVmwareApplication):
         for custom_data in vm.full_custom_data:
             for custom_name in custom_data.keys():
                 custom_value = custom_data[custom_name]
-                name = custom_name + ':'
-                line = '        - {n:<{len}} {val}'.format(
-                    n=name, len=max_key_len, val=custom_value)
+                name = custom_name + ":"
+                line = "        - {n:<{len}} {val}".format(
+                    n=name, len=max_key_len, val=custom_value
+                )
                 print(line.rstrip())
 
     # -------------------------------------------------------------------------
     def _get_vm_data(self, vm_name):
 
         if self.verbose > 1:
-            LOG.debug(_('Pulling full data of VM {!r} ...').format(vm_name))
+            LOG.debug(_("Pulling full data of VM {!r} ...").format(vm_name))
 
         vm = None
 
@@ -308,7 +332,7 @@ def main():
 
 
 # =============================================================================
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     main()
 

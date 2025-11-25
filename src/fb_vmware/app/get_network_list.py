@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: The module for the application object of the get-vsphere-network-list application.
+@summary: Print a list of all networks in a VMware vSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -10,7 +10,9 @@
 from __future__ import absolute_import, print_function
 
 # Standard modules
+import locale
 import logging
+import pathlib
 import sys
 from operator import itemgetter
 
@@ -500,9 +502,28 @@ class GetNetworkListApp(BaseVmwareApplication):
 
 
 # =============================================================================
+def main():
+    """Entrypoint for get-vsphere-network-list."""
+    my_path = pathlib.Path(__file__)
+    appname = my_path.name
+
+    locale.setlocale(locale.LC_ALL, "")
+
+    app = GetNetworkListApp(appname=appname)
+    app.initialized = True
+
+    if app.verbose > 2:
+        print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
+
+    app()
+
+    sys.exit(0)
+
+
+# =============================================================================
 if __name__ == '__main__':
 
-    pass
+    main()
 
 # =============================================================================
 

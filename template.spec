@@ -66,7 +66,7 @@ fi
 %files
 %defattr(-,root,root,-)
 %license LICENSE
-%doc LICENSE README.md requirements.txt debian/changelog
+%doc CHANGELOG.md LICENSE README.md requirements.txt debian/changelog
 %{_bindir}/*
 %{_datadir}/*
 %{python3_sitelib}/*

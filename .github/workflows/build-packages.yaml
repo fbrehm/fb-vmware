@@ -62,7 +62,7 @@ jobs:
       libdir: src/fb_vmware
       # debian_versions: 'Debian-Bullseye Debian-Bookworm Ubuntu-Focal Ubuntu-Jammy'
       el_versions: 'el-9 el-10'
-      additional_debian_build_packages: >
+      additional_debian_build_packages: >-
         flit
         pybuild-plugin-pyproject
         python3-fb-logging
@@ -70,7 +70,7 @@ jobs:
         python3-pyvmomi
         python3-semver
         python3-yaml
-      additional_rpm_build_packages: >
+      additional_rpm_build_packages: >-
         python3-fb-logging
         python3-fb-tools
         python3-pyvmomi

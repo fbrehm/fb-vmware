@@ -27,10 +27,12 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.4.4"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -45,6 +47,22 @@ class VsphereDatastore(VsphereObject):
     re_local_ds = re.compile(r"^local_", re.IGNORECASE)
     re_k8s_ds = re.compile(r"[_-](?:k8s|kubernetes)[_-]", re.IGNORECASE)
 
+    repr_fields = (
+        "name",
+        "vsphere",
+        "dc_name",
+        "cluster",
+        "status",
+        "accessible",
+        "capacity",
+        "free_space",
+        "fs_type",
+        "storage_type",
+        "appname",
+        "verbose",
+        "version",
+    )
+
     # -------------------------------------------------------------------------
     def __init__(
         self,
@@ -54,6 +72,9 @@ class VsphereDatastore(VsphereObject):
         base_dir=None,
         initialized=None,
         name=None,
+        vsphere=None,
+        dc_name=None,
+        cluster=None,
         status="gray",
         config_status="gray",
         accessible=True,
@@ -67,19 +88,9 @@ class VsphereDatastore(VsphereObject):
         for_k8s=None,
     ):
         """Initialize the VsphereDatastore object."""
-        self.repr_fields = (
-            "name",
-            "status",
-            "accessible",
-            "capacity",
-            "free_space",
-            "fs_type",
-            "storage_type",
-            "appname",
-            "verbose",
-            "version",
-        )
-
+        self._vsphere = None
+        self._dc_name = None
+        self._cluster = None
         self._accessible = bool(accessible)
         self._capacity = int(capacity)
         self._free_space = int(free_space)
@@ -114,6 +125,10 @@ class VsphereDatastore(VsphereObject):
             base_dir=base_dir,
         )
 
+        self.vsphere = vsphere
+        self.dc_name = dc_name
+        self.cluster = cluster
+
         st_type = self.storage_type_by_name(self.name)
         if st_type:
             self._storage_type = st_type
@@ -143,6 +158,44 @@ class VsphereDatastore(VsphereObject):
     def capacity_gb(self):
         """Return the maximum capacity of this datastore, in GiBytes."""
         return float(self.capacity) / 1024.0 / 1024.0 / 1024.0
+
+    # -----------------------------------------------------------
+    @property
+    def cluster(self):
+        """Return the datastore cluster name of the datastore."""
+        return self._cluster
+
+    @cluster.setter
+    def cluster(self, value):
+
+        if value is None:
+            self._cluster = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._cluster = val
+
+    # -----------------------------------------------------------
+    @property
+    def dc_name(self):
+        """Return the datacenter name of the datastore."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
 
     # -----------------------------------------------------------
     @property
@@ -202,6 +255,25 @@ class VsphereDatastore(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def vsphere(self):
+        """Return the name of the vSphere of the datastore."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == "":
+            msg = _("The name of the vSphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
+
+    # -----------------------------------------------------------
+    @property
     def for_k8s(self):
         """Return, whther this datastore is intended to use for Kubernetes PV."""
         return self._for_k8s
@@ -239,7 +311,17 @@ class VsphereDatastore(VsphereObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
+    def from_summary(
+        cls,
+        data,
+        vsphere=None,
+        dc_name=None,
+        cluster=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
+    ):
         """Create a new VsphereDatastore object based on the data given from pyvmomi module."""
         if test_mode:
 
@@ -274,6 +356,9 @@ class VsphereDatastore(VsphereObject):
                 raise TypeError(msg)
 
         params = {
+            "vsphere": vsphere,
+            "dc_name": dc_name,
+            "cluster": cluster,
             "appname": appname,
             "verbose": verbose,
             "base_dir": base_dir,
@@ -354,20 +439,23 @@ class VsphereDatastore(VsphereObject):
         """
         res = super(VsphereDatastore, self).as_dict(short=short)
         res["accessible"] = self.accessible
+        res["avail_space_gb"] = self.avail_space_gb
+        res["calculated_usage"] = self.calculated_usage
         res["capacity"] = self.capacity
         res["capacity_gb"] = self.capacity_gb
+        res["cluster"] = self.cluster
+        res["dc_name"] = self.dc_name
+        res["for_k8s"] = self.for_k8s
         res["free_space"] = self.free_space
         res["free_space_gb"] = self.free_space_gb
+        res["fs_type"] = self.fs_type
         res["maintenance_mode"] = self.maintenance_mode
         res["multiple_host_access"] = self.multiple_host_access
-        res["fs_type"] = self.fs_type
-        res["for_k8s"] = self.for_k8s
+        res["storage_type"] = self.storage_type
         res["uncommitted"] = self.uncommitted
         res["uncommitted_gb"] = self.uncommitted_gb
         res["url"] = self.url
-        res["storage_type"] = self.storage_type
-        res["calculated_usage"] = self.calculated_usage
-        res["avail_space_gb"] = self.avail_space_gb
+        res["vsphere"] = self.vsphere
 
         return res
 
@@ -380,6 +468,9 @@ class VsphereDatastore(VsphereObject):
             base_dir=self.base_dir,
             initialized=self.initialized,
             name=self.name,
+            cluster=self.cluster,
+            vsphere=self.vsphere,
+            dc_name=self.dc_name,
             accessible=self.accessible,
             capacity=self.capacity,
             free_space=self.free_space,
@@ -400,6 +491,12 @@ class VsphereDatastore(VsphereObject):
             LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDatastore):
+            return False
+
+        if self.vsphere != other.vsphere:
+            return False
+
+        if self.dc_name != other.dc_name:
             return False
 
         if self.name != other.name:

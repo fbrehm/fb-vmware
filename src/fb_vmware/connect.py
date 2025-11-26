@@ -54,7 +54,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -459,7 +459,7 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_networks(self, disconnect=False):
+    def get_networks(self, vsphere_name=None, disconnect=False):
         """Get all networks from vSphere as VsphereNetwork objects."""
         LOG.debug(_("Trying to get all networks from vSphere ..."))
         self.dv_portgroups = VsphereNetworkDict()
@@ -471,12 +471,14 @@ class VsphereConnection(BaseVsphereHandler):
             if not self.service_instance:
                 self.connect()
 
+            self.get_datacenters()
             content = self.service_instance.RetrieveContent()
-            dc = self.get_obj(content, [vim.Datacenter], self.dc)
-            if not dc:
-                raise VSphereDatacenterNotFoundError(self.dc)
-            for child in dc.networkFolder.childEntity:
-                self._get_networks(child)
+            for dc_name in self.datacenters.keys():
+                if self.verbose > 0:
+                    LOG.debug(_("Get all networking objects in DC {!r} ...").format(dc_name))
+                dc = self.get_obj(content, [vim.Datacenter], dc_name)
+                for child in dc.networkFolder.childEntity:
+                    self._get_networks(child, vsphere_name=vsphere_name, dc_name=dc_name)
 
         finally:
             if disconnect:
@@ -523,7 +525,7 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Network mappings:") + "\n" + pp(self.network_mapping))
 
     # -------------------------------------------------------------------------
-    def _get_networks(self, child, depth=1):
+    def _get_networks(self, child, vsphere_name=None, dc_name=None, depth=1):
 
         if self.verbose > 3:
             LOG.debug(_("Found a {} child.").format(child.__class__.__name__))
@@ -532,25 +534,42 @@ class VsphereConnection(BaseVsphereHandler):
             if depth > self.max_search_depth:
                 return
             for sub_child in child.childEntity:
-                self._get_networks(sub_child, depth + 1)
+                self._get_networks(
+                    sub_child, vsphere_name=vsphere_name, dc_name=dc_name, depth=depth + 1
+                )
 
         if isinstance(child, vim.DistributedVirtualSwitch):
             dvs = VsphereDVS.from_summary(
-                child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                child,
+                vsphere=vsphere_name,
+                dc_name=dc_name,
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
             )
             uuid = dvs.uuid
             self.dvs[uuid] = dvs
         elif isinstance(child, vim.Network):
             if isinstance(child, vim.dvs.DistributedVirtualPortgroup):
                 portgroup = VsphereDvPortGroup.from_summary(
-                    child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                    child,
+                    vsphere=vsphere_name,
+                    dc_name=dc_name,
+                    appname=self.appname,
+                    verbose=self.verbose,
+                    base_dir=self.base_dir,
                 )
                 self.dv_portgroups.append(portgroup)
             elif isinstance(child, vim.OpaqueNetwork):
                 LOG.debug("Evaluating Opaque Network later ...")
             else:
                 network = VsphereNetwork.from_summary(
-                    child, appname=self.appname, verbose=self.verbose, base_dir=self.base_dir
+                    child,
+                    vsphere=vsphere_name,
+                    dc_name=dc_name,
+                    appname=self.appname,
+                    verbose=self.verbose,
+                    base_dir=self.base_dir,
                 )
                 self.networks.append(network)
 

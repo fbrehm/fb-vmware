@@ -23,13 +23,15 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .errors import VSphereNoNetFoundError
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = "1.8.4"
+__version__ = "1.9.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -43,12 +45,18 @@ class VsphereNetwork(VsphereObject):
     re_ipv4_name = re.compile(r"\s*((?:\d{1,3}\.){3}\d{1,3})_(\d+)\s*$")
     re_tf_name = re.compile(r"[^a-z0-9_]+", re.IGNORECASE)
 
-    net_properties = ["accessible", "ip_pool_id", "ip_pool_name"]
+    net_properties = [
+        "accessible",
+        "dc_name",
+        "ip_pool_id",
+        "ip_pool_name",
+        "vsphere",
+    ]
 
     repr_fields = [
         "name",
         "obj_type",
-        "status",
+        "vsphere" "dc_name" "status",
         "config_status",
         "accessible",
         "ip_pool_id",
@@ -158,6 +166,25 @@ class VsphereNetwork(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def dc_name(self):
+        """Return the datacenter name of the network."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
+
+    # -----------------------------------------------------------
+    @property
     def ip_pool_id(self):
         """Return the Identifier of the associated IP pool."""
         return self._ip_pool_id
@@ -190,6 +217,25 @@ class VsphereNetwork(VsphereObject):
             return None
         return self.network.network_address + 1
 
+    # -----------------------------------------------------------
+    @property
+    def vsphere(self):
+        """Return the name of the vSphere of the network."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == "":
+            msg = _("The name of the vSphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
+
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
@@ -213,7 +259,16 @@ class VsphereNetwork(VsphereObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
+    def from_summary(
+        cls,
+        data,
+        vsphere=None,
+        dc_name=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
+    ):
         """Create a new VsphereNetwork object based on the data given from pyvmomi."""
         if test_mode:
 
@@ -243,6 +298,8 @@ class VsphereNetwork(VsphereObject):
                 raise TypeError(msg)
 
         common_params = {
+            "vsphere": vsphere,
+            "dc_name": dc_name,
             "appname": appname,
             "verbose": verbose,
             "base_dir": base_dir,

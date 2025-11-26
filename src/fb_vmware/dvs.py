@@ -22,12 +22,14 @@ from fb_tools.common import pp, to_bool
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .network import VsphereNetwork
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -41,6 +43,7 @@ class VsphereDVS(VsphereObject):
         "contact_info",
         "contact_name",
         "create_time",
+        "dc_name",
         "def_proxy_switch_max_num_ports",
         "description",
         "extension_key",
@@ -55,6 +58,7 @@ class VsphereDVS(VsphereObject):
         "product_vendor",
         "product_version",
         "uuid",
+        "vsphere",
     ]
 
     prop_source = {
@@ -171,6 +175,25 @@ class VsphereDVS(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def dc_name(self):
+        """Return the datacenter name of the VDS."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
+
+    # -----------------------------------------------------------
+    @property
     def def_proxy_switch_max_num_ports(self):
         """Return the default host proxy switch maximum port number of this VDS."""
         return self._def_proxy_switch_max_num_ports
@@ -257,6 +280,25 @@ class VsphereDVS(VsphereObject):
         """Return the UUID of this VDS."""
         return self._uuid
 
+    # -----------------------------------------------------------
+    @property
+    def vsphere(self):
+        """Return the name of the vSphere of the VDS."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == "":
+            msg = _("The name of the vSphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
+
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
@@ -282,6 +324,12 @@ class VsphereDVS(VsphereObject):
             LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDVS):
+            return False
+
+        if self.vsphere != other.vsphere:
+            return False
+
+        if self.dc_name != other.dc_name:
             return False
 
         if self.uuid != other.uuid:
@@ -332,42 +380,20 @@ class VsphereDVS(VsphereObject):
 
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
+    def from_summary(
+        cls,
+        data,
+        vsphere=None,
+        dc_name=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
+    ):
         """Create a new VsphereDVS object based on the data given from pyvmomi."""
-        # if test_mode:
-
-        #     failing_fields = []
-
-        #     for field in cls.necessary_fields:
-        #         if not hasattr(data, field):
-        #             failing_fields.append(field)
-
-        #     if hasattr(data, 'config'):
-        #         for field in cls.necessary_config_fields:
-        #             if not hasattr(data.config, field):
-        #                 failing_fields.append('config.' + field)
-        #         if not hasattr(data.config, 'name'):
-        #             failing_fields.append('config.name')
-        #     else:
-        #         failing_fields.append('config')
-
-        #     if not hasattr(data, 'summary'):
-        #         failing_fields.append('summary')
-
-        #     if len(failing_fields):
-        #         msg = _(
-        #             'The given parameter {p!r} on calling method {m}() has failing '
-        #             'attributes').format(p='data', m='from_summary')
-        #         msg += ': ' + format_list(failing_fields, do_repr=True)
-        #         raise AssertionError(msg)
-
-        # else:
-        #     if not isinstance(data, vim.DistributedVirtualSwitch):
-        #         msg = _('Parameter {t!r} must be a {e}, {v} was given.').format(
-        #             t='data', e='vim.DistributedVirtualSwitch', v=data.__class__.__name__)
-        #         raise TypeError(msg)
-
         params = {
+            "vsphere": vsphere,
+            "dc_name": dc_name,
             "appname": appname,
             "verbose": verbose,
             "base_dir": base_dir,
@@ -425,18 +451,6 @@ class VsphereDVS(VsphereObject):
 class VsphereDvPortGroup(VsphereNetwork):
     """Wrapper class for a Network definition in vSphere (vim.dvs.DistributedVirtualPortgroup)."""
 
-    repr_fields = (
-        "name",
-        "obj_type",
-        "status",
-        "config_status",
-        "accessible",
-        "ip_pool_id",
-        "ip_pool_name",
-        "appname",
-        "verbose",
-    )
-
     dvpg_properties = [
         "auto_expand",
         "backing_type",
@@ -447,6 +461,8 @@ class VsphereDvPortGroup(VsphereNetwork):
         "port_keys",
         "port_name_format",
         "segment_id",
+        "subnet_id",
+        "vlan_id",
         "pg_type",
         "uplink",
     ]
@@ -454,6 +470,8 @@ class VsphereDvPortGroup(VsphereNetwork):
     repr_fields = [
         "name",
         "obj_type",
+        "vsphere",
+        "dc_name",
         "status",
         "config_status",
         "accessible",
@@ -470,6 +488,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         "port_keys",
         "port_name_format",
         "segment_id",
+        "subnet_id",
         "pg_type",
         "uplink",
     ]
@@ -486,6 +505,7 @@ class VsphereDvPortGroup(VsphereNetwork):
         "num_ports": "numPorts",
         "port_name_format": "portNameFormat",
         "segment_id": "segmentId",
+        "subnet_id": "subnetId",
         "pg_type": "type",
         "uplink": "uplink",
     }
@@ -636,6 +656,16 @@ class VsphereDvPortGroup(VsphereNetwork):
 
     # -----------------------------------------------------------
     @property
+    def subnet_id(self):
+        """Return the subnet ID of the portgroup."""
+        return self._subnet_id
+
+    @subnet_id.setter
+    def subnet_id(self, value):
+        self._subnet_id = value
+
+    # -----------------------------------------------------------
+    @property
     def segment_id(self):
         """Return the segment ID of the portgroup."""
         return self._segment_id
@@ -643,6 +673,16 @@ class VsphereDvPortGroup(VsphereNetwork):
     @segment_id.setter
     def segment_id(self, value):
         self._segment_id = value
+
+    # -----------------------------------------------------------
+    @property
+    def vlan_id(self):
+        """Return the VLAN ID of the portgroup."""
+        return self._vlan_id
+
+    @vlan_id.setter
+    def vlan_id(self, value):
+        self._vlan_id = value
 
     # -----------------------------------------------------------
     @property
@@ -689,7 +729,7 @@ class VsphereDvPortGroup(VsphereNetwork):
     @classmethod
     def get_init_params(cls, data, verbose=0):
         """Return a dict with all keys for init a new network object with from_summary()."""
-        params = super(VsphereDvPortGroup, cls).get_init_params(data, verbose)
+        params = super(VsphereDvPortGroup, cls).get_init_params(data, verbose=verbose)
 
         for prop in cls.dvpg_prop_source:
             prop_src = cls.dvpg_prop_source[prop]
@@ -705,6 +745,21 @@ class VsphereDvPortGroup(VsphereNetwork):
 
         if hasattr(data.config, "distributedVirtualSwitch"):
             params["dvs_uuid"] = data.config.distributedVirtualSwitch.uuid
+
+        if hasattr(data.config, "defaultPortConfig"):
+            if hasattr(data.config.defaultPortConfig, "vlan"):
+                vlan_info = data.config.defaultPortConfig.vlan
+                vlan_spec = vim.dvs.VmwareDistributedVirtualSwitch.TrunkVlanSpec
+                if isinstance(vlan_info, vlan_spec):
+                    vlanlist = []
+                    for item in vlan_info.vlanId:
+                        if item.start == item.end:
+                            vlanlist.append(str(item.start))
+                        else:
+                            vlanlist.append(str(item.start) + "-" + str(item.end))
+                    params["vlan_id"] = ",".join(vlanlist)
+                else:
+                    params["vlan_id"] = str(vlan_info.vlanId)
 
         return params
 

@@ -33,7 +33,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -242,6 +242,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 cluster["cluster_name"] = cluster_name
 
                 cluster["vsphere_name"] = vsphere_name
+                cluster["dc"] = cl.dc_name
 
                 cluster["capacity"] = cl.capacity_gb
                 cluster["capacity_gb"] = format_decimal(cl.capacity_gb, format="#,##0")
@@ -275,6 +276,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             self.totals = {
                 "cluster_name": _("Total"),
                 "vsphere_name": "",
+                "dc": "",
                 "is_total": True,
                 "capacity_gb": format_decimal(total_capacity, format="#,##0"),
                 "free_space_gb": format_decimal(total_free, format="#,##0"),
@@ -314,6 +316,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         labels = {
             "cluster_name": "Cluster",
             "vsphere_name": "vSphere",
+            "dc": _("Data Center"),
             "capacity_gb": _("Capacity in GB"),
             "free_space_gb": _("Free space in GB"),
             "usage_gb": _("Calculated usage in GB"),
@@ -323,6 +326,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         label_list = (
             "cluster_name",
             "vsphere_name",
+            "dc",
             "capacity_gb",
             "usage_gb",
             "usage_pc_out",
@@ -349,7 +353,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         for label in label_list:
             if tpl != "":
                 tpl += "  "
-            if label in ("cluster_name", "vsphere_name"):
+            if label in ("cluster_name", "vsphere_name", "dc"):
                 tpl += "{{{la}:<{le}}}".format(la=label, le=field_length[label])
             else:
                 tpl += "{{{la}:>{le}}}".format(la=label, le=field_length[label])

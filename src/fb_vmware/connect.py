@@ -54,7 +54,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.5.0"
+__version__ = "2.5.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -331,7 +331,7 @@ class VsphereConnection(BaseVsphereHandler):
         return None
 
     # -------------------------------------------------------------------------
-    def get_datastores(self, no_local_ds=True, disconnect=False):
+    def get_datastores(self, vsphere_name=None, no_local_ds=True, disconnect=False):
         """Get all datastores from vSphere as VsphereDatastore objects."""
         LOG.debug(_("Trying to get all datastores from vSphere ..."))
         self.datastores = VsphereDatastoreDict()
@@ -404,7 +404,6 @@ class VsphereConnection(BaseVsphereHandler):
                     depth=(depth + 1),
                 )
             return
-
 
         if hasattr(child, "childEntity"):
             if depth > self.max_search_depth:

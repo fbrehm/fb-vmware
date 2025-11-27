@@ -33,7 +33,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -242,7 +242,7 @@ class GetStorageListApp(BaseVmwareApplication):
             sys.stdout.flush()
 
         if self.verbose > 2:
-            LOG.debug(_("Found datastores:") + "\n" + pp(all_storage_clusters))
+            LOG.debug(_("Found datastores:") + "\n" + pp(all_datastores))
 
         self.print_datastores(all_datastores)
 

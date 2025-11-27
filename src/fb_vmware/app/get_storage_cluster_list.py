@@ -28,12 +28,11 @@ from fb_tools.xlate import format_list
 from . import BaseVmwareApplication
 from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-# from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -387,9 +386,9 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             if count:
                 msg = ngettext(
                     "Found one VMware storage cluster.",
-                    "Found {} VMware storage clusters.".format(count),
+                    "Found {} VMware storage clusters.",
                     count,
-                )
+                ).format(count)
             else:
                 msg = _("No VMware storage clusters found.")
 

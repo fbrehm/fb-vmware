@@ -28,12 +28,11 @@ from fb_tools.xlate import format_list
 from . import BaseVmwareApplication
 from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-# from ..ds_cluster import VsphereDsCluster
 from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -78,9 +77,7 @@ class GetStorageListApp(BaseVmwareApplication):
         env_prefix=None,
     ):
         """Initialize a GetStorageListApp object."""
-        desc = _(
-            "Tries to get a list of all datastores in VMware vSphere and print it out."
-        )
+        desc = _("Tries to get a list of all datastores in VMware vSphere and print it out.")
 
         self.datastores = []
         self._print_total = True
@@ -417,9 +414,9 @@ class GetStorageListApp(BaseVmwareApplication):
             if count:
                 msg = ngettext(
                     "Found one VMware datastore.",
-                    "Found {} VMware datastores.".format(count),
+                    "Found {} VMware datastores.",
                     count,
-                )
+                ).format(count)
             else:
                 msg = _("No VMware datastores found.")
 

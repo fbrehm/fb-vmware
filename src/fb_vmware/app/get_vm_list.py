@@ -30,7 +30,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -49,8 +49,18 @@ class GetVmListApplication(BaseVmwareApplication):
     """Class for the application objects."""
 
     default_vm_pattern = r".*"
-    avail_sort_keys = ("name", "vsphere", "cluster", "path", "type", "onl_str", "cfg_ver", "os")
-    default_sort_keys = ["name", "vsphere"]
+    avail_sort_keys = (
+        "name",
+        "vsphere",
+        "dc",
+        "cluster",
+        "path",
+        "type",
+        "onl_str",
+        "cfg_ver",
+        "os",
+    )
+    default_sort_keys = ["name", "vsphere", "dc"]
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -351,11 +361,12 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_vms(self, all_vms):
         """Print out on STDOUT the list of found VMs."""
-        label_list = ("name", "vsphere", "path")
+        label_list = ("name", "vsphere", "dc", "path")
         labels = {
-            "name": "Host",
+            "name": _("Host"),
             "vsphere": "vSphere",
-            "path": "Path",
+            "dc": _("Data Center"),
+            "path": _("Path"),
         }
 
         self._print_vms(all_vms, label_list, labels)
@@ -367,12 +378,13 @@ class GetVmListApplication(BaseVmwareApplication):
         labels = {
             "name": "VM/Template",
             "vsphere": "vSphere",
-            "cluster": "Cluster",
-            "path": "Path",
-            "type": "Type",
-            "onl_str": "Online Status",
-            "cfg_ver": "Config Version",
-            "os": "Operating System",
+            "dc": _("Data Center"),
+            "cluster": _("Cluster"),
+            "path": _("Path"),
+            "type": _("Type"),
+            "onl_str": _("Online Status"),
+            "cfg_ver": _("Config Version"),
+            "os": _("Operating System"),
         }
 
         self._print_vms(all_vms, label_list, labels)
@@ -389,7 +401,7 @@ class GetVmListApplication(BaseVmwareApplication):
         for cdata in all_vms:
             for field in ("cluster", "path", "type", "cfg_ver", "os"):
                 if field in labels and cdata[field] is None:
-                    cdata[field] = "-"
+                    cdata[field] = "~"
             for label in labels.keys():
                 val = cdata[label]
                 if len(val) > str_lengths[label]:
@@ -468,7 +480,8 @@ class GetVmListApplication(BaseVmwareApplication):
             cdata = {
                 "vsphere": vsphere_name,
                 "name": vm[0],
-                "path": vm[1],
+                "dc": vm[1],
+                "path": vm[2],
             }
 
             if cdata["path"]:
@@ -543,8 +556,13 @@ class GetVmListApplication(BaseVmwareApplication):
             if not self._re_os.search(vm.config_version):
                 return None
 
+        dc = "~"
+        if vm.dc_name:
+            dc = vm.dc_name
+
         cdata = {
             "vsphere": vsphere_name,
+            "dc": dc,
             "cluster": vm.cluster_name,
             "name": vm.name,
             "path": vm.path,

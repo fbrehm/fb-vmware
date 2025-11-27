@@ -16,11 +16,12 @@ import re
 import socket
 import time
 import uuid
+from numbers import Number
+
 try:
     from collections.abc import Sequence
 except ImportError:
     from collections import Sequence
-from numbers import Number
 
 # Third party modules
 from fb_tools.common import RE_TF_NAME, pp
@@ -54,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.5.1"
+__version__ = "2.6.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -377,7 +378,13 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def _get_datastores(
-        self, child, vsphere_name=None, dc_name=None, cluster=None, no_local_ds=True, depth=1,
+        self,
+        child,
+        vsphere_name=None,
+        dc_name=None,
+        cluster=None,
+        no_local_ds=True,
+        depth=1,
     ):
 
         if self.verbose > 3:
@@ -498,7 +505,10 @@ class VsphereConnection(BaseVsphereHandler):
                 return
             for sub_child in child.childEntity:
                 self._get_ds_clusters(
-                    sub_child, vsphere_name=vsphere_name, dc_name=dc_name, depth=depth + 1,
+                    sub_child,
+                    vsphere_name=vsphere_name,
+                    dc_name=dc_name,
+                    depth=depth + 1,
                 )
 
         if isinstance(child, vim.StoragePod):
@@ -942,27 +952,39 @@ class VsphereConnection(BaseVsphereHandler):
             if not self.service_instance:
                 self.connect()
 
+            if not self.datacenters.keys():
+                self.get_datacenters()
             content = self.service_instance.RetrieveContent()
-            dc = self.get_obj(content, [vim.Datacenter], self.dc)
-            if not dc:
-                raise VSphereDatacenterNotFoundError(self.dc)
+            for dc_name in self.datacenters.keys():
+                if self.verbose > 0:
+                    LOG.debug(
+                        _("Searching for virtual machines in DC {} ...").format(
+                            self.colored(dc_name, "CYAN")
+                        )
+                    )
+                dc = self.get_obj(content, [vim.Datacenter], dc_name)
 
-            for child in dc.vmFolder.childEntity:
-                path = child.name
-                if self.verbose > 1:
-                    LOG.debug(_("Searching in path {!r} ...").format(path))
-                vms = self._get_vms(
-                    child,
-                    re_name,
-                    vsphere_name=vsphere_name,
-                    is_template=is_template,
-                    as_vmw_obj=as_vmw_obj,
-                    as_obj=as_obj,
-                    name_only=name_only,
-                    stop_at_found=stop_at_found,
-                )
-                if vms:
-                    vm_list += vms
+                for child in dc.vmFolder.childEntity:
+                    path = child.name
+                    if self.verbose > 1:
+                        LOG.debug(_("Searching in path {!r} ...").format(path))
+                    vms = self._get_vms(
+                        child,
+                        re_name,
+                        vsphere_name=vsphere_name,
+                        dc_name=dc_name,
+                        is_template=is_template,
+                        as_vmw_obj=as_vmw_obj,
+                        as_obj=as_obj,
+                        name_only=name_only,
+                        stop_at_found=stop_at_found,
+                    )
+                    if vms:
+                        vm_list += vms
+                        if stop_at_found:
+                            break
+                if vms and stop_at_found:
+                    break
 
         finally:
             if disconnect:
@@ -982,6 +1004,7 @@ class VsphereConnection(BaseVsphereHandler):
         re_name,
         cur_path="",
         vsphere_name=None,
+        dc_name=None,
         is_template=None,
         depth=1,
         as_vmw_obj=False,
@@ -1011,6 +1034,7 @@ class VsphereConnection(BaseVsphereHandler):
                 re_name,
                 cur_path=cur_path,
                 vsphere_name=vsphere_name,
+                dc_name=dc_name,
                 is_template=is_template,
                 depth=depth,
                 as_vmw_obj=as_vmw_obj,
@@ -1025,8 +1049,8 @@ class VsphereConnection(BaseVsphereHandler):
             vm_config = summary.config
             vm_name = vm_config.name
 
-            if self.verbose > 3:
-                LOG.debug(_("Checking VM {!r} ...").format(vm_name))
+            if self.verbose > 2:
+                LOG.debug(_("Checking VM {} ...").format(self.colored(vm_name, "CYAN")))
             if is_template is not None:
                 if self.verbose > 3:
                     msg = _("Checking VM {!r} for being a template ...")
@@ -1041,10 +1065,17 @@ class VsphereConnection(BaseVsphereHandler):
             if self.verbose > 3:
                 LOG.debug(_("Checking VM {!r} for pattern.").format(vm_name))
             if re_name.search(vm_name):
-                if self.verbose > 2:
-                    LOG.debug(_("Found VM {!r}.").format(vm_name))
+                if self.verbose > 0:
+                    LOG.debug(
+                        _("Found VM {vm} in vSphere {vs}, DC {dc}, path {p}.").format(
+                            vm=self.colored(vm_name, "CYAN"),
+                            vs=self.colored(vsphere_name, "CYAN"),
+                            dc=self.colored(dc_name, "CYAN"),
+                            p=self.colored(cur_path, "CYAN"),
+                        )
+                    )
                 if name_only:
-                    vm_list.append((vm_name, cur_path))
+                    vm_list.append((vm_name, dc_name, cur_path))
                 elif as_obj:
                     if self.verbose > 1:
                         LOG.debug(f"Get VM {vm_name!r} as an object.")
@@ -1052,6 +1083,7 @@ class VsphereConnection(BaseVsphereHandler):
                         child,
                         cur_path,
                         vsphere=vsphere_name,
+                        dc_name=dc_name,
                         appname=self.appname,
                         verbose=self.verbose,
                         base_dir=self.base_dir,
@@ -1072,6 +1104,7 @@ class VsphereConnection(BaseVsphereHandler):
         re_name,
         cur_path="",
         vsphere_name=None,
+        dc_name=None,
         is_template=None,
         depth=1,
         as_vmw_obj=False,
@@ -1089,6 +1122,14 @@ class VsphereConnection(BaseVsphereHandler):
                 initialized=True,
             )
 
+        if self.verbose > 4:
+            msg = _("Searching VMs in vSphere {vs}, DC '{dc}' in path '{p}'.").format(
+                vs=self.colored(vsphere_name, "CYAN"),
+                dc=self.colored(dc_name, "CYAN"),
+                p=self.colored(cur_path, "CYAN"),
+            )
+            LOG.debug(msg)
+
         for sub_child in child.childEntity:
 
             child_path = ""
@@ -1097,11 +1138,20 @@ class VsphereConnection(BaseVsphereHandler):
             else:
                 child_path = child.name
 
+            if self.verbose > 3 and not isinstance(sub_child, vim.VirtualMachine):
+                msg = _("Searching VMs in vSphere {vs}, DC '{dc}' in path '{p}'.").format(
+                    vs=self.colored(vsphere_name, "CYAN"),
+                    dc=self.colored(dc_name, "CYAN"),
+                    p=self.colored(child_path, "CYAN"),
+                )
+                LOG.debug(msg)
+
             vms = self._get_vms(
                 sub_child,
                 re_name,
                 cur_path=child_path,
                 vsphere_name=vsphere_name,
+                dc_name=dc_name,
                 is_template=is_template,
                 depth=(depth + 1),
                 as_vmw_obj=as_vmw_obj,
@@ -1203,7 +1253,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0:i + 1])
+            path = "/".join(parts[0 : i + 1])
             paths.append(path)
 
         try:
@@ -1261,7 +1311,7 @@ class VsphereConnection(BaseVsphereHandler):
         paths = []
         parts = folder.split("/")
         for i in range(0, len(parts)):
-            path = "/".join(parts[0:i + 1])
+            path = "/".join(parts[0 : i + 1])
             paths.append(path)
 
         try:

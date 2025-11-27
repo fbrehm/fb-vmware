@@ -38,7 +38,7 @@ from .obj import OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -60,6 +60,7 @@ class VsphereVm(VsphereObject):
         base_dir=None,
         initialized=None,
         vsphere=None,
+        dc_name=None,
         name=None,
         status=DEFAULT_OBJ_STATUS,
         config_status=DEFAULT_OBJ_STATUS,
@@ -104,6 +105,8 @@ class VsphereVm(VsphereObject):
 
         if vsphere is not None:
             self.vsphere = vsphere
+        if dc_name is not None:
+            self.dc_name = dc_name
 
         self.disks = VsphereDiskList(
             appname=appname, verbose=verbose, base_dir=base_dir, initialized=True
@@ -543,7 +546,7 @@ class VsphereVm(VsphereObject):
         appname=None,
         verbose=0,
         base_dir=None,
-        test_mode=False
+        test_mode=False,
     ):
         """Create a new VsphereVm object based on the data given from pyvmomi."""
         if test_mode:
@@ -567,7 +570,7 @@ class VsphereVm(VsphereObject):
             "config_status": OBJ_STATUS_GREEN,
         }
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         vm = cls(**params)
@@ -658,7 +661,7 @@ class VsphereVm(VsphereObject):
                 ).format(n=vm.name, c=vm.cluster_name, p=vm.path)
             )
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(vm.as_dict()))
 
         return vm

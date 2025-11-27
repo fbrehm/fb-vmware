@@ -31,7 +31,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = "1.9.0"
+__version__ = "1.9.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -56,7 +56,9 @@ class VsphereNetwork(VsphereObject):
     repr_fields = [
         "name",
         "obj_type",
-        "vsphere" "dc_name" "status",
+        "vsphere",
+        "dc_name",
+        "status",
         "config_status",
         "accessible",
         "ip_pool_id",

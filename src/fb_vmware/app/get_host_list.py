@@ -29,7 +29,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -251,6 +251,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         summary = {}
 
         summary["vsphere"] = host.vsphere
+        summary["dc"] = host.dc_name
         summary["cluster"] = host.cluster_name
         summary["name"] = host.name
         summary["connection_state"] = host.connection_state
@@ -279,6 +280,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         """Print on STDOUT all information about all hosts in a human readable format."""
         labels = {
             "vsphere": "vSphere",
+            "dc": "DC",
             "cluster": "Cluster",
             "name": "Host",
             "connection_state": _("Connect state"),
@@ -297,6 +299,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
         label_list = (
             "name",
+            "dc",
             "vsphere",
             "cluster",
             "vendor",
@@ -384,7 +387,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         hosts = []
 
         vsphere = self.vsphere[vsphere_name]
-        vsphere.get_datacenter()
+        # vsphere.get_datacenter()
 
         re_name = None
         if self.host_pattern is not None:

@@ -31,12 +31,13 @@ from pyVmomi import vim
 # Own modules
 from .about import VsphereAboutInfo
 from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .host_port_group import VsphereHostPortgroup, VsphereHostPortgroupList
 from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -318,13 +319,14 @@ class VsphereHost(VsphereObject):
         base_dir=None,
         initialized=None,
         name=None,
+        dc_name=None,
         cluster_name=None,
         vsphere=None,
         status=DEFAULT_OBJ_STATUS,
         config_status=DEFAULT_OBJ_STATUS,
     ):
         """Initialize a VsphereHost object."""
-        self.repr_fields = ("name", "vsphere")
+        self.repr_fields = ("name", "dc_name", "vsphere")
         self._vsphere = None
         self._cluster_name = None
         self.bios = None
@@ -347,6 +349,7 @@ class VsphereHost(VsphereObject):
         self.ipv6_enabled = None
         self.atboot_ipv6_enabled = None
         self.portgroups = None
+        self._dc_name = None
 
         self.product = None
 
@@ -362,6 +365,7 @@ class VsphereHost(VsphereObject):
             base_dir=base_dir,
         )
 
+        self.dc_name = dc_name
         if vsphere is not None:
             self.vsphere = vsphere
 
@@ -385,6 +389,25 @@ class VsphereHost(VsphereObject):
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
+
+    # -----------------------------------------------------------
+    @property
+    def dc_name(self):
+        """Return the datacenter name of the cluster."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
 
     # -----------------------------------------------------------
     @property
@@ -514,6 +537,7 @@ class VsphereHost(VsphereObject):
         res = super(VsphereHost, self).as_dict(short=short)
 
         res["vsphere"] = self.vsphere
+        res["dc_name"] = self.dc_name
         res["cluster_name"] = self.cluster_name
         res["memory_mb"] = self.memory_mb
         res["memory_gb"] = self.memory_gb
@@ -540,6 +564,7 @@ class VsphereHost(VsphereObject):
         fields.append("appname={!r}".format(self.appname))
         fields.append("verbose={!r}".format(self.verbose))
         fields.append("name={!r}".format(self.name))
+        fields.append("dc_name={!r}".format(self.dc_name))
         fields.append("cluster_name={!r}".format(self.cluster_name))
         fields.append("initialized={!r}".format(self.initialized))
 
@@ -556,6 +581,7 @@ class VsphereHost(VsphereObject):
             initialized=self.initialized,
             vsphere=self.vsphere,
             name=self.name,
+            dc_name=self.dc_name,
             status=self.status,
             config_status=self.config_status,
             cluster_name=self.cluster_name,
@@ -595,6 +621,8 @@ class VsphereHost(VsphereObject):
 
         if self.vsphere != other.vsphere:
             return False
+        if self.dc_name != other.dc_name:
+            return False
         if self.name != other.name:
             return False
 
@@ -609,6 +637,7 @@ class VsphereHost(VsphereObject):
         appname=None,
         verbose=0,
         base_dir=None,
+        dc_name=None,
         cluster_name=None,
         test_mode=False,
     ):
@@ -632,6 +661,7 @@ class VsphereHost(VsphereObject):
             "base_dir": base_dir,
             "initialized": True,
             "name": data.summary.config.name,
+            "dc_name": dc_name,
             "cluster_name": cluster_name,
             "status": DEFAULT_OBJ_STATUS,
             "config_status": OBJ_STATUS_GREEN,

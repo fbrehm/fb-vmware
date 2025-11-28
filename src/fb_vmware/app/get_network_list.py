@@ -28,7 +28,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -117,7 +117,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         vsphere = self.vsphere[vsphere_name]
         try:
-            vsphere.get_networks()
+            vsphere.get_networks(vsphere_name=vsphere_name)
 
         except VSphereExpectedError as e:
             LOG.error(str(e))
@@ -136,7 +136,7 @@ class GetNetworkListApp(BaseVmwareApplication):
             LOG.debug(_("Get all network-like objects from vSphere {!r} ...").format(vsphere_name))
 
             try:
-                vsphere.get_networks()
+                vsphere.get_networks(vsphere_name=vsphere_name)
             except VSphereExpectedError as e:
                 LOG.error(str(e))
                 self.exit(6)
@@ -229,8 +229,13 @@ class GetNetworkListApp(BaseVmwareApplication):
             for uuid in self.vsphere[vsphere_name].dvs.keys():
                 this_dvs = self.vsphere[vsphere_name].dvs[uuid]
 
+                dc_name = "~"
+                if this_dvs.dc_name:
+                    dc_name = this_dvs.dc_name
+
                 dvs = {
                     "vsphere": vsphere_name,
+                    "dc": dc_name,
                     "name": this_dvs.name,
                     "contact": get_contact(this_dvs),
                     "create_time": this_dvs.create_time.isoformat(sep=" ", timespec="seconds"),
@@ -254,6 +259,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         labels = {
             "vsphere": "vSphere",
+            "dc": _("Data Center"),
             "name": _("Name"),
             "contact": _("Contact"),
             "create_time": _("Creation time"),
@@ -266,6 +272,7 @@ class GetNetworkListApp(BaseVmwareApplication):
         label_list = (
             "name",
             "vsphere",
+            "dc",
             "create_time",
             "hosts",
             "ports",
@@ -348,10 +355,20 @@ class GetNetworkListApp(BaseVmwareApplication):
                 if this_dvpg.accessible:
                     accessible = _("Yes")
 
+                dc_name = "~"
+                if this_dvpg.dc_name:
+                    dc_name = this_dvpg.dc_name
+
+                vlan_id = "~"
+                if this_dvpg.vlan_id:
+                    vlan_id = this_dvpg.vlan_id
+
                 dvpg = {
                     "vsphere": vsphere_name,
+                    "dc": dc_name,
                     "name": name,
                     "dvs": dvs_name,
+                    "vlan_id": vlan_id,
                     "network": network,
                     "accessible": accessible,
                     "num_ports": "{:,}".format(this_dvpg.num_ports),
@@ -373,8 +390,10 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         labels = {
             "vsphere": "vSphere",
+            "dc": "DC",
             "name": _("Name"),
             "dvs": "DV Switch",
+            "vlan_id": "VLAN ID",
             "network": _("Network"),
             "accessible": _("Accessible"),
             "num_ports": _("Ports"),
@@ -385,7 +404,9 @@ class GetNetworkListApp(BaseVmwareApplication):
         label_list = (
             "name",
             "vsphere",
+            "dc",
             "dvs",
+            "vlan_id",
             "network",
             "accessible",
             "type",
@@ -422,7 +443,7 @@ class GetNetworkListApp(BaseVmwareApplication):
         for label in label_list:
             if tpl != "":
                 tpl += "  "
-            if label in ("num_ports",):
+            if label in ("num_ports", "vlan_id"):
                 tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
             else:
                 tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
@@ -458,8 +479,13 @@ class GetNetworkListApp(BaseVmwareApplication):
                 if this_network.accessible:
                     accessible = _("Yes")
 
+                dc_name = "~"
+                if this_network.dc_name:
+                    dc_name = this_network.dc_name
+
                 net = {
                     "vsphere": vsphere_name,
+                    "dc": dc_name,
                     "name": name,
                     "network": network,
                     "accessible": accessible,
@@ -478,11 +504,12 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         labels = {
             "vsphere": "vSphere",
+            "dc": _("Data Center"),
             "name": _("Name"),
             "network": _("Network"),
             "accessible": _("Accessible"),
         }
-        label_list = ("name", "vsphere", "network", "accessible")
+        label_list = ("name", "vsphere", "dc", "network", "accessible")
 
         str_lengths = {}
         for label in labels:

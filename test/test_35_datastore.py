@@ -72,12 +72,18 @@ class TestVDataStore(FbVMWareTestcase):
         ds_name = "my-datastore"
         capacity = int(100 * 1024 * 1024 * 1024)
         free_space = int(capacity * 0.6)
+        vsphere = "live"
+        dc = "dc1"
+        cluster = "StorageCluster1"
 
         ds = VsphereDatastore(
             name=ds_name,
             appname=self.appname,
             capacity=capacity,
             free_space=free_space,
+            vsphere=vsphere,
+            dc_name=dc,
+            cluster=cluster,
             verbose=1,
         )
 
@@ -88,6 +94,9 @@ class TestVDataStore(FbVMWareTestcase):
         self.assertEqual(ds.appname, self.appname)
         self.assertEqual(ds.verbose, 1)
         self.assertEqual(ds.name, ds_name)
+        self.assertEqual(ds.vsphere, vsphere)
+        self.assertEqual(ds.dc_name, dc)
+        self.assertEqual(ds.cluster, cluster)
 
 
 # =============================================================================

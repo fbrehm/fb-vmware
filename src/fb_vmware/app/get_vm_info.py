@@ -24,7 +24,7 @@ from ..errors import VSphereExpectedError
 from ..ether import VsphereEthernetcard
 from ..xlate import XLATOR
 
-__version__ = "1.7.0"
+__version__ = "1.8.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -117,7 +117,7 @@ class GetVmApplication(BaseVmwareApplication):
         try:
             for vsphere_name in self.vsphere:
                 vsphere = self.vsphere[vsphere_name]
-                vsphere.get_datacenter()
+                vsphere.get_datacenters()
 
         except VSphereExpectedError as e:
             LOG.error(str(e))
@@ -149,8 +149,11 @@ class GetVmApplication(BaseVmwareApplication):
                 s=vm.power_state, v=vm.config_version
             )
         )
-        msg = "    vSphere:  {vs:<10}    Cluster: {cl:<20}    Path: {p}".format(
-            vs=vm.vsphere, cl=vm.cluster_name, p=vm.path
+        dc_name = "~"
+        if vm.dc_name:
+            dc_name = vm.dc_name
+        msg = "    vSphere:  {vs:<10}    DC: {dc:<25}    Cluster: {cl:<20}    Path: {p}".format(
+            vs=vm.vsphere, dc=dc_name, cl=vm.cluster_name, p=vm.path
         )
         print(msg)
 
@@ -201,7 +204,7 @@ class GetVmApplication(BaseVmwareApplication):
             nr_disks = len(ctrlr.devices)
             if ctrlr.ctrl_type in VsphereDiskController.type_names.keys():
                 ctype = VsphereDiskController.type_names[ctrlr.ctrl_type]
-            no_disk = ngettext('{nr:>2} disk ", "{nr:>2} disks', nr_disks).format(nr=nr_disks)
+            no_disk = ngettext("{nr:>2} disk ", "{nr:>2} disks", nr_disks).format(nr=nr_disks)
             # no_disk = _("{nr:>2} disks").format(nr=len(ctrlr.devices))
             # if len(ctrlr.devices) == 1:
             #     no_disk = _(" 1 disk ")
@@ -295,7 +298,15 @@ class GetVmApplication(BaseVmwareApplication):
 
         for vsphere_name in self.vsphere:
             vsphere = self.vsphere[vsphere_name]
+            LOG.debug(
+                _("Searching for VM {vm} in vSphere {vs} ...").format(
+                    vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
+                )
+            )
             vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True, as_obj=True)
+            if not vm:
+                continue
+
             vm.full_custom_data = []
             if vm.custom_data:
                 for cdata in vm.custom_data:

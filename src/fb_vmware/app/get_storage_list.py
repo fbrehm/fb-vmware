@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@summary: Print a list of all storage clusters in a VMware vSphere.
+@summary: Print a list of all datastores (Storages) in a VMware vSphere.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
@@ -28,11 +28,11 @@ from fb_tools.xlate import format_list
 from . import BaseVmwareApplication
 from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
-from ..ds_cluster import VsphereDsClusterDict
+from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.3.1"
+__version__ = "1.0.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -40,25 +40,27 @@ ngettext = XLATOR.ngettext
 
 
 # =============================================================================
-class GetVmStorageClustersAppError(VmwareAppError):
+class GetVmStoragesAppError(VmwareAppError):
     """Base exception class for all exceptions in this application."""
 
     pass
 
 
 # =============================================================================
-class GetStorageClusterListApp(BaseVmwareApplication):
+class GetStorageListApp(BaseVmwareApplication):
     """Class for the application object."""
 
     avail_sort_keys = (
-        "cluster_name",
+        "ds_name",
         "vsphere_name",
+        "dc",
+        "ecluster",
         "capacity",
         "free_space",
         "usage",
         "usage_pc",
     )
-    default_sort_keys = ["vsphere_name", "cluster_name"]
+    default_sort_keys = ["vsphere_name", "dc", "ds_name"]
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -74,17 +76,16 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         argparse_prefix_chars="-",
         env_prefix=None,
     ):
-        """Initialize a GetStorageClusterListApp object."""
-        desc = _(
-            "Tries to get a list of all datastore clusters in " "VMware vSphere and print it out."
-        )
+        """Initialize a GetStorageListApp object."""
+        desc = _("Tries to get a list of all datastores in VMware vSphere and print it out.")
 
-        self.st_clusters = []
+        self.datastores = []
         self._print_total = True
+        self._no_local = False
         self.totals = None
         self.sort_keys = self.default_sort_keys
 
-        super(GetStorageClusterListApp, self).__init__(
+        super(GetStorageListApp, self).__init__(
             appname=appname,
             verbose=verbose,
             version=version,
@@ -102,6 +103,12 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         return self._print_total
 
     # -------------------------------------------------------------------------
+    @property
+    def no_local(self):
+        """Don't print out local datastores on the ESX hosts."""
+        return self._no_local
+
+    # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
         Transform the elements of the object into a dict.
@@ -112,7 +119,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         @return: structure as dict
         @rtype:  dict
         """
-        res = super(GetStorageClusterListApp, self).as_dict(short=short)
+        res = super(GetStorageListApp, self).as_dict(short=short)
+        res["no_local"] = self.no_local
         res["print_total"] = self.print_total
 
         return res
@@ -120,16 +128,24 @@ class GetStorageClusterListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetStorageClusterListApp, self).init_arg_parser()
+        super(GetStorageListApp, self).init_arg_parser()
 
         output_options = self.arg_parser.add_argument_group(_("Output options"))
+
+        output_options.add_argument(
+            "-L",
+            "--no-local",
+            action="store_true",
+            dest="no_local",
+            help=_("Don't print local datastores on the ESX hosts."),
+        )
 
         output_options.add_argument(
             "-N",
             "--no-totals",
             action="store_true",
             dest="no_totals",
-            help=_("Don't print the totals of all storage clusters."),
+            help=_("Don't print the totals of all datastores."),
         )
 
         output_options.add_argument(
@@ -151,13 +167,16 @@ class GetStorageClusterListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
         """Evaluate command line parameters."""
-        super(GetStorageClusterListApp, self).perform_arg_parser()
+        super(GetStorageListApp, self).perform_arg_parser()
 
         if self.args.sort_keys:
             self.sort_keys = self.args.sort_keys
 
         if getattr(self.args, "no_totals", False):
             self._print_total = False
+
+        if getattr(self.args, "no_local", False):
+            self._no_local = True
 
     # -------------------------------------------------------------------------
     def _run(self):
@@ -166,103 +185,109 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
         ret = 0
         try:
-            ret = self.get_all_storage_clusters()
+            ret = self.get_all_datastores()
         finally:
             self.cleaning_up()
 
         self.exit(ret)
 
     # -------------------------------------------------------------------------
-    def get_datastore_clusters(self, vsphere_name):
+    def get_datastores(self, vsphere_name):
         """Get all datastore clusters in a VMware vSphere."""
-        storage_clusters = []
+        datastores = []
 
         vsphere = self.vsphere[vsphere_name]
+        no_local_ds = False
+        if self.no_local:
+            no_local_ds = True
         try:
-            vsphere.get_ds_clusters()
+            vsphere.get_datastores(no_local_ds=no_local_ds)
         except VSphereExpectedError as e:
             LOG.error(str(e))
             self.exit(6)
 
-        for cluster in vsphere.ds_clusters:
-            storage_clusters.append(vsphere.ds_clusters[cluster])
+        for datastore in vsphere.datastores:
+            datastores.append(vsphere.datastores[datastore])
 
-        return storage_clusters
+        return datastores
 
     # -------------------------------------------------------------------------
-    def get_all_storage_clusters(self):
-        """Collect all storage clusters."""
+    def get_all_datastores(self):
+        """Collect all datastores."""
         ret = 0
-        all_storage_clusters = {}
+        all_datastores = {}
 
         # ----------
-        def _get_all_storage_clusters():
+        def _get_all_datastores():
 
             for vsphere_name in self.vsphere:
-                if vsphere_name not in all_storage_clusters:
-                    all_storage_clusters[vsphere_name] = VsphereDsClusterDict()
-                for cluster in self.get_datastore_clusters(vsphere_name):
-                    all_storage_clusters[vsphere_name].append(cluster)
+                if vsphere_name not in all_datastores:
+                    all_datastores[vsphere_name] = VsphereDatastoreDict()
+                for datastore in self.get_datastores(vsphere_name):
+                    all_datastores[vsphere_name].append(datastore)
 
         if self.verbose or self.quiet:
-            _get_all_storage_clusters()
+            _get_all_datastores()
 
         else:
-            spin_prompt = _("Getting all vSphere storage clusters ...")
+            spin_prompt = _("Getting all vSphere datastores ...")
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
-                _get_all_storage_clusters()
+                _get_all_datastores()
             sys.stdout.write(" " * len(spin_prompt))
             sys.stdout.write("\r")
             sys.stdout.flush()
 
         if self.verbose > 2:
-            LOG.debug(_("Found datastore clusters:") + "\n" + pp(all_storage_clusters))
+            LOG.debug(_("Found datastores:") + "\n" + pp(all_datastores))
 
-        self.print_clusters(all_storage_clusters)
+        self.print_datastores(all_datastores)
 
         return ret
 
     # -------------------------------------------------------------------------
-    def _get_cluster_list(self, clusters):
+    def _get_datastore_list(self, datastores):
 
-        cluster_list = []
+        datastore_list = []
 
         total_capacity = 0.0
         total_free = 0.0
 
-        for vsphere_name in clusters.keys():
-            for cluster_name in clusters[vsphere_name].keys():
+        for vsphere_name in datastores.keys():
+            for ds_name in datastores[vsphere_name].keys():
 
-                cl = clusters[vsphere_name][cluster_name]
-                cluster = {}
-                cluster["is_total"] = False
+                ds = datastores[vsphere_name][ds_name]
+                datastore = {}
+                datastore["is_total"] = False
 
-                cluster["cluster_name"] = cluster_name
+                datastore["ds_name"] = ds_name
 
-                cluster["vsphere_name"] = vsphere_name
-                cluster["dc"] = cl.dc_name
+                datastore["vsphere_name"] = vsphere_name
+                datastore["dc"] = ds.dc_name
+                datastore["cluster"] = "~"
+                if ds.cluster:
+                    datastore["cluster"] = ds.cluster
 
-                cluster["capacity"] = cl.capacity_gb
-                cluster["capacity_gb"] = format_decimal(cl.capacity_gb, format="#,##0")
-                total_capacity += cl.capacity_gb
+                datastore["capacity"] = ds.capacity_gb
+                datastore["capacity_gb"] = format_decimal(ds.capacity_gb, format="#,##0")
+                total_capacity += ds.capacity_gb
 
-                cluster["free_space"] = cl.free_space_gb
-                cluster["free_space_gb"] = format_decimal(cl.free_space_gb, format="#,##0")
-                total_free += cl.free_space_gb
+                datastore["free_space"] = ds.free_space_gb
+                datastore["free_space_gb"] = format_decimal(ds.free_space_gb, format="#,##0")
+                total_free += ds.free_space_gb
 
-                used = cl.capacity_gb - cl.free_space_gb
-                cluster["usage"] = used
-                cluster["usage_gb"] = format_decimal(used, format="#,##0")
+                used = ds.capacity_gb - ds.free_space_gb
+                datastore["usage"] = used
+                datastore["usage_gb"] = format_decimal(used, format="#,##0")
 
-                if cl.capacity_gb:
-                    usage_pc = used / cl.capacity_gb
-                    cluster["usage_pc"] = usage_pc
-                    cluster["usage_pc_out"] = format_decimal(usage_pc, format="0.0 %")
+                if ds.capacity_gb:
+                    usage_pc = used / ds.capacity_gb
+                    datastore["usage_pc"] = usage_pc
+                    datastore["usage_pc_out"] = format_decimal(usage_pc, format="0.0 %")
                 else:
-                    cluster["usage_pc_out"] = "- %"
+                    datastore["usage_pc_out"] = "- %"
 
-                cluster_list.append(cluster)
+                datastore_list.append(datastore)
 
         if self.print_total:
             total_used = total_capacity - total_free
@@ -273,9 +298,10 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 total_used_pc_out = format_decimal(total_used_pc, format="0.0 %")
 
             self.totals = {
-                "cluster_name": _("Total"),
+                "ds_name": _("Total"),
                 "vsphere_name": "",
                 "dc": "",
+                "cluster": "",
                 "is_total": True,
                 "capacity_gb": format_decimal(total_capacity, format="#,##0"),
                 "free_space_gb": format_decimal(total_free, format="#,##0"),
@@ -283,21 +309,21 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 "usage_pc_out": total_used_pc_out,
             }
             if not self.quiet:
-                self.totals["cluster_name"] += ":"
+                self.totals["ds_name"] += ":"
 
-        return cluster_list
+        return datastore_list
 
     # -------------------------------------------------------------------------
-    def _get_cluster_fields_len(self, cluster_list, labels):
+    def _get_ds_fields_len(self, datastore_list, labels):
 
         field_length = {}
 
         for label in labels.keys():
             field_length[label] = len(labels[label])
 
-        for cluster in cluster_list:
+        for ds in datastore_list:
             for label in labels.keys():
-                field = cluster[label]
+                field = ds[label]
                 if len(field) > field_length[label]:
                     field_length[label] = len(field)
 
@@ -310,12 +336,13 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         return field_length
 
     # -------------------------------------------------------------------------
-    def print_clusters(self, clusters):
+    def print_datastores(self, all_datastores):
         """Print on STDOUT all information about all datastore clusters."""
         labels = {
-            "cluster_name": "Cluster",
+            "ds_name": _("Datastore"),
             "vsphere_name": "vSphere",
             "dc": _("Data Center"),
+            "cluster": _("Cluster"),
             "capacity_gb": _("Capacity in GB"),
             "free_space_gb": _("Free space in GB"),
             "usage_gb": _("Calculated usage in GB"),
@@ -323,20 +350,21 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         }
 
         label_list = (
-            "cluster_name",
+            "ds_name",
             "vsphere_name",
             "dc",
+            "cluster",
             "capacity_gb",
             "usage_gb",
             "usage_pc_out",
             "free_space_gb",
         )
 
-        cluster_list = self._get_cluster_list(clusters)
-        field_length = self._get_cluster_fields_len(cluster_list, labels)
+        datastore_list = self._get_datastore_list(all_datastores)
+        field_length = self._get_ds_fields_len(datastore_list, labels)
 
         max_len = 0
-        count = len(cluster_list)
+        count = len(datastore_list)
 
         for label in labels.keys():
             if max_len:
@@ -346,13 +374,13 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         if self.verbose > 2:
             LOG.debug("Label length:\n" + pp(field_length))
             LOG.debug("Max line length: {} chars".format(max_len))
-            LOG.debug("Datastore clusters:\n" + pp(cluster_list))
+            LOG.debug("Datastore clusters:\n" + pp(datastore_list))
 
         tpl = ""
         for label in label_list:
             if tpl != "":
                 tpl += "  "
-            if label in ("cluster_name", "vsphere_name", "dc"):
+            if label in ("ds_name", "vsphere_name", "dc", "cluster"):
                 tpl += "{{{la}:<{le}}}".format(la=label, le=field_length[label])
             else:
                 tpl += "{{{la}:>{le}}}".format(la=label, le=field_length[label])
@@ -363,18 +391,18 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             LOG.debug("Sorting keys: " + pp(self.sort_keys))
             self.sort_keys.reverse()
             for key in self.sort_keys:
-                if key in ("cluster_name", "vsphere_name"):
-                    cluster_list.sort(key=itemgetter(key))
+                if key in ("ds_name", "vsphere_name", "dc", "cluster"):
+                    datastore_list.sort(key=itemgetter(key))
                 else:
-                    cluster_list.sort(key=itemgetter(key), reverse=True)
+                    datastore_list.sort(key=itemgetter(key), reverse=True)
 
         if not self.quiet:
             print()
             print(tpl.format(**labels))
             print("-" * max_len)
 
-        for cluster in cluster_list:
-            print(tpl.format(**cluster))
+        for datastore in datastore_list:
+            print(tpl.format(**datastore))
 
         if self.totals:
             if not self.quiet:
@@ -385,12 +413,12 @@ class GetStorageClusterListApp(BaseVmwareApplication):
             print()
             if count:
                 msg = ngettext(
-                    "Found one VMware storage cluster.",
-                    "Found {} VMware storage clusters.",
+                    "Found one VMware datastore.",
+                    "Found {} VMware datastores.",
                     count,
                 ).format(count)
             else:
-                msg = _("No VMware storage clusters found.")
+                msg = _("No VMware datastores found.")
 
             print(msg)
             print()
@@ -398,13 +426,13 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
 # =============================================================================
 def main():
-    """Entrypoint for get-vsphere-storage-cluster-list."""
+    """Entrypoint for get-vsphere-storage-list."""
     my_path = pathlib.Path(__file__)
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")
 
-    app = GetStorageClusterListApp(appname=appname)
+    app = GetStorageListApp(appname=appname)
     app.initialized = True
 
     if app.verbose > 2:
@@ -412,7 +440,7 @@ def main():
 
     app()
 
-    sys.exit(0)
+    return 0
 
 
 # =============================================================================

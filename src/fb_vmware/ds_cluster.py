@@ -25,10 +25,12 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.3.4"
+__version__ = "1.4.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -37,6 +39,19 @@ _ = XLATOR.gettext
 # =============================================================================
 class VsphereDsCluster(VsphereObject):
     """A wrapper for a Datastore cluster (dsPod)."""
+
+    repr_fields = (
+        "name",
+        "vsphere",
+        "dc_name",
+        "status",
+        "config_status",
+        "capacity",
+        "free_space",
+        "appname",
+        "verbose",
+        "version",
+    )
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -47,23 +62,16 @@ class VsphereDsCluster(VsphereObject):
         base_dir=None,
         initialized=None,
         name=None,
+        vsphere=None,
+        dc_name=None,
         status="gray",
         config_status="gray",
         capacity=None,
         free_space=None,
     ):
         """Initialize a VsphereDsCluster object."""
-        self.repr_fields = (
-            "name",
-            "status",
-            "config_status",
-            "capacity",
-            "free_space",
-            "appname",
-            "verbose",
-            "version",
-        )
-
+        self._vsphere = None
+        self._dc_name = None
         self._capacity = int(capacity)
         self._free_space = int(free_space)
 
@@ -81,6 +89,9 @@ class VsphereDsCluster(VsphereObject):
             base_dir=base_dir,
         )
 
+        self.vsphere = vsphere
+        self.dc_name = dc_name
+
         if initialized is not None:
             self.initialized = initialized
 
@@ -95,6 +106,25 @@ class VsphereDsCluster(VsphereObject):
     def capacity_gb(self):
         """Maximum capacity of this datastore cluster, in GiBytes."""
         return float(self.capacity) / 1024.0 / 1024.0 / 1024.0
+
+    # -----------------------------------------------------------
+    @property
+    def dc_name(self):
+        """Return the datacenter name of the datastore cluster."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
 
     # -----------------------------------------------------------
     @property
@@ -129,9 +159,37 @@ class VsphereDsCluster(VsphereObject):
             return self.free_space_gb
         return self.free_space_gb - self.calculated_usage
 
+    # -----------------------------------------------------------
+    @property
+    def vsphere(self):
+        """Return the name of the vSphere of the datastore cluster."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == "":
+            msg = _("The name of the vSphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
+
     # -------------------------------------------------------------------------
     @classmethod
-    def from_summary(cls, data, appname=None, verbose=0, base_dir=None, test_mode=False):
+    def from_summary(
+        cls,
+        data,
+        vsphere=None,
+        dc_name=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
+    ):
         """Create a new VsphereDsCluster object based on the data given from pyvmomi."""
         if test_mode:
 
@@ -166,6 +224,8 @@ class VsphereDsCluster(VsphereObject):
                 raise TypeError(msg)
 
         params = {
+            "vsphere": vsphere,
+            "dc_name": dc_name,
             "appname": appname,
             "verbose": verbose,
             "base_dir": base_dir,
@@ -195,12 +255,14 @@ class VsphereDsCluster(VsphereObject):
         @rtype:  dict
         """
         res = super(VsphereDsCluster, self).as_dict(short=short)
+        res["avail_space_gb"] = self.avail_space_gb
+        res["calculated_usage"] = self.calculated_usage
         res["capacity"] = self.capacity
         res["capacity_gb"] = self.capacity_gb
+        res["dc_name"] = self.dc_name
         res["free_space"] = self.free_space
         res["free_space_gb"] = self.free_space_gb
-        res["calculated_usage"] = self.calculated_usage
-        res["avail_space_gb"] = self.avail_space_gb
+        res["vsphere"] = self.vsphere
 
         return res
 
@@ -208,6 +270,8 @@ class VsphereDsCluster(VsphereObject):
     def __copy__(self):
         """Return a new VsphereDsCluster as a deep copy of the current object."""
         return VsphereDsCluster(
+            vsphere=self.vsphere,
+            dc_name=self.dc_name,
             appname=self.appname,
             verbose=self.verbose,
             base_dir=self.base_dir,
@@ -226,6 +290,12 @@ class VsphereDsCluster(VsphereObject):
             LOG.debug(_("Comparing {} objects ...").format(self.__class__.__name__))
 
         if not isinstance(other, VsphereDsCluster):
+            return False
+
+        if self.vsphere != other.vsphere:
+            return False
+
+        if self.dc_name != other.dc_name:
             return False
 
         if self.name != other.name:

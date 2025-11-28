@@ -31,13 +31,14 @@ from pyVmomi import vim
 from .controller import VsphereDiskController, VsphereDiskControllerList
 from .disk import VsphereDisk, VsphereDiskList
 from .errors import VSphereHandlerError
+from .errors import VSphereNameError
 from .ether import VsphereEthernetcard, VsphereEthernetcardList
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -59,6 +60,7 @@ class VsphereVm(VsphereObject):
         base_dir=None,
         initialized=None,
         vsphere=None,
+        dc_name=None,
         name=None,
         status=DEFAULT_OBJ_STATUS,
         config_status=DEFAULT_OBJ_STATUS,
@@ -66,6 +68,7 @@ class VsphereVm(VsphereObject):
         """Initialize a VsphereVm object."""
         self.repr_fields = ("name", "vsphere")
         self._vsphere = None
+        self._dc_name = None
         self._cluster_name = None
         self._path = None
         self._template = False
@@ -102,6 +105,8 @@ class VsphereVm(VsphereObject):
 
         if vsphere is not None:
             self.vsphere = vsphere
+        if dc_name is not None:
+            self.dc_name = dc_name
 
         self.disks = VsphereDiskList(
             appname=appname, verbose=verbose, base_dir=base_dir, initialized=True
@@ -131,6 +136,25 @@ class VsphereVm(VsphereObject):
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
+
+    # -----------------------------------------------------------
+    @property
+    def dc_name(self):
+        """Return the datacenter name of the VM."""
+        return self._dc_name
+
+    @dc_name.setter
+    def dc_name(self, value):
+
+        if value is None:
+            self._dc_name = None
+            return
+
+        val = str(value)
+        if val == "":
+            raise VSphereNameError(value, self.obj_type)
+
+        self._dc_name = val
 
     # -----------------------------------------------------------
     @property
@@ -405,6 +429,7 @@ class VsphereVm(VsphereObject):
         if bare:
             res = {
                 "vsphere": self.vsphere,
+                "dc_name": self.dc_name,
                 "cluster_name": self.cluster_name,
                 "config_path": self.config_path,
                 "config_path_relative": self.config_path_relative,
@@ -432,6 +457,7 @@ class VsphereVm(VsphereObject):
 
         res = super(VsphereVm, self).as_dict(short=short)
         res["vsphere"] = self.vsphere
+        res["dc_name"] = self.dc_name
         res["cluster_name"] = self.cluster_name
         res["config_path"] = self.config_path
         res["config_path_relative"] = self.config_path_relative
@@ -464,6 +490,7 @@ class VsphereVm(VsphereObject):
             name=self.name,
             status=self.status,
             vsphere=self.vsphere,
+            dc_name=self.dc_name,
             config_status=self.config_status,
         )
 
@@ -499,6 +526,8 @@ class VsphereVm(VsphereObject):
 
         if self.vsphere != other.vsphere:
             return False
+        if self.dc_name != other.dc_name:
+            return False
         if self.name != other.name:
             return False
         if self.path != other.path:
@@ -509,7 +538,15 @@ class VsphereVm(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(
-        cls, data, cur_path, vsphere=None, appname=None, verbose=0, base_dir=None, test_mode=False
+        cls,
+        data,
+        cur_path,
+        vsphere=None,
+        dc_name=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
     ):
         """Create a new VsphereVm object based on the data given from pyvmomi."""
         if test_mode:
@@ -523,6 +560,7 @@ class VsphereVm(VsphereObject):
 
         params = {
             "vsphere": vsphere,
+            "dc_name": dc_name,
             "appname": appname,
             "verbose": verbose,
             "base_dir": base_dir,
@@ -532,7 +570,7 @@ class VsphereVm(VsphereObject):
             "config_status": OBJ_STATUS_GREEN,
         }
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         vm = cls(**params)
@@ -623,7 +661,7 @@ class VsphereVm(VsphereObject):
                 ).format(n=vm.name, c=vm.cluster_name, p=vm.path)
             )
 
-        if verbose > 2:
+        if verbose > 3:
             LOG.debug(_("Created {} object:").format(cls.__name__) + "\n" + pp(vm.as_dict()))
 
         return vm

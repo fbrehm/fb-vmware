@@ -1031,8 +1031,8 @@ class VsphereConnection(BaseVsphereHandler):
 
                 for child in dc.vmFolder.childEntity:
                     path = child.name
-                    if self.verbose > 1:
-                        LOG.debug(_("Searching in path {!r} ...").format(path))
+                    if self.verbose > 0:
+                        LOG.debug(_("Searching in path {} ...").format(self.colored(path, 'CYAN')))
                     vms = self._get_vms(
                         child,
                         re_name,

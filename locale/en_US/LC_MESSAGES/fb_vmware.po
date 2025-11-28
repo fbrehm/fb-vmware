@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware \n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2025-11-28 13:24+0100\n"
+"POT-Creation-Date: 2025-11-28 13:33+0100\n"
 "PO-Revision-Date: 2025-02-05 11:40+0100\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -928,8 +928,8 @@ msgstr "Searching for virtual machines in DC {} …"
 
 #: src/fb_vmware/connect.py:1035
 #, python-brace-format
-msgid "Searching in path {!r} ..."
-msgstr "Searching in path {!r} …"
+msgid "Searching in path {} ..."
+msgstr "Searching in path {} …"
 
 #: src/fb_vmware/connect.py:1059
 #, python-brace-format

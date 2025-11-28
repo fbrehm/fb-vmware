@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware VERSION\n"
 "Report-Msgid-Bugs-To: frank.brehm@pixelpark.com\n"
-"POT-Creation-Date: 2025-11-28 13:24+0100\n"
+"POT-Creation-Date: 2025-11-28 13:33+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <frank.brehm@pixelpark.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -927,7 +927,7 @@ msgstr ""
 
 #: src/fb_vmware/connect.py:1035
 #, python-brace-format
-msgid "Searching in path {!r} ..."
+msgid "Searching in path {} ..."
 msgstr ""
 
 #: src/fb_vmware/connect.py:1059

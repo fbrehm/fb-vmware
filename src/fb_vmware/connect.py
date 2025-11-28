@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.7.2"
+__version__ = "2.7.3"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -160,16 +160,11 @@ class VsphereConnection(BaseVsphereHandler):
             return
 
         val = str(value).strip()
-        if val = "":
+        if val == "":
             self._name = None
             return
 
-        val = re.sub(r"\s+", "_", val)
-
-        if isinstance(value, pytz.tzinfo.BaseTzInfo):
-            self._tz = value
-        else:
-            self._tz = pytz.timezone(value)
+        self._name = val
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.7.0"
+__version__ = "2.7.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -1130,7 +1130,7 @@ class VsphereConnection(BaseVsphereHandler):
             if self.verbose > 3:
                 LOG.debug(_("Checking VM {!r} for pattern.").format(vm_name))
             if re_name.search(vm_name):
-                if self.verbose > 0:
+                if self.verbose > 1:
                     vsn = "~"
                     if vsphere_name:
                         vsn = vsphere_name

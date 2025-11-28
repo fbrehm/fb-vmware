@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-11-28
+
+### Changed
+
+* Collecting different objects now in all available data centers.
+* Extending classes VsphereDatastoreand VsphereDsCluster by new
+  properties `vsphere` and `dc_name`.
+* Extending class VsphereVm by ne property `dc_name`.
+* Output of DC name in Query scripts.
+* Adding property 'name' to VsphereConnection.
+
 ## [1.6.0] - 2025-11-25
 
 ### Added
@@ -231,6 +242,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Initial release.
 
 
+[1.7.0]: https://github.com/fbrehm/fb-vmware/compare/1.6.0...1.7.0
 [1.6.0]: https://github.com/fbrehm/fb-vmware/compare/1.5.3...1.6.0
 [1.5.3]: https://github.com/fbrehm/fb-vmware/compare/1.5.2...1.5.3
 [1.5.2]: https://github.com/fbrehm/fb-vmware/compare/1.5.1...1.5.2

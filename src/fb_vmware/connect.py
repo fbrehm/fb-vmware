@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.7.1"
+__version__ = "2.7.2"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -149,7 +149,7 @@ class VsphereConnection(BaseVsphereHandler):
     @property
     def name(self):
         """Return the name of the current vSphere/vCenter."""
-        if self._name id None:
+        if self._name is None:
             return "<" + _("unknown") + ">"
         return self._name
 

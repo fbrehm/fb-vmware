@@ -1,3 +1,10 @@
+fb-vmware (1.7.0) all; urgency=medium
+
+  * Collecting different objects now in all available data centers.
+  * See CHANGELOG.md for details.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Fri, 28 Nov 2025 16:01:39 +0100
+
 fb-vmware (1.6.0) all; urgency=medium
 
   * Refactoring for package build with pyproject.toml and flit.

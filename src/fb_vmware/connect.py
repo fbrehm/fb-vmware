@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.6.0"
+__version__ = "2.7.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -87,6 +87,7 @@ class VsphereConnection(BaseVsphereHandler):
     def __init__(
         self,
         connect_info,
+        name=None,
         appname=None,
         verbose=0,
         version=__version__,
@@ -100,6 +101,8 @@ class VsphereConnection(BaseVsphereHandler):
         initialized=False,
     ):
         """Initialize a VsphereConnection object."""
+        self._name = None
+
         self.datastores = VsphereDatastoreDict()
         self.ds_clusters = VsphereDsClusterDict()
         self.networks = VsphereNetworkDict()
@@ -133,12 +136,56 @@ class VsphereConnection(BaseVsphereHandler):
             initialized=False,
         )
 
+        self.name = name
+
         self.initialized = initialized
 
     # -------------------------------------------------------------------------
     def __repr__(self):
         """Typecasting into a string for reproduction."""
         return self._repr()
+
+    # -----------------------------------------------------------
+    @property
+    def name(self):
+        """Return the name of the current vSphere/vCenter."""
+        if self._name id None:
+            return "<" + _("unknown") + ">"
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if value is None:
+            self._name = None
+            return
+
+        val = str(value).strip()
+        if val = "":
+            self._name = None
+            return
+
+        val = re.sub(r"\s+", "_", val)
+
+        if isinstance(value, pytz.tzinfo.BaseTzInfo):
+            self._tz = value
+        else:
+            self._tz = pytz.timezone(value)
+
+    # -------------------------------------------------------------------------
+    def as_dict(self, short=True):
+        """
+        Transform the elements of the object into a dict.
+
+        @param short: don't include local properties in resulting dict.
+        @type short: bool
+
+        @return: structure as dict
+        @rtype:  dict
+        """
+        res = super(VsphereConnection, self).as_dict(short=short)
+        res["name"] = self.name
+
+        return res
 
     # -------------------------------------------------------------------------
     def get_about(self, disconnect=False):
@@ -338,6 +385,9 @@ class VsphereConnection(BaseVsphereHandler):
         self.datastores = VsphereDatastoreDict()
         self.ds_mapping = {}
 
+        if vsphere_name is None:
+            vsphere_name = self.name
+
         try:
 
             if not self.service_instance:
@@ -457,6 +507,9 @@ class VsphereConnection(BaseVsphereHandler):
         self.ds_clusters = VsphereDsClusterDict()
         self.ds_cluster_mapping = {}
 
+        if vsphere_name is None:
+            vsphere_name = self.name
+
         try:
 
             if not self.service_instance:
@@ -531,6 +584,9 @@ class VsphereConnection(BaseVsphereHandler):
         self.dv_portgroups = VsphereNetworkDict()
         self.networks = VsphereNetworkDict()
         self.network_mapping = {}
+
+        if vsphere_name is None:
+            vsphere_name = self.name
 
         try:
 
@@ -657,6 +713,9 @@ class VsphereConnection(BaseVsphereHandler):
             )
         else:
             LOG.debug(_("Trying to get all host systems from vSphere ..."))
+
+        if vsphere_name is None:
+            vsphere_name = self.name
 
         self.clusters = []
         self.hosts = {}
@@ -797,6 +856,9 @@ class VsphereConnection(BaseVsphereHandler):
         name_only=False,
     ):
         """Get a virtual machine from vSphere as VsphereVm object by its name."""
+        if vsphere_name is None:
+            vsphere_name = self.name
+
         pattern_name = r"^\s*" + re.escape(vm_name) + r"\s*$"
         LOG.debug(
             _("Searching for VM {n!r} (pattern: {p!r}) in vSphere {v!r} ...").format(
@@ -925,6 +987,9 @@ class VsphereConnection(BaseVsphereHandler):
         stop_at_found=False,
     ):
         """Get all virtual machines from vSphere as VsphereVm objects."""
+        if vsphere_name is None:
+            vsphere_name = self.name
+
         if not hasattr(re_name, "match"):
             msg = _("Parameter {p!r} => {r!r} seems not to be a regex object.").format(
                 p="re_name", r=re_name
@@ -1066,11 +1131,17 @@ class VsphereConnection(BaseVsphereHandler):
                 LOG.debug(_("Checking VM {!r} for pattern.").format(vm_name))
             if re_name.search(vm_name):
                 if self.verbose > 0:
+                    vsn = "~"
+                    if vsphere_name:
+                        vsn = vsphere_name
+                    dcn = "~"
+                    if dc_name:
+                        dcn = dc_name
                     LOG.debug(
                         _("Found VM {vm} in vSphere {vs}, DC {dc}, path {p}.").format(
                             vm=self.colored(vm_name, "CYAN"),
-                            vs=self.colored(vsphere_name, "CYAN"),
-                            dc=self.colored(dc_name, "CYAN"),
+                            vs=self.colored(vsn, "CYAN"),
+                            dc=self.colored(dcn, "CYAN"),
                             p=self.colored(cur_path, "CYAN"),
                         )
                     )

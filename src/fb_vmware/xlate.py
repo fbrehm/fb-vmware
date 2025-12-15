@@ -16,11 +16,7 @@ import copy
 import gettext
 import logging
 import sys
-
-try:
-    from pathlib import Path
-except ImportError:
-    from pathlib2 import Path
+from pathlib import Path
 
 # Third party modules
 import babel
@@ -28,23 +24,22 @@ import babel.lists
 from babel.support import Translations
 
 try:
-    from packaging.version import Version
+    from semver import Version
 except ImportError:
-    from distutils.version import LooseVersion as Version
+    from semver import VersionInfo as Version
 
 DOMAIN = "fb_vmware"
 
 LOG = logging.getLogger(__name__)
 
-__version__ = "1.1.2"
-
+__version__ = "1.2.0"
 
 __me__ = Path(__file__).resolve()
 __module_dir__ = __me__.parent
 __lib_dir__ = __module_dir__.parent
 __base_dir__ = __lib_dir__.parent
 
-LOCALE_DIR = __base_dir__.joinpath("locale")
+LOCALE_DIR = __base_dir__ / "locale"
 
 if LOCALE_DIR.is_dir():
     # Not installed, in development workdir
@@ -82,10 +77,10 @@ if __mo_file__:
 else:
     XLATOR = gettext.NullTranslations()
 
-CUR_BABEL_VERSION = Version(babel.__version__)
-NEWER_BABEL_VERSION = Version("2.6.0")
+CUR_BABEL_VERSION = Version.parse(babel.__version__)
+NEWER_BABEL_VERSION = Version.parse("2.6.0")
 
-SUPPORTED_LANGS = ("de_DE", "en_US")
+SUPPORTED_LANGS = ("de", "en")
 
 _ = XLATOR.gettext
 

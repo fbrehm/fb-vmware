@@ -40,7 +40,7 @@ pybabel extract src \
 
 sed -i -e "s/FIRST AUTHOR/Frank Brehm/g" -e "s/<EMAIL@ADDRESS>/<${my_address}>/g" "${pot_file}"
 
-for lang in de_DE en_US ; do
+for lang in de en ; do
     po_file="${locale_dir}/${lang}/LC_MESSAGES/${locale_domain}.po"
     if [[ ! -f "${po_file}" ]] ; then
         pybabel init --domain "${locale_domain}" \

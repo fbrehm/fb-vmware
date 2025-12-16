@@ -10,6 +10,7 @@
 from __future__ import absolute_import, print_function
 
 # Standard modules
+import argparse
 import locale
 import logging
 import pathlib
@@ -19,7 +20,9 @@ from operator import attrgetter, itemgetter
 
 # Third party modules
 from fb_tools.argparse_actions import RegexOptionAction
-from fb_tools.common import pp, to_bool
+from fb_tools.common import is_sequence
+from fb_tools.common import pp
+from fb_tools.common import to_bool
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
@@ -30,7 +33,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.10.0"
+__version__ = "1.11.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -42,6 +45,51 @@ class GetVmListAppError(VmwareAppError):
     """Base exception class for all exceptions in this application."""
 
     pass
+
+
+# =============================================================================
+class RegexListOptionAction(argparse.Action):
+    """An argparse action for regular expressions."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, option_strings, topic, re_options=None, *args, **kwargs):
+        """Initialise a RegexListOptionAction object."""
+        self._topic = topic
+        self._re_options = None
+        if re_options is not None:
+            self._re_options = re_options
+
+        super(RegexListOptionAction, self).__init__(*args, option_strings=option_strings, **kwargs)
+
+    # -------------------------------------------------------------------------
+    def __call__(self, parser, namespace, pattern, option_string=None):
+        """Parse the regular expression option."""
+        try:
+            if is_sequence(pattern):
+                if len(pattern) > 1:
+                    used_pattern = []
+                    for pat in pattern:
+                        used_pattern.append("(" + pat + ")")
+                    pattern_all = "|".join(used_pattern)
+                elif len(pattern) == 1:
+                    pattern_all = pattern[0]
+                else:
+                    pattern_all = None
+            else:
+                pattern_all = pattern
+
+            if pattern_all is not None:
+                if self._re_options is None:
+                    re_test = re.compile(pattern_all)  # noqa
+                else:
+                    re_test = re.compile(pattern_all, self._re_options)  # noqa
+        except Exception as e:
+            msg = _("Got a {c} for pattern {p!r}: {e}").format(
+                c=e.__class__.__name__, p=pattern_all, e=e
+            )
+            raise argparse.ArgumentError(self, msg)
+
+        setattr(namespace, self.dest, pattern_all)
 
 
 # =============================================================================
@@ -156,12 +204,10 @@ class GetVmListApplication(BaseVmwareApplication):
         filter_group = self.arg_parser.add_argument_group(_("Filter options"))
 
         filter_group.add_argument(
-            "-p",
-            "--pattern",
-            "--search-pattern",
             dest="vm_pattern",
+            nargs="*",
             metavar="REGEX",
-            action=RegexOptionAction,
+            action=RegexListOptionAction,
             topic=_("for names of VMs"),
             re_options=re.IGNORECASE,
             help=_(

@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.7.3"
+__version__ = "2.8.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -970,11 +970,236 @@ class VsphereConnection(BaseVsphereHandler):
         return vm_info
 
     # -------------------------------------------------------------------------
-    def get_vms(
+    def get_vm_list(
         self,
         re_name,
         vsphere_name=None,
         is_template=None,
+        disconnect=False,
+        name_only=False,
+        stop_at_found=False,
+    ):
+        """Get all virtual machines from vSphere.
+
+        The result may be fltered by a regular expression, or whether it is a regular
+        VM or a template.
+
+        Result is (depending of parameter 'name_only') either as a list of tuples with
+        three members (VM name, DC name and path), or as a VsphereVmList (list of VMs
+        as VsphereVm objects).
+
+        @param re_name: a regular expression for filtering the result list by the name.
+                        Maybe None, then all VMs are returned
+
+        """
+        if vsphere_name is None:
+            vsphere_name = self.name
+
+        if not hasattr(re_name, "match"):
+            msg = _("Parameter {p!r} => {r!r} seems not to be a regex object.").format(
+                p="re_name", r=re_name
+            )
+            raise TypeError(msg)
+        # if as_vmw_obj and as_obj:
+        #     msg = _("Parameter {p1!r} and {p2!r} may not be {w!r} at the same time.").format(
+        #         p1="as_vmw_obj", p2="as_obj", w=True
+        #     )
+        #     raise ValueError(msg)
+
+        LOG.debug(
+            _("Trying to get list of VMs with name pattern {} ...").format(
+                self.colored(re_name.pattern, "CYAN")
+            )
+        )
+        vm_list = []
+        if not name_only:
+            vm_list = VsphereVmList(
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
+                initialized=True,
+            )
+
+        try:
+            if not self.service_instance:
+                self.connect()
+
+            if not self.datacenters.keys():
+                self.get_datacenters()
+            content = self.service_instance.RetrieveContent()
+
+            for dc_name in self.datacenters.keys():
+                if self.verbose > 0:
+                    LOG.debug(
+                        _("Searching for virtual machines in DC {} ...").format(
+                            self.colored(dc_name, "CYAN")
+                        )
+                    )
+                dc = self.get_obj(content, [vim.Datacenter], dc_name)
+
+                for child in dc.vmFolder.childEntity:
+                    path = "/" + child.name
+                    if self.verbose == 1:
+                        LOG.debug(
+                            _("Searching in top path {} ...").format(self.colored(path, "CYAN"))
+                        )
+                    vms = self._get_vm_list(
+                        child,
+                        re_name,
+                        parent_path="/",
+                        vsphere_name=vsphere_name,
+                        dc_name=dc_name,
+                        is_template=is_template,
+                        name_only=name_only,
+                        stop_at_found=stop_at_found,
+                    )
+                    if vms:
+                        vm_list += vms
+                        if stop_at_found:
+                            break
+                if len(vm_list) and stop_at_found:
+                    break
+        finally:
+            if disconnect:
+                self.disconnect()
+
+        if len(vm_list):
+            msg = ngettext(
+                "Found one VM with name pattern {p}.",
+                "Found {no} VMs with name pattern {p}.",
+                len(vm_list),
+            )
+        else:
+            msg = _("Did not found a VM with name pattern {p}.")
+        LOG.debug(
+            msg.format(
+                no=self.colored(str(len(vm_list)), "CYAN"), p=self.colored(re_name.pattern, "CYAN")
+            )
+        )
+
+        return vm_list
+
+    # -------------------------------------------------------------------------
+    def _get_vm_list(
+        self,
+        entry,
+        re_name,
+        parent_path,
+        vsphere_name=None,
+        dc_name=None,
+        is_template=None,
+        depth=1,
+        name_only=False,
+        stop_at_found=False,
+    ):
+
+        vm_list = []
+        if not name_only:
+            vm_list = VsphereVmList(
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
+                initialized=True,
+            )
+
+        if isinstance(entry, vim.VirtualMachine):
+
+            summary = entry.summary
+            vm_config = summary.config
+            vm_name = vm_config.name
+
+            add_to_list = True
+
+            if self.verbose > 2:
+                LOG.debug(_("Checking VM {} ...").format(self.colored(vm_name, "CYAN")))
+            if is_template is not None:
+                if self.verbose > 3:
+                    msg = _("Checking VM {!r} for being a template ...")
+                    if not is_template:
+                        msg = _("Checking VM {!r} for being not a template ...")
+                    LOG.debug(msg.format(vm_name))
+                if is_template and not vm_config.template:
+                    add_to_list = False
+                if not is_template and vm_config.template:
+                    add_to_list = False
+
+            if add_to_list:
+                if self.verbose > 3:
+                    LOG.debug(_("Checking VM {!r} for pattern.").format(vm_name))
+                if not re_name.search(vm_name):
+                    add_to_list = False
+
+            if add_to_list:
+                if self.verbose > 1:
+                    vsn = "~"
+                    if vsphere_name:
+                        vsn = vsphere_name
+                    dcn = "~"
+                    if dc_name:
+                        dcn = dc_name
+                    LOG.debug(
+                        _("Found VM {vm} in vSphere {vs}, DC {dc}, path {p}.").format(
+                            vm=self.colored(vm_name, "CYAN"),
+                            vs=self.colored(vsn, "CYAN"),
+                            dc=self.colored(dcn, "CYAN"),
+                            p=self.colored(parent_path, "CYAN"),
+                        )
+                    )
+
+                if name_only:
+                    vm_list.append((vm_name, dc_name, parent_path))
+                else:
+                    if self.verbose > 1:
+                        LOG.debug(f"Get VM {vm_name!r} as an object.")
+
+                    vm = VsphereVm.from_summary(
+                        entry,
+                        parent_path,
+                        vsphere=vsphere_name,
+                        dc_name=dc_name,
+                        appname=self.appname,
+                        verbose=self.verbose,
+                        base_dir=self.base_dir,
+                    )
+                    vm_list.append(vm)
+
+                if stop_at_found:
+                    return vm_list
+
+        if hasattr(entry, "childEntity"):
+            if depth > self.max_search_depth:
+                return vm_list
+
+            if parent_path != "/":
+                cur_path = parent_path + "/" + entry.name
+            else:
+                cur_path = "/" + entry.name
+            if self.verbose > 1:
+                LOG.debug(_("Searching in path {} ...").format(self.colored(cur_path, "CYAN")))
+            for child in entry.childEntity:
+                vms = self._get_vm_list(
+                    child,
+                    re_name,
+                    parent_path=cur_path,
+                    vsphere_name=vsphere_name,
+                    dc_name=dc_name,
+                    is_template=is_template,
+                    depth=depth + 1,
+                    name_only=name_only,
+                    stop_at_found=stop_at_found,
+                )
+
+                if len(vms):
+                    vm_list += vms
+
+        return vm_list
+
+    # -------------------------------------------------------------------------
+    def get_vms(
+        self,
+        re_name,
+        vsphere_name=None,
+        late=None,
         disconnect=False,
         as_vmw_obj=False,
         as_obj=False,
@@ -1027,7 +1252,7 @@ class VsphereConnection(BaseVsphereHandler):
                 for child in dc.vmFolder.childEntity:
                     path = child.name
                     if self.verbose > 0:
-                        LOG.debug(_("Searching in path {} ...").format(self.colored(path, 'CYAN')))
+                        LOG.debug(_("Searching in path {} ...").format(self.colored(path, "CYAN")))
                     vms = self._get_vms(
                         child,
                         re_name,

@@ -30,7 +30,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.9.0"
+__version__ = "1.10.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -455,10 +455,16 @@ class GetVmListApplication(BaseVmwareApplication):
             re_name = re.compile(self.vm_pattern, re.IGNORECASE)
 
         if self.details:
-            vm_list = vsphere.get_vms(re_name, vsphere_name=vsphere_name, as_obj=True)
+            # vm_list = vsphere.get_vms(re_name, vsphere_name=vsphere_name, as_obj=True)
+            vm_list = vsphere.get_vm_list(
+                re_name, vsphere_name=vsphere_name, name_only=False, disconnect=True
+            )
             vms = self.mangle_vmlist_details(vm_list, vsphere_name)
         else:
-            vm_list = vsphere.get_vms(re_name, vsphere_name=vsphere_name, name_only=True)
+            # vm_list = vsphere.get_vms(re_name, vsphere_name=vsphere_name, name_only=True)
+            vm_list = vsphere.get_vm_list(
+                re_name, vsphere_name=vsphere_name, name_only=True, disconnect=True
+            )
             vms = self.mangle_vmlist_no_details(vm_list, vsphere_name)
 
         return vms
@@ -485,7 +491,7 @@ class GetVmListApplication(BaseVmwareApplication):
             }
 
             if cdata["path"]:
-                cdata["path"] = "/" + cdata["path"]
+                cdata["path"] = cdata["path"]
             else:
                 cdata["path"] = "/"
 
@@ -574,7 +580,7 @@ class GetVmListApplication(BaseVmwareApplication):
         }
 
         if cdata["path"]:
-            cdata["path"] = "/" + cdata["path"]
+            cdata["path"] = cdata["path"]
         else:
             cdata["path"] = "/"
 

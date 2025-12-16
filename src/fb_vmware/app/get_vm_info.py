@@ -16,6 +16,9 @@ import pathlib
 import sys
 from operator import attrgetter
 
+# Third party modules
+from fb_tools.spinner import Spinner
+
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
@@ -24,7 +27,7 @@ from ..errors import VSphereExpectedError
 from ..ether import VsphereEthernetcard
 from ..xlate import XLATOR
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -132,11 +135,23 @@ class GetVmApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def show_vm(self, vm_name):
         """Show a particular VM on STDOUT."""
-        print("\n{}: ".format(vm_name), end="")
+        print()
+        msg_tpl = _("Getting data of VM {} ... ")
         if self.verbose:
-            print()
+            msg = msg_tpl.format(self.colored(vm_name, "CYAN"))
+            print(msg)
+            vm = self._get_vm_data(vm_name)
+        else:
+            msg_len = len(msg_tpl.format(vm_name))
+            spin_prompt = msg_tpl.format(self.colored(vm_name, "CYAN"))
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
+                vm = self._get_vm_data(vm_name)
+            sys.stdout.write(" " * msg_len)
+            sys.stdout.write("\r")
+            sys.stdout.flush()
 
-        vm = self._get_vm_data(vm_name)
+        print("{}: ".format(vm_name), end="")
         if not vm:
             print(self.colored(_("NOT FOUND"), "RED"))
             return False
@@ -303,7 +318,7 @@ class GetVmApplication(BaseVmwareApplication):
                     vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
                 )
             )
-            vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True, as_obj=True)
+            vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True)
             if not vm:
                 continue
 
@@ -337,7 +352,11 @@ def main():
     if app.verbose > 2:
         print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
 
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        print("\n" + app.colored(_("User interrupt."), "YELLOW"))
+        sys.exit(5)
 
     sys.exit(0)
 

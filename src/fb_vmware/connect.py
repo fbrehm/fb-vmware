@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.8.0"
+__version__ = "2.8.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -846,8 +846,6 @@ class VsphereConnection(BaseVsphereHandler):
         vsphere_name=None,
         no_error=False,
         disconnect=False,
-        as_vmw_obj=False,
-        as_obj=False,
         name_only=False,
     ):
         """Get a virtual machine from vSphere as VsphereVm object by its name."""
@@ -861,12 +859,10 @@ class VsphereConnection(BaseVsphereHandler):
             )
         )
         re_name = re.compile(pattern_name, re.IGNORECASE)
-        vmlist = self.get_vms(
+        vmlist = self.get_vm_list(
             re_name,
             vsphere_name=vsphere_name,
             disconnect=disconnect,
-            as_vmw_obj=as_vmw_obj,
-            as_obj=as_obj,
             name_only=name_only,
             stop_at_found=True,
         )

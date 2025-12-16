@@ -33,7 +33,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.11.0"
+__version__ = "1.11.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -659,7 +659,11 @@ def main():
     if app.verbose > 2:
         print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
 
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        print("\n" + app.colored(_("User interrupt."), "YELLOW"))
+        sys.exit(5)
 
     sys.exit(0)
 

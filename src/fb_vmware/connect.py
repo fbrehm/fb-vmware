@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.8.1"
+__version__ = "2.9.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -878,6 +878,83 @@ class VsphereConnection(BaseVsphereHandler):
         return vmlist[0]
 
     # -------------------------------------------------------------------------
+    def get_vm_direct(
+        self,
+        vm_name,
+        vsphere_name=None,
+        no_error=False,
+        disconnect=False,
+        name_only=False,
+    ):
+        """Get a virtual machine from vSphere as VsphereVm object straight by its name."""
+        if vsphere_name is None:
+            vsphere_name = self.name
+
+        LOG.debug(
+            _("Searching for VM {n!r} in vSphere {v!r} ...").format(
+                n=vm_name, v=vsphere_name)
+        )
+
+        try:
+            if not self.service_instance:
+                self.connect()
+
+            if not self.datacenters.keys():
+                self.get_datacenters()
+            content = self.service_instance.RetrieveContent()
+
+            vm_obj = self.get_obj(content, [vim.VirtualMachine], vm_name)
+
+            if vm_obj:
+                if self.verbose > 1:
+                    LOG.debug(_("Got VM {vm} in vSphere {vs}.").format(
+                        vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")))
+                parents = self.get_parents(vm_obj)
+                if self.verbose > 3:
+                    LOG.debug("Parents of VM {vm!r}:\n{p}".format(
+                        vm=vm_obj.name, p=pp(parents)))
+
+                # Highest parent is the vSphere root - we don't need it
+                parents.pop(0)
+                # Next parent is the datacenter
+                dc_tuple = parents.pop(0)
+                dc_name = dc_tuple[1]
+                # Next parent is the VM folder of the datacenter - we also don't need it
+                parents.pop(0)
+                # Rest are now the parent folders from top to bottom
+                parent_path = "/" + "/".join(x[1] for x in parents)
+                if self.verbose > 1:
+                    LOG.debug(_("VM {vm} is located in DC {dc} path {p}.").format(
+                        vm=self.colored(vm_name, "CYAN"),
+                        dc=self.colored(dc_name, "CYAN"),
+                        p=self.colored(parent_path, "CYAN"))
+                    )
+
+                vm = VsphereVm.from_summary(
+                    vm_obj,
+                    parent_path,
+                    vsphere=vsphere_name,
+                    dc_name=dc_name,
+                    appname=self.appname,
+                    verbose=self.verbose,
+                    base_dir=self.base_dir,
+                )
+
+                return vm
+
+            else:
+                msg = _("vSphere VM {!r} not found.").format(vm_name)
+                if no_error:
+                    LOG.debug(msg)
+                else:
+                    LOG.error(msg)
+                return None
+
+        finally:
+            if disconnect:
+                self.disconnect()
+
+    # -------------------------------------------------------------------------
     def _dict_from_vim_obj(self, vm, cur_path):
 
         if not isinstance(vm, vim.VirtualMachine):
@@ -1076,7 +1153,7 @@ class VsphereConnection(BaseVsphereHandler):
         return vm_list
 
     # -------------------------------------------------------------------------
-    def _get_vm_list(
+    def _get_vm_list(                                           # noqa: C901
         self,
         entry,
         re_name,
@@ -1196,6 +1273,7 @@ class VsphereConnection(BaseVsphereHandler):
         re_name,
         vsphere_name=None,
         late=None,
+        is_template=None,
         disconnect=False,
         as_vmw_obj=False,
         as_obj=False,

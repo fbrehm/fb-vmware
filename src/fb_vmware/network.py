@@ -31,7 +31,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = "1.9.1"
+__version__ = "1.10.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -237,6 +237,23 @@ class VsphereNetwork(VsphereObject):
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+                content.rootFolder, vim.Network, True)
+        for c in container.view:
+            if c.name == name:
+                obj = c
+                break
+
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

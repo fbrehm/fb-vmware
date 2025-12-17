@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 LOG = logging.getLogger(__name__)
 
 
@@ -263,6 +263,33 @@ class VsphereCluster(VsphereObject):
     @standalone.setter
     def standalone(self, value):
         self._standalone = to_bool(value)
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+                content.rootFolder, vim.ClusterComputeResource, True)
+        for c in container.view:
+            if c.name == name:
+                obj = c
+                break
+
+        if obj is not Mone:
+            return obj
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+                content.rootFolder, vim.ComputeResource, True)
+        for c in container.view:
+            if c.name == name:
+                obj = c
+                break
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

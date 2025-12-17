@@ -30,7 +30,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -242,6 +242,23 @@ class VsphereDsCluster(VsphereObject):
 
         cluster = cls(**params)
         return cluster
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+                content.rootFolder, vim.StoragePod, True)
+        for c in container.view:
+            if c.name == name:
+                obj = c
+                break
+
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

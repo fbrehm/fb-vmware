@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 LOG = logging.getLogger(__name__)
 
 
@@ -273,20 +273,22 @@ class VsphereCluster(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vim.ClusterComputeResource, True)
+            content.rootFolder, vim.ClusterComputeResource, True
+        )
         for c in container.view:
-            if c.name == name:
+            if c.name == self.name:
                 obj = c
                 break
 
-        if obj is not Mone:
+        if obj is not None:
             return obj
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vim.ComputeResource, True)
+            content.rootFolder, vim.ComputeResource, True
+        )
         for c in container.view:
-            if c.name == name:
+            if c.name == self.name:
                 obj = c
                 break
         return obj

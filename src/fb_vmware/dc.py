@@ -23,7 +23,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_HOST_FOLDER = "host"
@@ -142,9 +142,9 @@ class VsphereDatacenter(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vim.Datacenter, True)
+            content.rootFolder, vim.Datacenter, True)
         for c in container.view:
-            if c.name == name:
+            if c.name == self.name:
                 obj = c
                 break
 

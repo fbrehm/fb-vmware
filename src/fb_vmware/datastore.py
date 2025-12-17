@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -391,7 +391,7 @@ class VsphereDatastore(VsphereObject):
 
         ds = cls(**params)
 
-        if hasattr(data, 'host'):
+        if hasattr(data, "host"):
             for host_data in data.host:
                 host_name = host_data.key.name
                 ds.hosts.append(host_name)
@@ -443,9 +443,10 @@ class VsphereDatastore(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-                content.rootFolder, vim.Datastore, True)
+            content.rootFolder, vim.Datastore, True
+        )
         for c in container.view:
-            if c.name == name:
+            if c.name == self.name:
                 obj = c
                 break
 

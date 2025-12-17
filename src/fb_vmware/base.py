@@ -38,7 +38,7 @@ from .errors import VSphereUnsufficientCredentials
 from .errors import VSphereVimFault
 from .xlate import XLATOR
 
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 
 LOG = logging.getLogger(__name__)
 
@@ -307,6 +307,33 @@ class BaseVsphereHandler(HandlingObject):
                 break
 
         return obj
+
+    # -------------------------------------------------------------------------
+    def get_all_objects(self, content, vimtype, name):
+        """Get all appropriate pyvomomi objects with the given criteria."""
+        objects = []
+
+        container = content.viewManager.CreateContainerView(content.rootFolder, vimtype, True)
+        for c in container.view:
+            if c.name == name:
+                objects.append(c)
+
+        return objects
+
+    # -------------------------------------------------------------------------
+    def get_parents(self, managed_object):
+        """Get the parents of y managed object as an array."""
+        parents = []
+        if hasattr(managed_object, "parent") and managed_object.parent is not None:
+            parent = managed_object.parent
+            grand_parents = self.get_parents(parent)
+            if grand_parents:
+                parents = grand_parents
+            parents += [(parent.__class__.__name__, parent.name)]
+
+            return parents
+
+        return None
 
     # -------------------------------------------------------------------------
     def __del__(self):

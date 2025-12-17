@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -112,6 +112,8 @@ class VsphereDatastore(VsphereObject):
         self._storage_type = "unknown"
 
         self._calculated_usage = 0.0
+
+        self.hosts = []
 
         super(VsphereDatastore, self).__init__(
             name=name,
@@ -388,6 +390,12 @@ class VsphereDatastore(VsphereObject):
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
 
         ds = cls(**params)
+
+        if hasattr(data, 'host'):
+            for host_data in data.host:
+                host_name = host_data.key.name
+                ds.hosts.append(host_name)
+
         return ds
 
     # -------------------------------------------------------------------------

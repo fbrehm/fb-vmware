@@ -27,7 +27,7 @@ from ..errors import VSphereExpectedError
 from ..ether import VsphereEthernetcard
 from ..xlate import XLATOR
 
-__version__ = "1.9.0"
+__version__ = "1.10.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -205,6 +205,24 @@ class GetVmApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _print_ctrlrs(self, vm):
 
+        ctrl_lbl = _("Controller") + ':'
+        len_ctrl_lbl = len(ctrl_lbl)
+
+        len_no_disk = 1
+        len_ctrl_no = 1
+        for ctrlr in filter(lambda x: x.scsi_ctrl_nr is not None, vm.controllers):
+            nr_disks = len(ctrlr.devices)
+            no_disk = ngettext("{nr:>2} disk ", "{nr:>2} disks", nr_disks).format(nr=nr_disks)
+            if len(no_disk) > len_no_disk:
+                len_no_disk = len(no_disk)
+            if len(str(ctrlr.bus_nr)) > len_ctrl_no:
+                len_ctrl_no = len(str(ctrlr.bus_nr))
+
+        line_template = (
+            f"    {{la:<{len_ctrl_lbl}}}  {{nr:>{len_ctrl_no}}} - {{di:<{len_no_disk}}} - {{ty}}"
+        )
+        # LOG.debug(f"Line template: {line_template!r}")
+
         first = True
         for ctrlr in sorted(
             filter(lambda x: x.scsi_ctrl_nr is not None, vm.controllers), key=attrgetter("bus_nr")
@@ -213,27 +231,45 @@ class GetVmApplication(BaseVmwareApplication):
                 continue
             label = ""
             if first:
-                label = "Controller:"
+                label = ctrl_lbl
             first = False
             ctype = _("Unknown")
             nr_disks = len(ctrlr.devices)
             if ctrlr.ctrl_type in VsphereDiskController.type_names.keys():
                 ctype = VsphereDiskController.type_names[ctrlr.ctrl_type]
             no_disk = ngettext("{nr:>2} disk ", "{nr:>2} disks", nr_disks).format(nr=nr_disks)
-            # no_disk = _("{nr:>2} disks").format(nr=len(ctrlr.devices))
-            # if len(ctrlr.devices) == 1:
-            #     no_disk = _(" 1 disk ")
-            msg = "    {la:<15}  {nr:>2} - {di} - {ty}".format(
-                la=label, nr=ctrlr.bus_nr, di=no_disk, ty=ctype
-            )
+            msg = line_template.format(la=label, nr=ctrlr.bus_nr, di=no_disk, ty=ctype)
             print(msg)
 
     # -------------------------------------------------------------------------
     def _print_disks(self, vm):
 
         if not vm.disks:
-            print("    Disks:       {}".format(_("None")))
+            print("    " + _("Disks") + ":       " + _("None"))
             return
+
+        ctrl_lbl = _("Controller")
+        file_lbl = _("File")
+        len_disk_lbl = 1
+        len_ctrl_lbl = len(ctrl_lbl)
+        len_ctrlr_nr = 1
+
+        for disk in vm.disks:
+            if len(disk.label) > len_disk_lbl:
+                len_disk_lbl = len(disk.label)
+            ctrlr_nr = -1
+            for ctrlr in vm.controllers:
+                if disk.key in ctrlr.devices:
+                    ctrlr_nr = ctrlr.bus_nr
+                    break
+            if len(str(ctrlr_nr)) > len_ctrlr_nr:
+                len_ctrlr_nr = len(str(ctrlr_nr))
+
+        line_template = f"    {{la}}  {{n:<{len_disk_lbl}}}"
+        line_template += f" - {{s:7.1f}} GiB - {{ctrl_lbl:<{len_ctrl_lbl}}}"
+        line_template += f" {{c:>{len_ctrlr_nr}}}"
+        line_template += " - {file_lbl} {f}"
+        # LOG.debug(f"Line template: {line_template!r}")
 
         total_gb = 0.0
         first = True
@@ -248,8 +284,9 @@ class GetVmApplication(BaseVmwareApplication):
                 if disk.key in ctrlr.devices:
                     ctrlr_nr = ctrlr.bus_nr
                     break
-            msg = "    {la}  {n:<15} - {s:7.1f} GiB - Controller {c:>2} - File {f}".format(
-                la=label, n=disk.label, s=disk.size_gb, c=ctrlr_nr, f=disk.file_name
+            msg = line_template.format(
+                la=label, n=disk.label, s=disk.size_gb, ctrl_lbl=ctrl_lbl, c=ctrlr_nr,
+                file_lbl=file_lbl, f=disk.file_name
             )
             print(msg)
         if len(vm.disks) > 1:
@@ -318,7 +355,9 @@ class GetVmApplication(BaseVmwareApplication):
                     vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
                 )
             )
-            vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True)
+            vm = vsphere.get_vm_direct(
+                vm_name, vsphere_name=vsphere_name, no_error=True)
+            # vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True)
             if not vm:
                 continue
 

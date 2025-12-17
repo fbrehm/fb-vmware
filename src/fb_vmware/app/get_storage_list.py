@@ -32,7 +32,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -253,14 +253,23 @@ class GetStorageListApp(BaseVmwareApplication):
         total_capacity = 0.0
         total_free = 0.0
 
+        first = True
+
         for vsphere_name in datastores.keys():
             for ds_name in datastores[vsphere_name].keys():
 
                 ds = datastores[vsphere_name][ds_name]
+
+                if self.verbose == 2 and first:
+                    LOG.debug("First found datastore:\n" + pp(ds.as_dict()))
+                    first = False
+
                 datastore = {}
                 datastore["is_total"] = False
 
                 datastore["ds_name"] = ds_name
+
+                datastore["hosts"] = str(len(ds.hosts))
 
                 datastore["vsphere_name"] = vsphere_name
                 datastore["dc"] = ds.dc_name
@@ -300,6 +309,7 @@ class GetStorageListApp(BaseVmwareApplication):
             self.totals = {
                 "ds_name": _("Total"),
                 "vsphere_name": "",
+                "hosts": "",
                 "dc": "",
                 "cluster": "",
                 "is_total": True,
@@ -340,6 +350,7 @@ class GetStorageListApp(BaseVmwareApplication):
         """Print on STDOUT all information about all datastore clusters."""
         labels = {
             "ds_name": _("Datastore"),
+            "hosts": "Hosts",
             "vsphere_name": "vSphere",
             "dc": _("Data Center"),
             "cluster": _("Cluster"),
@@ -354,6 +365,7 @@ class GetStorageListApp(BaseVmwareApplication):
             "vsphere_name",
             "dc",
             "cluster",
+            "hosts",
             "capacity_gb",
             "usage_gb",
             "usage_pc_out",

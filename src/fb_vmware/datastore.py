@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -413,7 +413,8 @@ class VsphereDatastore(VsphereObject):
             self.hosts.add(host_name)
             if host_name not in hostlist:
                 parents = self.get_parents(host_data.key)
-                LOG.debug(f"Parents of host {host_name!r}:\n" + pp(parents))
+                if self.verbose > 2:
+                    LOG.debug(f"Parents of host {host_name!r}:\n" + pp(parents))
                 hostlist[host_name] = (parents[1][1], parents[3][1])
 
         for host in hostlist:

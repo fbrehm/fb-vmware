@@ -16,8 +16,11 @@ import pathlib
 import sys
 
 # Third party modules
+from babel.numbers import format_decimal
+
 from fb_tools.common import pp
 from fb_tools.spinner import Spinner
+from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication
@@ -26,7 +29,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.1.0"
+__version__ = "0.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -129,6 +132,8 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
             if not self.show_ds_cluster(cluster_name):
                 ret = 1
 
+        print()
+
         return ret
 
     # -------------------------------------------------------------------------
@@ -145,7 +150,7 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
             spin_prompt = msg_tpl.format(self.colored(cluster_name, "CYAN"))
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):
-                ds_cluster = self._get_vm_data(cluster_name)
+                ds_cluster = self._get_ds_cluster_obj(cluster_name)
             sys.stdout.write(" " * msg_len)
             sys.stdout.write("\r")
             sys.stdout.flush()
@@ -157,6 +162,59 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
 
         print("{ok}".format(ok=self.colored("OK", "GREEN")))
         print()
+
+        capacity_gb = format_decimal(ds_cluster.capacity_gb, format="#,##0")
+        free_space_gb = format_decimal(ds_cluster.free_space_gb, format="#,##0")
+        used = ds_cluster.capacity_gb - ds_cluster.free_space_gb
+        used_gb = format_decimal(used, format="#,##0")
+        usage_pc_out = "- %"
+        if ds_cluster.capacity_gb:
+            used_pc = used / ds_cluster.capacity_gb
+            usage_pc_out = format_decimal(used_pc, format="0.0 %")
+
+        len_cluster = len("{}:  ".format(ds_cluster.name))
+        space = " " * len_cluster
+
+        compute_clusters = [self.colored(x, "CYAN") for x in ds_cluster.compute_clusters]
+
+        line = "{}:  ".format(self.colored(ds_cluster.name, "CYAN"))
+        line += "vSphere: {}     ".format(self.colored(ds_cluster.vsphere, "CYAN"))
+        line += "Datacenter: {}     ".format(self.colored(ds_cluster.dc_name, "CYAN"))
+        line += _("Connected computing clusters") + ": " + format_list(compute_clusters)
+        print(line)
+
+        line = space + _("Capacity in GB") + ": " + capacity_gb + "     "
+        line += _("Free space in GB") + ": " + free_space_gb + "     "
+        line += _("Calculated usage in GB") + ": " + used_gb + "     "
+        line += _("Usage in percent") + ": " + usage_pc_out
+        print(line)
+
+        ch = _("Connected hosts") + ": "
+        len_ch = len(ch)
+        first = True
+
+        for host in sorted(ds_cluster.hosts, key=str.lower):
+            if first:
+                line = space + ch
+            else:
+                line = space + (" " * len_ch)
+            first = False
+            line += "* " + host
+            print(line)
+
+        ds_lbl = _("Datastores") + ": "
+        len_ds_lbl = len(ds_lbl)
+        first = True
+
+        for ds_name in sorted(ds_cluster.datastores.keys(), key=str.lower):
+            # ds = ds_cluster.datastores[ds_name]
+            if first:
+                line = space + ds_lbl
+            else:
+                line = space + (" " * len_ds_lbl)
+            first = False
+            line += "* " + ds_name + " - "
+            print(line)
 
     # -------------------------------------------------------------------------
     def _get_ds_cluster_obj(self, cluster_name):
@@ -186,9 +244,11 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
 
             break
 
-        LOG.debug(
-            "Got data of datastore cluster {}:\n".format(cluster_name) + pp(ds_cluster.as_dict())
-        )
+        if self.verbose > 2:
+            LOG.debug(
+                "Got data of datastore cluster {}:\n".format(cluster_name)
+                + pp(ds_cluster.as_dict())
+            )
 
         return ds_cluster
 

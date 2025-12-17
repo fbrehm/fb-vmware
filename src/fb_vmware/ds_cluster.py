@@ -25,12 +25,14 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .datastore import VsphereDatastore
+from .datastore import VsphereDatastoreDict
 from .errors import VSphereHandlerError
 from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.5.1"
+__version__ = "1.6.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -74,6 +76,9 @@ class VsphereDsCluster(VsphereObject):
         self._dc_name = None
         self._capacity = int(capacity)
         self._free_space = int(free_space)
+        self.datastores = None
+        self.hosts = None
+        self.compute_clusters = None
 
         self._calculated_usage = 0.0
 
@@ -189,6 +194,7 @@ class VsphereDsCluster(VsphereObject):
         verbose=0,
         base_dir=None,
         test_mode=False,
+        detailled=False,
     ):
         """Create a new VsphereDsCluster object based on the data given from pyvmomi."""
         if test_mode:
@@ -239,9 +245,52 @@ class VsphereDsCluster(VsphereObject):
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))
-
         cluster = cls(**params)
+
+        if detailled:
+            cluster.get_detailled_info(data)
+
         return cluster
+
+    # -----------------------------------------------------------
+    def get_detailled_info(self, data):
+        """Get detailled infos about owning datastores and connected hosts."""
+        if not hasattr(data, "childEntity"):
+            return
+
+        self.datastores = VsphereDatastoreDict()
+        self.hosts = set()
+        self.compute_clusters = set()
+
+        hostlist = {}
+
+        for child in data.childEntity:
+            if isinstance(child, vim.Datastore):
+                if self.verbose > 1:
+                    LOG.debug(
+                        _("Datastore {ds!r} is assigned to datastore_cluster {dsc!r}.").format(
+                            ds=child.name, dsc=self.name
+                        )
+                    )
+                ds = VsphereDatastore.from_summary(
+                    child,
+                    vsphere=self.vsphere,
+                    dc_name=self.dc_name,
+                    cluster=self.name,
+                    appname=self.appname,
+                    verbose=self.verbose,
+                    base_dir=self.base_dir,
+                    detailled=True,
+                    hostlist=hostlist,
+                )
+                self.datastores.append(ds)
+
+                for host in ds.hosts:
+                    self.hosts.add(host)
+
+                if ds.compute_clusters:
+                    for compute_cluster in ds.compute_clusters:
+                        self.compute_clusters.add(compute_cluster)
 
     # -----------------------------------------------------------
     def get_pyvmomi_obj(self, service_instance):
@@ -252,7 +301,8 @@ class VsphereDsCluster(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.StoragePod, True)
+            content.rootFolder, vim.StoragePod, True
+        )
         for c in container.view:
             if c.name == self.name:
                 obj = c

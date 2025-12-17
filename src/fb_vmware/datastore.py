@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -112,8 +112,6 @@ class VsphereDatastore(VsphereObject):
         self._storage_type = "unknown"
 
         self._calculated_usage = 0.0
-
-        self.hosts = []
 
         super(VsphereDatastore, self).__init__(
             name=name,
@@ -323,6 +321,8 @@ class VsphereDatastore(VsphereObject):
         verbose=0,
         base_dir=None,
         test_mode=False,
+        detailled=False,
+        hostlist=None,
     ):
         """Create a new VsphereDatastore object based on the data given from pyvmomi module."""
         if test_mode:
@@ -391,12 +391,34 @@ class VsphereDatastore(VsphereObject):
 
         ds = cls(**params)
 
-        if hasattr(data, "host"):
-            for host_data in data.host:
-                host_name = host_data.key.name
-                ds.hosts.append(host_name)
+        if detailled:
+            ds.get_hosts(data, hostlist=hostlist)
 
         return ds
+
+    # -------------------------------------------------------------------------
+    def get_hosts(self, data, hostlist=None):
+        """Get a list of all connected ESX hosts."""
+        if not hasattr(data, "host"):
+            return
+
+        if hostlist is None:
+            hostlist = {}
+
+        self.hosts = set()
+        self.compute_clusters = set()
+
+        for host_data in data.host:
+            host_name = host_data.key.name
+            self.hosts.add(host_name)
+            if host_name not in hostlist:
+                parents = self.get_parents(host_data.key)
+                LOG.debug(f"Parents of host {host_name!r}:\n" + pp(parents))
+                hostlist[host_name] = (parents[1][1], parents[3][1])
+
+        for host in hostlist:
+            compute_cluster = hostlist[host][1]
+            self.compute_clusters.add(compute_cluster)
 
     # -------------------------------------------------------------------------
     @classmethod

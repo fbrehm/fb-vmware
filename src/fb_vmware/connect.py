@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.9.0"
+__version__ = "2.10.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -573,6 +573,74 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
+    def get_ds_cluster(
+        self, cluster_name, vsphere_name=None, no_error=False, disconnect=False, detailled=False
+    ):
+        """Get the first datastore cluster from vSphere with the given name."""
+        if vsphere_name is None:
+            vsphere_name = self.name
+
+        if not cluster_name:
+            msg = _("No valid cluster name given on calling {}.").format("get_ds_cluster()")
+            raise ValueError(msg)
+
+        msg = _("Searching for datastore cluster {cl} in vSphere {vs} ...").format(
+            cl=self.colored(cluster_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
+        )
+        LOG.debug(msg)
+
+        try:
+            if not self.service_instance:
+                self.connect()
+
+            if not self.datacenters.keys():
+                self.get_datacenters()
+            content = self.service_instance.RetrieveContent()
+            container = content.viewManager.CreateContainerView(
+                content.rootFolder, [vim.StoragePod], True
+            )
+
+            obj = None
+
+            for entry in container.view:
+                if entry.name == cluster_name:
+                    obj = entry
+                    break
+            if not obj:
+                msg = _("Datastore cluster {} not found.").format(
+                    self.colored(cluster_name, "CYAN")
+                )
+                if no_error:
+                    LOG.debug(msg)
+                else:
+                    LOG.error(msg)
+                return None
+
+            parents = self.get_parents(obj)
+
+            # Highest parent is the vSphere root - we don't need it
+            parents.pop(0)
+            # Next parent is the datacenter
+            dc_tuple = parents.pop(0)
+            dc_name = dc_tuple[1]
+
+            ds_cluster = VsphereDsCluster.from_summary(
+                obj,
+                vsphere=vsphere_name,
+                dc_name=dc_name,
+                appname=self.appname,
+                verbose=self.verbose,
+                base_dir=self.base_dir,
+                detailled=detailled,
+            )
+
+            return ds_cluster
+
+        finally:
+            if disconnect:
+                self.disconnect()
+
+    # -------------------------------------------------------------------------
     def get_networks(self, vsphere_name=None, disconnect=False):
         """Get all networks from vSphere as VsphereNetwork objects."""
         LOG.debug(_("Trying to get all networks from vSphere ..."))
@@ -891,8 +959,7 @@ class VsphereConnection(BaseVsphereHandler):
             vsphere_name = self.name
 
         LOG.debug(
-            _("Searching for VM {n!r} in vSphere {v!r} ...").format(
-                n=vm_name, v=vsphere_name)
+            _("Searching for VM {n!r} in vSphere {v!r} ...").format(n=vm_name, v=vsphere_name)
         )
 
         try:
@@ -907,12 +974,14 @@ class VsphereConnection(BaseVsphereHandler):
 
             if vm_obj:
                 if self.verbose > 1:
-                    LOG.debug(_("Got VM {vm} in vSphere {vs}.").format(
-                        vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")))
+                    LOG.debug(
+                        _("Got VM {vm} in vSphere {vs}.").format(
+                            vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
+                        )
+                    )
                 parents = self.get_parents(vm_obj)
                 if self.verbose > 3:
-                    LOG.debug("Parents of VM {vm!r}:\n{p}".format(
-                        vm=vm_obj.name, p=pp(parents)))
+                    LOG.debug("Parents of VM {vm!r}:\n{p}".format(vm=vm_obj.name, p=pp(parents)))
 
                 # Highest parent is the vSphere root - we don't need it
                 parents.pop(0)
@@ -924,10 +993,12 @@ class VsphereConnection(BaseVsphereHandler):
                 # Rest are now the parent folders from top to bottom
                 parent_path = "/" + "/".join(x[1] for x in parents)
                 if self.verbose > 1:
-                    LOG.debug(_("VM {vm} is located in DC {dc} path {p}.").format(
-                        vm=self.colored(vm_name, "CYAN"),
-                        dc=self.colored(dc_name, "CYAN"),
-                        p=self.colored(parent_path, "CYAN"))
+                    LOG.debug(
+                        _("VM {vm} is located in DC {dc} path {p}.").format(
+                            vm=self.colored(vm_name, "CYAN"),
+                            dc=self.colored(dc_name, "CYAN"),
+                            p=self.colored(parent_path, "CYAN"),
+                        )
                     )
 
                 vm = VsphereVm.from_summary(
@@ -1153,7 +1224,7 @@ class VsphereConnection(BaseVsphereHandler):
         return vm_list
 
     # -------------------------------------------------------------------------
-    def _get_vm_list(                                           # noqa: C901
+    def _get_vm_list(  # noqa: C901
         self,
         entry,
         re_name,

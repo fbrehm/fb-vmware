@@ -322,7 +322,7 @@ class BaseVsphereHandler(HandlingObject):
 
     # -------------------------------------------------------------------------
     def get_parents(self, managed_object):
-        """Get the parents of y managed object as an array."""
+        """Get the parents of a managed object as an array."""
         parents = []
         if hasattr(managed_object, "parent") and managed_object.parent is not None:
             parent = managed_object.parent

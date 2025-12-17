@@ -26,7 +26,7 @@ from six import add_metaclass
 from .errors import VSphereNameError
 from .xlate import XLATOR
 
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -330,6 +330,21 @@ class VsphereObject(FbBaseObject):
             return True
 
         return self.qual_name > other.qual_name
+
+    # -------------------------------------------------------------------------
+    def get_parents(self, managed_object):
+        """Get the parents of a managed object as an array."""
+        parents = []
+        if hasattr(managed_object, "parent") and managed_object.parent is not None:
+            parent = managed_object.parent
+            grand_parents = self.get_parents(parent)
+            if grand_parents:
+                parents = grand_parents
+            parents += [(parent.__class__.__name__, parent.name)]
+
+            return parents
+
+        return None
 
 
 # =============================================================================

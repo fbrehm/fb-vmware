@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.10.0"
+__version__ = "2.10.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -374,7 +374,9 @@ class VsphereConnection(BaseVsphereHandler):
         return None
 
     # -------------------------------------------------------------------------
-    def get_datastores(self, vsphere_name=None, no_local_ds=True, disconnect=False):
+    def get_datastores(
+        self, vsphere_name=None, no_local_ds=True, disconnect=False, detailled=False
+    ):
         """Get all datastores from vSphere as VsphereDatastore objects."""
         LOG.debug(_("Trying to get all datastores from vSphere ..."))
         self.datastores = VsphereDatastoreDict()
@@ -400,6 +402,7 @@ class VsphereConnection(BaseVsphereHandler):
                         vsphere_name=vsphere_name,
                         dc_name=dc_name,
                         no_local_ds=no_local_ds,
+                        detailled=detailled,
                     )
 
         finally:
@@ -430,6 +433,7 @@ class VsphereConnection(BaseVsphereHandler):
         cluster=None,
         no_local_ds=True,
         depth=1,
+        detailled=False,
     ):
 
         if self.verbose > 3:
@@ -454,6 +458,7 @@ class VsphereConnection(BaseVsphereHandler):
                     cluster=ds.name,
                     no_local_ds=no_local_ds,
                     depth=(depth + 1),
+                    detailled=detailled,
                 )
             return
 
@@ -468,6 +473,7 @@ class VsphereConnection(BaseVsphereHandler):
                     cluster=cluster,
                     no_local_ds=no_local_ds,
                     depth=(depth + 1),
+                    detailled=detailled,
                 )
             return
 
@@ -484,6 +490,7 @@ class VsphereConnection(BaseVsphereHandler):
                 appname=self.appname,
                 verbose=self.verbose,
                 base_dir=self.base_dir,
+                detailled=detailled,
             )
             if self.verbose > 2:
                 LOG.debug(

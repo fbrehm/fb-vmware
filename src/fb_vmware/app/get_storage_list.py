@@ -24,6 +24,10 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
+
 # Own modules
 from . import BaseVmwareApplication
 from . import VmwareAppError
@@ -32,7 +36,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -83,6 +87,7 @@ class GetStorageListApp(BaseVmwareApplication):
         self._print_total = True
         self._no_local = False
         self.totals = None
+        self._detailled = False
         self.sort_keys = self.default_sort_keys
 
         super(GetStorageListApp, self).__init__(
@@ -109,6 +114,12 @@ class GetStorageListApp(BaseVmwareApplication):
         return self._no_local
 
     # -------------------------------------------------------------------------
+    @property
+    def detailled(self):
+        """Print out a more detailled info about the datastores."""
+        return self._detailled
+
+    # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
         Transform the elements of the object into a dict.
@@ -120,6 +131,7 @@ class GetStorageListApp(BaseVmwareApplication):
         @rtype:  dict
         """
         res = super(GetStorageListApp, self).as_dict(short=short)
+        res["detailled"] = self.detailled
         res["no_local"] = self.no_local
         res["print_total"] = self.print_total
 
@@ -146,6 +158,17 @@ class GetStorageListApp(BaseVmwareApplication):
             action="store_true",
             dest="no_totals",
             help=_("Don't print the totals of all datastores."),
+        )
+
+        output_options.add_argument(
+            "-D",
+            "--detailled",
+            action="store_true",
+            dest="detailled",
+            help=_(
+                "Print out a more detailled info about the datastores, e.g. the number of "
+                "connected hosts. Tooks significant more time to retrieve the data from vSphere."
+            ),
         )
 
         output_options.add_argument(
@@ -178,6 +201,9 @@ class GetStorageListApp(BaseVmwareApplication):
         if getattr(self.args, "no_local", False):
             self._no_local = True
 
+        if getattr(self.args, "detailled", False):
+            self._detailled = True
+
     # -------------------------------------------------------------------------
     def _run(self):
 
@@ -201,7 +227,7 @@ class GetStorageListApp(BaseVmwareApplication):
         if self.no_local:
             no_local_ds = True
         try:
-            vsphere.get_datastores(no_local_ds=no_local_ds)
+            vsphere.get_datastores(no_local_ds=no_local_ds, detailled=self.detailled)
         except VSphereExpectedError as e:
             LOG.error(str(e))
             self.exit(6)
@@ -269,7 +295,10 @@ class GetStorageListApp(BaseVmwareApplication):
 
                 datastore["ds_name"] = ds_name
 
-                datastore["hosts"] = str(len(ds.hosts))
+                if hasattr(ds, "hosts"):
+                    datastore["hosts"] = str(len(ds.hosts))
+                else:
+                    datastore["hosts"] = "~"
 
                 datastore["vsphere_name"] = vsphere_name
                 datastore["dc"] = ds.dc_name
@@ -294,32 +323,32 @@ class GetStorageListApp(BaseVmwareApplication):
                     datastore["usage_pc"] = usage_pc
                     datastore["usage_pc_out"] = format_decimal(usage_pc, format="0.0 %")
                 else:
+                    datastore["usage_pc"] = None
                     datastore["usage_pc_out"] = "- %"
 
                 datastore_list.append(datastore)
 
-        if self.print_total:
-            total_used = total_capacity - total_free
-            total_used_pc = None
-            total_used_pc_out = "- %"
-            if total_capacity:
-                total_used_pc = total_used / total_capacity
-                total_used_pc_out = format_decimal(total_used_pc, format="0.0 %")
+        total_used = total_capacity - total_free
+        total_used_pc = None
+        total_used_pc_out = "- %"
+        if total_capacity:
+            total_used_pc = total_used / total_capacity
+            total_used_pc_out = format_decimal(total_used_pc, format="0.0 %")
 
-            self.totals = {
-                "ds_name": _("Total"),
-                "vsphere_name": "",
-                "hosts": "",
-                "dc": "",
-                "cluster": "",
-                "is_total": True,
-                "capacity_gb": format_decimal(total_capacity, format="#,##0"),
-                "free_space_gb": format_decimal(total_free, format="#,##0"),
-                "usage_gb": format_decimal(total_used, format="#,##0"),
-                "usage_pc_out": total_used_pc_out,
-            }
-            if not self.quiet:
-                self.totals["ds_name"] += ":"
+        self.totals = {
+            "ds_name": _("Total"),
+            "vsphere_name": "",
+            "hosts": "",
+            "dc": "",
+            "cluster": "",
+            "is_total": True,
+            "capacity_gb": format_decimal(total_capacity, format="#,##0"),
+            "free_space_gb": format_decimal(total_free, format="#,##0"),
+            "usage_gb": format_decimal(total_used, format="#,##0"),
+            "usage_pc_out": total_used_pc_out,
+        }
+        if not self.quiet:
+            self.totals["ds_name"] += ":"
 
         return datastore_list
 
@@ -348,56 +377,17 @@ class GetStorageListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_datastores(self, all_datastores):
         """Print on STDOUT all information about all datastore clusters."""
-        labels = {
-            "ds_name": _("Datastore"),
-            "hosts": "Hosts",
-            "vsphere_name": "vSphere",
-            "dc": _("Data Center"),
-            "cluster": _("Cluster"),
-            "capacity_gb": _("Capacity in GB"),
-            "free_space_gb": _("Free space in GB"),
-            "usage_gb": _("Calculated usage in GB"),
-            "usage_pc_out": _("Usage in percent"),
-        }
+        show_footer = False
+        if self.print_total:
+            show_footer = True
 
-        label_list = (
-            "ds_name",
-            "vsphere_name",
-            "dc",
-            "cluster",
-            "hosts",
-            "capacity_gb",
-            "usage_gb",
-            "usage_pc_out",
-            "free_space_gb",
-        )
+        show_header = True
+        table_title = _("All datastores")
+        if self.quiet:
+            show_header = False
+            table_title = None
 
         datastore_list = self._get_datastore_list(all_datastores)
-        field_length = self._get_ds_fields_len(datastore_list, labels)
-
-        max_len = 0
-        count = len(datastore_list)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += field_length[label]
-
-        if self.verbose > 2:
-            LOG.debug("Label length:\n" + pp(field_length))
-            LOG.debug("Max line length: {} chars".format(max_len))
-            LOG.debug("Datastore clusters:\n" + pp(datastore_list))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            if label in ("ds_name", "vsphere_name", "dc", "cluster"):
-                tpl += "{{{la}:<{le}}}".format(la=label, le=field_length[label])
-            else:
-                tpl += "{{{la}:>{le}}}".format(la=label, le=field_length[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
 
         if self.sort_keys:
             LOG.debug("Sorting keys: " + pp(self.sort_keys))
@@ -408,32 +398,55 @@ class GetStorageListApp(BaseVmwareApplication):
                 else:
                     datastore_list.sort(key=itemgetter(key), reverse=True)
 
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
+        ds_table = Table(
+            title=table_title,
+            title_style="bold cyan",
+            show_header=show_header,
+            show_footer=show_footer,
+        )
+
+        ds_table.add_column(header=_("Datastore"), footer=_("Total"))
+        ds_table.add_column(header=_("vSphere"), footer="")
+        ds_table.add_column(header=_("Data Center"), footer="")
+        ds_table.add_column(header=_("Cluster"), footer="")
+        ds_table.add_column(header=_("Connected Hosts"), footer="", justify="right")
+        ds_table.add_column(
+            header=_("Capacity in GB"), footer=self.totals["capacity_gb"], justify="right"
+        )
+        ds_table.add_column(
+            header=_("Calculated usage in GB"), footer=self.totals["usage_gb"], justify="right"
+        )
+        ds_table.add_column(
+            header=_("Usage in percent"), footer=self.totals["usage_pc_out"], justify="right"
+        )
+        ds_table.add_column(
+            header=_("Free space in GB"), footer=self.totals["free_space_gb"], justify="right"
+        )
 
         for datastore in datastore_list:
-            print(tpl.format(**datastore))
+            used_pc_out = Text(datastore["usage_pc_out"])
+            if datastore["usage_pc"] is None:
+                used_pc_out.stylize("bold magenta")
+            elif datastore["usage_pc"] >= 0.9:
+                used_pc_out.stylize("bold red")
+            elif datastore["usage_pc"] >= 0.8:
+                used_pc_out.stylize("bold yellow")
+            ds_table.add_row(
+                datastore["ds_name"],
+                datastore["vsphere_name"],
+                datastore["dc"],
+                datastore["cluster"],
+                datastore["hosts"],
+                datastore["capacity_gb"],
+                datastore["usage_gb"],
+                used_pc_out,
+                datastore["free_space_gb"],
+            )
 
-        if self.totals:
-            if not self.quiet:
-                print("-" * max_len)
-            print(tpl.format(**self.totals))
+        console = Console()
+        console.print(ds_table)
 
-        if not self.quiet:
-            print()
-            if count:
-                msg = ngettext(
-                    "Found one VMware datastore.",
-                    "Found {} VMware datastores.",
-                    count,
-                ).format(count)
-            else:
-                msg = _("No VMware datastores found.")
-
-            print(msg)
-            print()
+        return
 
 
 # =============================================================================
@@ -450,7 +463,11 @@ def main():
     if app.verbose > 2:
         print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
 
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        print("\n" + app.colored(_("User interrupt."), "YELLOW"))
+        sys.exit(5)
 
     return 0
 

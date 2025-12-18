@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware \n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2025-12-18 13:56+0100\n"
+"POT-Creation-Date: 2025-12-18 15:07+0100\n"
 "PO-Revision-Date: 2025-02-05 11:40+0100\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: de_DE\n"
@@ -126,12 +126,12 @@ msgid "Filter output for offline hosts and templates."
 msgstr "Filtern der Ausgabeliste nach Hosts, die offline sind.."
 
 #: src/fb_vmware/app/get_host_list.py:150 src/fb_vmware/app/get_storage_cluster_list.py:125
-#: src/fb_vmware/app/get_storage_list.py:133 src/fb_vmware/app/get_vm_list.py:277
+#: src/fb_vmware/app/get_storage_list.py:145 src/fb_vmware/app/get_vm_list.py:277
 msgid "Output options"
 msgstr "Ausgabeoptionen"
 
 #: src/fb_vmware/app/get_host_list.py:160 src/fb_vmware/app/get_storage_cluster_list.py:143
-#: src/fb_vmware/app/get_storage_list.py:159 src/fb_vmware/app/get_vm_list.py:295
+#: src/fb_vmware/app/get_storage_list.py:182 src/fb_vmware/app/get_vm_list.py:295
 #, python-brace-format
 msgid ""
 "The keys for sorting the output. Available keys are: {avail}. The default sorting keys are: "
@@ -153,7 +153,7 @@ msgstr "Ein {c} für das Suchmuster {p!r} erhalten: {e}"
 
 #: src/fb_vmware/app/get_host_list.py:190 src/fb_vmware/app/get_network_list.py:98
 #: src/fb_vmware/app/get_storage_cluster_info.py:110 src/fb_vmware/app/get_storage_cluster_list.py:165
-#: src/fb_vmware/app/get_storage_list.py:184 src/fb_vmware/app/get_vm_info.py:105
+#: src/fb_vmware/app/get_storage_list.py:210 src/fb_vmware/app/get_vm_info.py:105
 #: src/fb_vmware/app/get_vm_list.py:363
 #, python-brace-format
 msgid "Starting {a!r}, version {v!r} ..."
@@ -218,8 +218,7 @@ msgstr "Nein"
 
 #: src/fb_vmware/app/get_host_list.py:360 src/fb_vmware/app/get_network_list.py:318
 #: src/fb_vmware/app/get_network_list.py:451 src/fb_vmware/app/get_network_list.py:544
-#: src/fb_vmware/app/get_storage_cluster_list.py:360 src/fb_vmware/app/get_storage_list.py:400
-#: src/fb_vmware/app/get_vm_list.py:471
+#: src/fb_vmware/app/get_storage_cluster_list.py:360 src/fb_vmware/app/get_vm_list.py:471
 #, python-brace-format
 msgid "Line template: {}"
 msgstr "Zeilenvorlage: {}"
@@ -237,7 +236,7 @@ msgstr[1] "Fand {} VMware Hosts."
 
 #: src/fb_vmware/app/get_host_list.py:417 src/fb_vmware/app/get_network_list.py:568
 #: src/fb_vmware/app/get_storage_cluster_info.py:285 src/fb_vmware/app/get_storage_cluster_list.py:411
-#: src/fb_vmware/app/get_storage_list.py:451 src/fb_vmware/app/get_vm_info.py:392
+#: src/fb_vmware/app/get_storage_list.py:464 src/fb_vmware/app/get_vm_info.py:392
 #: src/fb_vmware/app/get_vm_list.py:660
 #, python-brace-format
 msgid ""
@@ -277,7 +276,7 @@ msgid "No Distributed Virtual Switches found."
 msgstr "Keine Verteilten Virtuelle Switche gefunden."
 
 #: src/fb_vmware/app/get_network_list.py:262 src/fb_vmware/app/get_network_list.py:507
-#: src/fb_vmware/app/get_storage_cluster_list.py:318 src/fb_vmware/app/get_storage_list.py:355
+#: src/fb_vmware/app/get_storage_cluster_list.py:318 src/fb_vmware/app/get_storage_list.py:410
 #: src/fb_vmware/app/get_vm_list.py:414 src/fb_vmware/app/get_vm_list.py:427
 msgid "Data Center"
 msgstr "Rechenzentrum"
@@ -338,8 +337,8 @@ msgstr "Uplink"
 #: src/fb_vmware/app/get_storage_cluster_info.py:69
 msgid "Tries to get information about the given datastore cluster in VMware vSphere and print it out."
 msgstr ""
-"Versucht, Informationen über den angegebenen Datastore-Cluster in VMware vSphere zu ermitteln und gibt diese "
-"aus."
+"Versucht, Informationen über den angegebenen Datastore-Cluster in VMware vSphere zu ermitteln "
+"und gibt diese aus."
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:96
 msgid "Names of the datastore clusters to get information."
@@ -355,7 +354,6 @@ msgid "NOT FOUND"
 msgstr "NICHT GEFUNDEN"
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:177
-#, python-brace-format
 msgid "Connected computing clusters"
 msgstr "Verbundene Rechencluster"
 
@@ -367,27 +365,27 @@ msgstr "Allgemein"
 msgid "Datastore cluster total"
 msgstr "Datastore-Cluster insgesamt"
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:191 src/fb_vmware/app/get_storage_list.py:352
+#: src/fb_vmware/app/get_storage_cluster_info.py:191 src/fb_vmware/app/get_storage_list.py:408
 msgid "Datastore"
 msgstr "Datastore"
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:193 src/fb_vmware/app/get_storage_cluster_list.py:319
-#: src/fb_vmware/app/get_storage_list.py:357
+#: src/fb_vmware/app/get_storage_list.py:414
 msgid "Capacity in GB"
 msgstr "Kapazität in GiB"
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:198 src/fb_vmware/app/get_storage_cluster_list.py:321
-#: src/fb_vmware/app/get_storage_list.py:359
+#: src/fb_vmware/app/get_storage_list.py:417
 msgid "Calculated usage in GB"
 msgstr "Berechnete Verwendung in GiB"
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:202 src/fb_vmware/app/get_storage_cluster_list.py:322
-#: src/fb_vmware/app/get_storage_list.py:360
+#: src/fb_vmware/app/get_storage_list.py:420
 msgid "Usage in percent"
 msgstr "Verwendung in Prozent"
 
 #: src/fb_vmware/app/get_storage_cluster_info.py:204 src/fb_vmware/app/get_storage_cluster_list.py:320
-#: src/fb_vmware/app/get_storage_list.py:358
+#: src/fb_vmware/app/get_storage_list.py:423
 msgid "Free space in GB"
 msgstr "Freier Platz in GiB"
 
@@ -409,8 +407,8 @@ msgstr "Hole vollständige Daten des Datastore-Clusters {!r} …"
 msgid "Searching for datastore cluster {dsc} in vSphere {vs} ..."
 msgstr "Suche nach Datastore-Cluster {dsc} in vSphere {vs} …"
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:290 src/fb_vmware/app/get_vm_info.py:397
-#: src/fb_vmware/app/get_vm_list.py:665
+#: src/fb_vmware/app/get_storage_cluster_info.py:290 src/fb_vmware/app/get_storage_list.py:469
+#: src/fb_vmware/app/get_vm_info.py:397 src/fb_vmware/app/get_vm_list.py:665
 msgid "User interrupt."
 msgstr "Benutzerunterbrechung."
 
@@ -426,8 +424,8 @@ msgstr "Die Gesamt-Zahlen aller Datastore-Cluster nicht ausgeben."
 msgid "Getting all vSphere storage clusters ..."
 msgstr "Ermittele alle vSphere Datastore-Cluster …"
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:276 src/fb_vmware/app/get_storage_list.py:310
-#: src/fb_vmware/app/get_vm_info.py:293
+#: src/fb_vmware/app/get_storage_cluster_list.py:276 src/fb_vmware/app/get_storage_list.py:339
+#: src/fb_vmware/app/get_storage_list.py:408 src/fb_vmware/app/get_vm_info.py:293
 msgid "Total"
 msgstr "Insgesamt"
 
@@ -442,36 +440,45 @@ msgstr[1] "Fand {} VMware Datastore-Clusters."
 msgid "No VMware storage clusters found."
 msgstr "Keine  VMware Storage-Cluster gefunden."
 
-#: src/fb_vmware/app/get_storage_list.py:80
+#: src/fb_vmware/app/get_storage_list.py:84
 msgid "Tries to get a list of all datastores in VMware vSphere and print it out."
 msgstr "Versucht eine Liste aller Datastores in VMware vSphere zu erhalten und gibt diese aus."
 
-#: src/fb_vmware/app/get_storage_list.py:140
+#: src/fb_vmware/app/get_storage_list.py:152
 msgid "Don't print local datastores on the ESX hosts."
 msgstr "Keine Ausgabe lokaler Datastores auf ESX-Hosts."
 
-#: src/fb_vmware/app/get_storage_list.py:148
+#: src/fb_vmware/app/get_storage_list.py:160
 msgid "Don't print the totals of all datastores."
 msgstr "Die Gesamt-Zahlen aller Datastores nicht ausgeben."
 
-#: src/fb_vmware/app/get_storage_list.py:233
+#: src/fb_vmware/app/get_storage_list.py:169
+msgid ""
+"Print out a more detailled info about the datastores, e.g. the number of connected hosts. Tooks "
+"significant more time to retrieve the data from vSphere."
+msgstr ""
+"Gibt mehr, detailliertere über die Datastores aus, zum Beispiel die Anzahl der verbundenen "
+"Hosts. Benötigt signifikant mehr Zeit zum Beschaffen der Informationen."
+
+#: src/fb_vmware/app/get_storage_list.py:259
 msgid "Getting all vSphere datastores ..."
 msgstr "Ermittele alle vSphere Datastores …"
 
-#: src/fb_vmware/app/get_storage_list.py:356 src/fb_vmware/app/get_vm_list.py:428
+#: src/fb_vmware/app/get_storage_list.py:385
+msgid "All datastores"
+msgstr "Alle Datastores"
+
+#: src/fb_vmware/app/get_storage_list.py:409
+msgid "vSphere"
+msgstr "vSphere"
+
+#: src/fb_vmware/app/get_storage_list.py:411 src/fb_vmware/app/get_vm_list.py:428
 msgid "Cluster"
 msgstr "Cluster"
 
-#: src/fb_vmware/app/get_storage_list.py:428
-#, python-brace-format
-msgid "Found one VMware datastore."
-msgid_plural "Found {} VMware datastores."
-msgstr[0] "Fand einen VMware Datastore."
-msgstr[1] "Fand {} VMware Datastores."
-
-#: src/fb_vmware/app/get_storage_list.py:433
-msgid "No VMware datastores found."
-msgstr "Keine VMware-Datastores gefunden."
+#: src/fb_vmware/app/get_storage_list.py:412
+msgid "Connected Hosts"
+msgstr "Verbundene Hosts"
 
 #: src/fb_vmware/app/get_vm_info.py:64
 msgid "Tries to get information about the given virtual machines in VMware vSphere and print it out."
@@ -800,39 +807,39 @@ msgstr "Versuche alle Cluster von vSphere zu erhalten …"
 msgid "Found clusters:"
 msgstr "Gefundene Cluster:"
 
-#: src/fb_vmware/connect.py:335 src/fb_vmware/connect.py:854
+#: src/fb_vmware/connect.py:335 src/fb_vmware/connect.py:861
 msgid "Found standalone host"
 msgstr "Fand einzelstehenden Host"
 
-#: src/fb_vmware/connect.py:337 src/fb_vmware/connect.py:856
+#: src/fb_vmware/connect.py:337 src/fb_vmware/connect.py:863
 msgid "Found cluster"
 msgstr "Gefundene Cluster"
 
-#: src/fb_vmware/connect.py:338 src/fb_vmware/connect.py:857
+#: src/fb_vmware/connect.py:338 src/fb_vmware/connect.py:864
 msgid "host"
 msgid_plural "hosts"
 msgstr[0] "Host"
 msgstr[1] "Hosts"
 
-#: src/fb_vmware/connect.py:339 src/fb_vmware/connect.py:858
+#: src/fb_vmware/connect.py:339 src/fb_vmware/connect.py:865
 msgid "CPU"
 msgid_plural "CPUs"
 msgstr[0] "CPU"
 msgstr[1] "CPUs"
 
-#: src/fb_vmware/connect.py:340 src/fb_vmware/connect.py:859
+#: src/fb_vmware/connect.py:340 src/fb_vmware/connect.py:866
 msgid "thread"
 msgid_plural "threads"
 msgstr[0] "Thread"
 msgstr[1] "Threads"
 
-#: src/fb_vmware/connect.py:341 src/fb_vmware/connect.py:860
+#: src/fb_vmware/connect.py:341 src/fb_vmware/connect.py:867
 msgid "network"
 msgid_plural "networks"
 msgstr[0] "Netzwerk"
 msgstr[1] "Netzwerke"
 
-#: src/fb_vmware/connect.py:342 src/fb_vmware/connect.py:861
+#: src/fb_vmware/connect.py:342 src/fb_vmware/connect.py:868
 msgid "datastore"
 msgid_plural "datastores"
 msgstr[0] "Datastore"
@@ -847,147 +854,147 @@ msgstr ""
 "{on} {cl!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, {mem:0.1f} GiB Hauptspeicher, {net} {nw_l} "
 "und {ds} {ds_l}."
 
-#: src/fb_vmware/connect.py:379
+#: src/fb_vmware/connect.py:381
 msgid "Trying to get all datastores from vSphere ..."
 msgstr "Versuche alle Datastores von vSphere zu erhalten …"
 
-#: src/fb_vmware/connect.py:395
+#: src/fb_vmware/connect.py:397
 #, python-brace-format
 msgid "Get all datastores in DC {!r} ..."
 msgstr "Hole alle Datastores im RZ {!r} …"
 
-#: src/fb_vmware/app/get_storage_list.py:242 src/fb_vmware/connect.py:412 src/fb_vmware/connect.py:414
+#: src/fb_vmware/app/get_storage_list.py:268 src/fb_vmware/connect.py:415 src/fb_vmware/connect.py:417
 msgid "Found datastores:"
 msgstr "Gefundene Datastores:"
 
-#: src/fb_vmware/connect.py:422
+#: src/fb_vmware/connect.py:425
 msgid "Datastore mappings:"
 msgstr "Datastore-Mappings:"
 
-#: src/fb_vmware/connect.py:436 src/fb_vmware/connect.py:549 src/fb_vmware/connect.py:716
+#: src/fb_vmware/connect.py:440 src/fb_vmware/connect.py:556 src/fb_vmware/connect.py:723
 #, python-brace-format
 msgid "Found a {} child."
 msgstr "Fand ein {}-Child."
 
-#: src/fb_vmware/connect.py:477
+#: src/fb_vmware/connect.py:483
 #, python-brace-format
 msgid "Datastore {!r} seems to be local."
 msgstr "Der Datastore {!r} scheint lokal zu sein."
 
-#: src/fb_vmware/connect.py:490
+#: src/fb_vmware/connect.py:497
 #, python-brace-format
 msgid "Found datastore {ds!r} of type {t!r}, capacity {c:0.1f} GByte."
 msgstr "Fand Datastore {ds!r} vom Typ {t!r} mit einer Kapazität von {c:0.1f} GiByte."
 
-#: src/fb_vmware/connect.py:501
+#: src/fb_vmware/connect.py:508
 msgid "Trying to get all datastore clusters from vSphere ..."
 msgstr "Versuche alle Datastore-Cluster von vSphere zu erhalten …"
 
-#: src/fb_vmware/connect.py:517
+#: src/fb_vmware/connect.py:524
 #, python-brace-format
 msgid "Get all datastore clusters in DC {!r} ..."
 msgstr "Hole alle Datastore-Cluster in RZ {!r} …"
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:220 src/fb_vmware/connect.py:530
-#: src/fb_vmware/connect.py:534
+#: src/fb_vmware/app/get_storage_cluster_list.py:220 src/fb_vmware/connect.py:537
+#: src/fb_vmware/connect.py:541
 msgid "Found datastore clusters:"
 msgstr "Gefundene Datastore-Cluster:"
 
-#: src/fb_vmware/connect.py:537
+#: src/fb_vmware/connect.py:544
 msgid "No vSphere datastore clusters found."
 msgstr "Keine vSphere-Datastore-Cluster gefunden."
 
-#: src/fb_vmware/connect.py:543
+#: src/fb_vmware/connect.py:550
 msgid "Datastore cluster mappings:"
 msgstr "Datastore-Cluster-Mappings:"
 
-#: src/fb_vmware/connect.py:584
+#: src/fb_vmware/connect.py:591
 #, python-brace-format
 msgid "No valid cluster name given on calling {}."
 msgstr "Kein gültiger Cluster-Name beim Aufruf von {} angegeben."
 
-#: src/fb_vmware/connect.py:587
+#: src/fb_vmware/connect.py:594
 #, python-brace-format
 msgid "Searching for datastore cluster {cl} in vSphere {vs} ..."
 msgstr "Suche nach Datastore-Cluster {cl} in vSphere {vs} …"
 
-#: src/fb_vmware/connect.py:610
+#: src/fb_vmware/connect.py:617
 #, python-brace-format
 msgid "Datastore cluster {} not found."
 msgstr "Datastore-Cluster {} nicht gefunden."
 
-#: src/fb_vmware/connect.py:646
+#: src/fb_vmware/connect.py:653
 msgid "Trying to get all networks from vSphere ..."
 msgstr "Versuche alle Netzwerke von vSphere zu bekommen."
 
-#: src/fb_vmware/connect.py:663
+#: src/fb_vmware/connect.py:670
 #, python-brace-format
 msgid "Get all networking objects in DC {!r} ..."
 msgstr "Hole alle Netzwerk-ähnlichen Objekte im RZ {!r} …"
 
-#: src/fb_vmware/connect.py:674
+#: src/fb_vmware/connect.py:681
 #, python-brace-format
 msgid "Found one Distributed Virtual Port Group."
 msgid_plural "Found {n} Distributed Virtual Port Groups."
 msgstr[0] "Fand eine Verteilte Virtuelle Portgruppe."
 msgstr[1] "Fand {n} Verteilte Virtuelle Portgruppen."
 
-#: src/fb_vmware/connect.py:680
+#: src/fb_vmware/connect.py:687
 msgid "Found Distributed Virtual Port Groups:"
 msgstr "Gefundene Verteilte Virtuelle Portgruppen:"
 
-#: src/fb_vmware/app/get_network_list.py:386 src/fb_vmware/connect.py:688
+#: src/fb_vmware/app/get_network_list.py:386 src/fb_vmware/connect.py:695
 msgid "No Distributed Virtual Port Groups found."
 msgstr "Keine Verteilte Virtuelle Portgruppen gefunden."
 
-#: src/fb_vmware/connect.py:692
+#: src/fb_vmware/connect.py:699
 #, python-brace-format
 msgid "Found one Virtual Network."
 msgid_plural "Found {n} Virtual Networks."
 msgstr[0] "Fand ein Virtuelles Netzwerk."
 msgstr[1] "Fand {n} Virtuelle Netzwerke."
 
-#: src/fb_vmware/app/get_network_list.py:193 src/fb_vmware/connect.py:697 src/fb_vmware/connect.py:699
+#: src/fb_vmware/app/get_network_list.py:193 src/fb_vmware/connect.py:704 src/fb_vmware/connect.py:706
 msgid "Found Virtual Networks:"
 msgstr "Gefundene Virtuelle Netzwerke:"
 
-#: src/fb_vmware/app/get_network_list.py:500 src/fb_vmware/connect.py:701
+#: src/fb_vmware/app/get_network_list.py:500 src/fb_vmware/connect.py:708
 msgid "No Virtual Networks found."
 msgstr "Keine Virtuellen Netzwerke gefunden."
 
-#: src/fb_vmware/connect.py:710
+#: src/fb_vmware/connect.py:717
 msgid "Network mappings:"
 msgstr "Netzwerk-Mappings:"
 
-#: src/fb_vmware/connect.py:768 src/fb_vmware/connect.py:1143 src/fb_vmware/connect.py:1359
+#: src/fb_vmware/connect.py:775 src/fb_vmware/connect.py:1150 src/fb_vmware/connect.py:1366
 #, python-brace-format
 msgid "Parameter {p!r} => {r!r} seems not to be a regex object."
 msgstr "Der Parameter {p!r} => {r!r} scheint kein Regex-Objekt zu sein."
 
-#: src/fb_vmware/connect.py:773
+#: src/fb_vmware/connect.py:780
 #, python-brace-format
 msgid "Trying to get all host systems from vSphere with name pattern {!r} ..."
 msgstr "Versuche eine Liste aller Hostsysteme mit dem Namensmuster {!r} zu ermitteln …"
 
-#: src/fb_vmware/connect.py:778
+#: src/fb_vmware/connect.py:785
 msgid "Trying to get all host systems from vSphere ..."
 msgstr "Versuche alle Host-Systeme von vSphere zu ermitteln …."
 
-#: src/fb_vmware/connect.py:795
+#: src/fb_vmware/connect.py:802
 #, python-brace-format
 msgid "Get all computing clusters in DC {!r} ..."
 msgstr "Hole alle Rechen-Cluster in RZ {!r} …"
 
-#: src/fb_vmware/connect.py:811 src/fb_vmware/connect.py:816
+#: src/fb_vmware/connect.py:818 src/fb_vmware/connect.py:823
 msgid "Found hosts:"
 msgstr "Gefundene Hosts:"
 
-#: src/fb_vmware/connect.py:828
+#: src/fb_vmware/connect.py:835
 #, python-brace-format
 msgid "Checking {o}-object in dc {dc!r}, cluster {c!r} ..."
 msgstr "Überprüfe {o}-Objekt in RZ {dc!r}, Cluster {c!r} …"
 
-#: src/fb_vmware/connect.py:864
+#: src/fb_vmware/connect.py:871
 #, python-brace-format
 msgid ""
 "{on} {cl!r} in dc {dc!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, {mem:0.1f} GiB Memory, {net} "
@@ -996,328 +1003,328 @@ msgstr ""
 "{on} {cl!r} in RZ {dc!r}, {h} {h_l}, {cpu} {cpu_l}, {thr} {t_l}, {mem:0.1f} GiB Hauptspeicher, "
 "{net} {nw_l} und {ds} {ds_l}."
 
-#: src/fb_vmware/connect.py:895
+#: src/fb_vmware/connect.py:902
 #, python-brace-format
 msgid "Found host {h!r} in cluster {c!r}."
 msgstr "Fand Host {h!r} in Cluster {c!r}."
 
-#: src/fb_vmware/connect.py:925
+#: src/fb_vmware/connect.py:932
 #, python-brace-format
 msgid "Searching for VM {n!r} (pattern: {p!r}) in vSphere {v!r} ..."
 msgstr "Suche nach VM {n!r} (Suchmuster: {p!r}) in vSphere {v!r} …"
 
-#: src/fb_vmware/connect.py:939 src/fb_vmware/connect.py:1017
+#: src/fb_vmware/connect.py:946 src/fb_vmware/connect.py:1024
 #, python-brace-format
 msgid "vSphere VM {!r} not found."
 msgstr "Die vSphere-VM {!r} wurde nicht gefunden."
 
-#: src/fb_vmware/connect.py:962
+#: src/fb_vmware/connect.py:969
 #, python-brace-format
 msgid "Searching for VM {n!r} in vSphere {v!r} ..."
 msgstr "Suche nach VM {n!r} in vSphere {v!r} …"
 
-#: src/fb_vmware/connect.py:978
+#: src/fb_vmware/connect.py:985
 #, python-brace-format
 msgid "Got VM {vm} in vSphere {vs}."
 msgstr "Fand VM {vm} in vSphere {vs}."
 
-#: src/fb_vmware/connect.py:997
+#: src/fb_vmware/connect.py:1004
 #, python-brace-format
 msgid "VM {vm} is located in DC {dc} path {p}."
 msgstr "VM {vm} befindet sich im RZ {dc} unter Pfad {p}."
 
-#: src/fb_vmware/connect.py:1032 src/fb_vmware/datastore.py:355 src/fb_vmware/ds_cluster.py:227
+#: src/fb_vmware/connect.py:1039 src/fb_vmware/datastore.py:355 src/fb_vmware/ds_cluster.py:227
 #: src/fb_vmware/iface.py:69 src/fb_vmware/network.py:314
 #, python-brace-format
 msgid "Parameter {t!r} must be a {e}, {v!r} was given."
 msgstr "Der Parameter {t!r} muss ein {e}-Objekt sein, statt dessen wurde ein {v}-Objekt übergeben."
 
-#: src/fb_vmware/connect.py:1154
+#: src/fb_vmware/connect.py:1161
 #, python-brace-format
 msgid "Trying to get list of VMs with name pattern {} ..."
 msgstr "Versuche eine Liste der VMs mit dem Namensmuster {} zu ermitteln …"
 
-#: src/fb_vmware/connect.py:1178 src/fb_vmware/connect.py:1391
+#: src/fb_vmware/connect.py:1185 src/fb_vmware/connect.py:1398
 #, python-brace-format
 msgid "Searching for virtual machines in DC {} ..."
 msgstr "Suche nach virtuellen Maschinen in RZ {} …"
 
-#: src/fb_vmware/connect.py:1188
+#: src/fb_vmware/connect.py:1195
 #, python-brace-format
 msgid "Searching in top path {} ..."
 msgstr "Suche in Top-Pfad {} …"
 
-#: src/fb_vmware/connect.py:1212
+#: src/fb_vmware/connect.py:1219
 #, python-brace-format
 msgid "Found one VM with name pattern {p}."
 msgid_plural "Found {no} VMs with name pattern {p}."
 msgstr[0] "Fand eine VM mit dem Namens-Suchmuster {p}."
 msgstr[1] "Fand {no} VMs mit dem Namens-Suchmuster {p}."
 
-#: src/fb_vmware/connect.py:1217
+#: src/fb_vmware/connect.py:1224
 #, python-brace-format
 msgid "Did not found a VM with name pattern {p}."
 msgstr "Fand keine VM mit dem Suchmuster {p}."
 
-#: src/fb_vmware/connect.py:1258 src/fb_vmware/connect.py:1483
+#: src/fb_vmware/connect.py:1265 src/fb_vmware/connect.py:1490
 #, python-brace-format
 msgid "Checking VM {} ..."
 msgstr "Überprüfe VM {} …"
 
-#: src/fb_vmware/connect.py:1261 src/fb_vmware/connect.py:1486
+#: src/fb_vmware/connect.py:1268 src/fb_vmware/connect.py:1493
 #, python-brace-format
 msgid "Checking VM {!r} for being a template ..."
 msgstr "Überprüfe, ob die VM {!r} eine Vorlage ist …"
 
-#: src/fb_vmware/connect.py:1263 src/fb_vmware/connect.py:1488
+#: src/fb_vmware/connect.py:1270 src/fb_vmware/connect.py:1495
 #, python-brace-format
 msgid "Checking VM {!r} for being not a template ..."
 msgstr "Überprüfe, ob die VM {!r} keine Vorlage ist …"
 
-#: src/fb_vmware/connect.py:1272 src/fb_vmware/connect.py:1496
+#: src/fb_vmware/connect.py:1279 src/fb_vmware/connect.py:1503
 #, python-brace-format
 msgid "Checking VM {!r} for pattern."
 msgstr "Überprüfe VM {!r} nach Muster."
 
-#: src/fb_vmware/connect.py:1285 src/fb_vmware/connect.py:1506
+#: src/fb_vmware/connect.py:1292 src/fb_vmware/connect.py:1513
 #, python-brace-format
 msgid "Found VM {vm} in vSphere {vs}, DC {dc}, path {p}."
 msgstr "Fand VM {vm} in vSphere {vs}, RC {dc}, Pfad {p}."
 
-#: src/fb_vmware/connect.py:1322 src/fb_vmware/connect.py:1400
+#: src/fb_vmware/connect.py:1329 src/fb_vmware/connect.py:1407
 #, python-brace-format
 msgid "Searching in path {} ..."
 msgstr "Suche in Pfad {} …"
 
-#: src/fb_vmware/connect.py:1364
+#: src/fb_vmware/connect.py:1371
 #, python-brace-format
 msgid "Parameter {p1!r} and {p2!r} may not be {w!r} at the same time."
 msgstr "Die Parameter {p1!r} und {p2!r} dürfen nicht {w!r} zur selben Zeit sein."
 
-#: src/fb_vmware/connect.py:1370
+#: src/fb_vmware/connect.py:1377
 #, python-brace-format
 msgid "Trying to get list of VMs with name pattern {!r} ..."
 msgstr "Versuche eine Liste der VMs mit dem Namensmuster {!r} zu ermitteln …"
 
-#: src/fb_vmware/connect.py:1424
+#: src/fb_vmware/connect.py:1431
 #, python-brace-format
 msgid "Found one VM with pattern {p!r}."
 msgid_plural "Found {no} VMs with pattern {p!r}."
 msgstr[0] "Fand eine VM mit dem Suchmuster {p!r}."
 msgstr[1] "Fand {no} VMs mit dem Suchmuster {p!r}."
 
-#: src/fb_vmware/connect.py:1562 src/fb_vmware/connect.py:1578
+#: src/fb_vmware/connect.py:1569 src/fb_vmware/connect.py:1585
 #, python-brace-format
 msgid "Searching VMs in vSphere {vs}, DC '{dc}' in path '{p}'."
 msgstr "Suche VMs in vSphere {vs}, RZ '{dc}' in Pfad '{p}'."
 
-#: src/fb_vmware/connect.py:1623
+#: src/fb_vmware/connect.py:1630
 #, python-brace-format
 msgid "VM {!r} is already powered on."
 msgstr "Die VM {!r} ist bereits eingeschaltet."
 
-#: src/fb_vmware/connect.py:1626
+#: src/fb_vmware/connect.py:1633
 #, python-brace-format
 msgid "Powering on VM {!r} ..."
 msgstr "Schalte VM {!r} ein …"
 
-#: src/fb_vmware/connect.py:1630
+#: src/fb_vmware/connect.py:1637
 #, python-brace-format
 msgid "VM {!r} successful powered on."
 msgstr "Die VM {!r} wurde erfolgreich eingeschaltet."
 
-#: src/fb_vmware/connect.py:1654
+#: src/fb_vmware/connect.py:1661
 #, python-brace-format
 msgid "VM {!r} is already powered off."
 msgstr "Die VM {!r} ist bereits ausgeschaltet."
 
-#: src/fb_vmware/connect.py:1657
+#: src/fb_vmware/connect.py:1664
 #, python-brace-format
 msgid "Powering off VM {!r} ..."
 msgstr "Schalte VM {!r} aus …"
 
-#: src/fb_vmware/connect.py:1661
+#: src/fb_vmware/connect.py:1668
 #, python-brace-format
 msgid "VM {!r} successful powered off."
 msgstr "Die VM {!r} wurde erfolgreich ausgeschaltet."
 
-#: src/fb_vmware/connect.py:1670
+#: src/fb_vmware/connect.py:1677
 msgid "Ensuring existence of vSphere VM folders:"
 msgstr "Stelle Existenz von vSphere VM-Ordnern sicher:"
 
-#: src/fb_vmware/connect.py:1687
+#: src/fb_vmware/connect.py:1694
 #, python-brace-format
 msgid "Trying to get VM folder object for path {!r}."
 msgstr "Versuche das VM-Ordnerobjekt für den Pfad {!r} zu erhalten."
 
-#: src/fb_vmware/connect.py:1713
+#: src/fb_vmware/connect.py:1720
 #, python-brace-format
 msgid "Checking single VM folder {i}: {f!r}."
 msgstr "Überprüfe einfachen VM-Ordner {i}: {f!r}."
 
-#: src/fb_vmware/connect.py:1725
+#: src/fb_vmware/connect.py:1732
 #, python-brace-format
 msgid "Found VM folder {n}, parent: {p}"
 msgstr "Habe VM-Ordner {n} gefunden, Eltern-Ordner: {p}"
 
-#: src/fb_vmware/connect.py:1745
+#: src/fb_vmware/connect.py:1752
 #, python-brace-format
 msgid "Ensuring existence of vSphere VM folder {!r}."
 msgstr "Stelle Existenz des vSphere-VM-Ordners {!r} sicher."
 
-#: src/fb_vmware/connect.py:1770
+#: src/fb_vmware/connect.py:1777
 #, python-brace-format
 msgid "VM Folder {!r} already exists."
 msgstr "Der VM-Ordner {!r} existiert bereits."
 
-#: src/fb_vmware/connect.py:1772
+#: src/fb_vmware/connect.py:1779
 #, python-brace-format
 msgid "Creating VM folder {!r} ..."
 msgstr "Erstelle VM-Ordner {!r} …"
 
-#: src/fb_vmware/connect.py:1774
+#: src/fb_vmware/connect.py:1781
 msgid "Simulation mode, don't creating it."
 msgstr "Simulationsmodus, erstelle ihn nicht."
 
-#: src/fb_vmware/connect.py:1791
+#: src/fb_vmware/connect.py:1798
 msgid "Waiting for tasks to finish ..."
 msgstr "Warte auf Beendigung der Tasks …"
 
-#: src/fb_vmware/connect.py:1804
+#: src/fb_vmware/connect.py:1811
 #, python-brace-format
 msgid "Waiting at most {m} seconds for tasks {t} to finish ..."
 msgstr "Warte maximal {m} Sekunden auf die Beendigung der Tasks {t} …"
 
-#: src/fb_vmware/connect.py:1809
+#: src/fb_vmware/connect.py:1816
 #, python-brace-format
 msgid "Waiting for tasks {} to finish ..."
 msgstr "Warte auf Beendigung der Tasks {} …"
 
-#: src/fb_vmware/connect.py:1830
+#: src/fb_vmware/connect.py:1837
 msgid "Waiting ..."
 msgstr "Warten …"
 
-#: src/fb_vmware/connect.py:1864
+#: src/fb_vmware/connect.py:1871
 #, python-brace-format
 msgid "Creating VM {!r} ..."
 msgstr "Erstelle VM {!r} …"
 
-#: src/fb_vmware/connect.py:1867
+#: src/fb_vmware/connect.py:1874
 #, python-brace-format
 msgid "Simulation mode - VM {!r} will not be created."
 msgstr "Simulations-Modus - die VM {!r} wird nicht erstellt."
 
-#: src/fb_vmware/connect.py:1899
+#: src/fb_vmware/connect.py:1906
 #, python-brace-format
 msgid "Generating create spec for VM {!r} ..."
 msgstr "Generiere Erstellungs-Spec für VM {!r} …"
 
-#: src/fb_vmware/connect.py:1907
+#: src/fb_vmware/connect.py:1914
 #, python-brace-format
 msgid "Datastore path: {!r}"
 msgstr "Datastore-Pfad: {!r}"
 
-#: src/fb_vmware/connect.py:1910
+#: src/fb_vmware/connect.py:1917
 #, python-brace-format
 msgid "VM path name: {!r}"
 msgstr "VM-Pfadname: {!r}"
 
-#: src/fb_vmware/connect.py:1979
+#: src/fb_vmware/connect.py:1986
 msgid "Generated VM config:"
 msgstr "Generierte VM-Konfiguration:"
 
-#: src/fb_vmware/connect.py:1988
+#: src/fb_vmware/connect.py:1995
 #, python-brace-format
 msgid "Given disksize {!r} must be greater than zero."
 msgstr "Die gegebene Plattengröße muss größer als Null sein."
 
-#: src/fb_vmware/connect.py:2001
+#: src/fb_vmware/connect.py:2008
 #, python-brace-format
 msgid "There may be created at most 6 disks, but {} were given."
 msgstr "Es können höchstens 6 Platten erstellt werden, aber {} wurden übergeben."
 
-#: src/fb_vmware/connect.py:2014
+#: src/fb_vmware/connect.py:2021
 #, python-brace-format
 msgid "Generating spec for SCSI controller and one disk: {d}"
 msgid_plural "Generating spec for SCSI controller and {n} disks: {d}"
 msgstr[0] "Generiere Spec für SCSI-Controller und eine Disk: {d}"
 msgstr[1] "Generiere Spec für SCSI-Controller und {n} Disks: {d}"
 
-#: src/fb_vmware/connect.py:2020
+#: src/fb_vmware/connect.py:2027
 msgid "Generating spec for SCSI controller without disks."
 msgstr "Generiere Spec für SCSI-Controller ohne Disks."
 
-#: src/fb_vmware/connect.py:2029
+#: src/fb_vmware/connect.py:2036
 #, python-brace-format
 msgid "Using a {name!r} disk controller ({desc})."
 msgstr "Verwende einen {name}-Disk-Controller ({desc})."
 
-#: src/fb_vmware/connect.py:2053
+#: src/fb_vmware/connect.py:2060
 #, python-brace-format
 msgid "Adding spec for disk {n!r} with {gb} GiB => {kb} KiByte."
 msgstr "Füge Spec für Disk {n!r} mit {gb} GiB => {kb} KiByte hinzu."
 
-#: src/fb_vmware/connect.py:2091 src/fb_vmware/connect.py:2095
+#: src/fb_vmware/connect.py:2098 src/fb_vmware/connect.py:2102
 #, python-brace-format
 msgid "Invalid Interface description {!r} given."
 msgstr "Ungültige Interface-Beschreibung {!r} übergeben."
 
-#: src/fb_vmware/connect.py:2108
+#: src/fb_vmware/connect.py:2115
 msgid "Defined interface:"
 msgstr "Definierte Netzwerkschnittstelle:"
 
-#: src/fb_vmware/connect.py:2124
+#: src/fb_vmware/connect.py:2131
 #, python-brace-format
 msgid "Adding spec for network interface {d!r} (Network {n!r}, MAC: {m!r}, summary: {s!r})."
 msgstr ""
 "Füge Spec für Netzwerkschnittstelle {d!r} (Netzwerk {n!r}, MAC: {m!r}, Zusammenfassung: {s!r}) "
 "hinzu."
 
-#: src/fb_vmware/connect.py:2154
+#: src/fb_vmware/connect.py:2161
 #, python-brace-format
 msgid ""
 "Did not found neither a Distributed Virtual Port group nor a Virtual Network for network name "
 "{!r}."
 msgstr "Fand weder eine Verteilte Virtuelle Portgruppe noch ein Virtuelles Netzwerk mit dem Namen {!r}."
 
-#: src/fb_vmware/connect.py:2173
+#: src/fb_vmware/connect.py:2180
 msgid "Networking device creation specification:"
 msgstr "Spezifikation zum Erstellen eines Netzwerkgerätes:"
 
-#: src/fb_vmware/connect.py:2196
+#: src/fb_vmware/connect.py:2203
 #, python-brace-format
 msgid "Purging VM {!r} ..."
 msgstr "Lösche VM {!r} vollständig …"
 
-#: src/fb_vmware/connect.py:2200
+#: src/fb_vmware/connect.py:2207
 #, python-brace-format
 msgid "VM {!r} successful removed."
 msgstr "VM {!r} wurde erfolgreich gelöscht."
 
-#: src/fb_vmware/connect.py:2232
+#: src/fb_vmware/connect.py:2239
 #, python-brace-format
 msgid "Did not found virtual ethernet device No. {no} (found {count} devices)."
 msgstr "Virtuelles Ethernet-Device Nummer {no} wurde nicht gefunden (es wurden {count} Devices gefunden)."
 
-#: src/fb_vmware/connect.py:2250
+#: src/fb_vmware/connect.py:2257
 msgid "Changes of MAC address:"
 msgstr "Ändern von MAC-Adresse:"
 
-#: src/fb_vmware/connect.py:2255
+#: src/fb_vmware/connect.py:2262
 #, python-brace-format
 msgid "Successful changed MAC address of VM {v!r} to {m!r}."
 msgstr "Erfolgreich MAC-Adresse der VM {v!r} auf {m!r} geändert."
 
-#: src/fb_vmware/connect.py:2270
+#: src/fb_vmware/connect.py:2277
 msgid "Trying to detect all field names of custom field definitions."
 msgstr "Versuche alle Namen von benutzerdefinierten Felddefinitionen zu ermitteln."
 
-#: src/fb_vmware/connect.py:2290
+#: src/fb_vmware/connect.py:2297
 #, python-brace-format
 msgid "Got a {c} on requesting custom field names from vSphere {url}: {e}"
 msgstr "Habe einen {c} beim Ermitteln benutzerdefinierter Feldnamen von vSphere {url} erhalten: {e}"
 
-#: src/fb_vmware/connect.py:2295
+#: src/fb_vmware/connect.py:2302
 #, python-brace-format
 msgid "Got custom field names from vSphere {}:"
 msgstr "Erhaltene benutzerdefinierte Feldnamenvon vSphere {}:"

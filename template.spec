@@ -38,6 +38,7 @@ Requires:       python%{python3_pkgversion}-pytz
 Requires:       python%{python3_pkgversion}-pyvmomi
 Requires:       python%{python3_pkgversion}-pyyaml
 Requires:       python%{python3_pkgversion}-requests
+Requires:       python%{python3_pkgversion}-rich
 Requires:       python%{python3_pkgversion}-semver
 Requires:       python%{python3_pkgversion}-six
 BuildArch:      noarch

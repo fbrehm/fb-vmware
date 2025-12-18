@@ -22,6 +22,9 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich.console import Console
+from rich.table import Table
+
 # Own modules
 from . import BaseVmwareApplication
 from . import VmwareAppError
@@ -29,7 +32,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -163,58 +166,74 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
         print("{ok}".format(ok=self.colored("OK", "GREEN")))
         print()
 
-        capacity_gb = format_decimal(ds_cluster.capacity_gb, format="#,##0")
-        free_space_gb = format_decimal(ds_cluster.free_space_gb, format="#,##0")
-        used = ds_cluster.capacity_gb - ds_cluster.free_space_gb
-        used_gb = format_decimal(used, format="#,##0")
+        dsc_table = Table(title=ds_cluster.name, title_style="bold cyan", box=None)
+        dsc_table.add_column(highlight=True, style="bold", no_wrap=True)
+        dsc_table.add_column()
+
+        info_table = Table(box=None, show_header=False, show_footer=False)
+        info_table.add_column(highlight=True, no_wrap=True)
+        info_table.add_column()
+        info_table.add_row("vSphere:", ds_cluster.vsphere)
+        info_table.add_row("Datacenter:", ds_cluster.dc_name)
+        info_table.add_row(
+            _("Connected computing clusters") + ":",
+            format_list(sorted(ds_cluster.compute_clusters)),
+        )
+
+        dsc_table.add_row(_("General"), info_table)
+        dsc_table.add_row("", "")
+
         usage_pc_out = "- %"
+        used = ds_cluster.capacity_gb - ds_cluster.free_space_gb
         if ds_cluster.capacity_gb:
             used_pc = used / ds_cluster.capacity_gb
             usage_pc_out = format_decimal(used_pc, format="0.0 %")
 
-        len_cluster = len("{}:  ".format(ds_cluster.name))
-        space = " " * len_cluster
-
-        compute_clusters = [self.colored(x, "CYAN") for x in ds_cluster.compute_clusters]
-
-        line = "{}:  ".format(self.colored(ds_cluster.name, "CYAN"))
-        line += "vSphere: {}     ".format(self.colored(ds_cluster.vsphere, "CYAN"))
-        line += "Datacenter: {}     ".format(self.colored(ds_cluster.dc_name, "CYAN"))
-        line += _("Connected computing clusters") + ": " + format_list(compute_clusters)
-        print(line)
-
-        line = space + _("Capacity in GB") + ": " + capacity_gb + "     "
-        line += _("Free space in GB") + ": " + free_space_gb + "     "
-        line += _("Calculated usage in GB") + ": " + used_gb + "     "
-        line += _("Usage in percent") + ": " + usage_pc_out
-        print(line)
-
-        ch = _("Connected hosts") + ": "
-        len_ch = len(ch)
-        first = True
-
-        for host in sorted(ds_cluster.hosts, key=str.lower):
-            if first:
-                line = space + ch
-            else:
-                line = space + (" " * len_ch)
-            first = False
-            line += "* " + host
-            print(line)
-
-        ds_lbl = _("Datastores") + ": "
-        len_ds_lbl = len(ds_lbl)
-        first = True
-
+        cap_table = Table(box=None, show_footer=True)
+        cap_table.add_column(header=_("Datastore"), footer=_("Datastore cluster total"))
+        cap_table.add_column(
+            header=_("Capacity in GB"),
+            footer=format_decimal(ds_cluster.capacity_gb, format="#,##0"),
+            justify="right",
+        )
+        cap_table.add_column(
+            header=_("Calculated usage in GB"),
+            footer=format_decimal(used, format="#,##0"),
+            justify="right",
+        )
+        cap_table.add_column(header=_("Usage in percent"), footer=usage_pc_out, justify="right")
+        cap_table.add_column(
+            header=_("Free space in GB"),
+            footer=format_decimal(ds_cluster.free_space_gb, format="#,##0"),
+            justify="right",
+        )
         for ds_name in sorted(ds_cluster.datastores.keys(), key=str.lower):
-            # ds = ds_cluster.datastores[ds_name]
-            if first:
-                line = space + ds_lbl
-            else:
-                line = space + (" " * len_ds_lbl)
-            first = False
-            line += "* " + ds_name + " - "
-            print(line)
+            ds = ds_cluster.datastores[ds_name]
+            ds_used = ds.capacity_gb - ds.free_space_gb
+            ds_used_pc = "- %"
+            if ds.capacity_gb:
+                ds_used_pc = format_decimal((ds_used / ds.capacity_gb), format="0.0 %")
+            cap_table.add_row(
+                ds_name,
+                format_decimal(ds.capacity_gb, format="#,##0"),
+                format_decimal(ds_used, format="#,##0"),
+                ds_used_pc,
+                format_decimal(ds.free_space_gb, format="#,##0"),
+            )
+
+        dsc_table.add_row(_("Capacity"), cap_table)
+        dsc_table.add_row("", "")
+
+        hosts_table = Table(box=None, show_header=False, show_footer=False)
+        hosts_table.add_column()
+        for host in sorted(ds_cluster.hosts, key=str.lower):
+            hosts_table.add_row("* " + host)
+
+        dsc_table.add_row(_("Connected hosts"), hosts_table)
+        dsc_table.add_row("", "")
+
+        console = Console()
+        console.print(dsc_table)
 
     # -------------------------------------------------------------------------
     def _get_ds_cluster_obj(self, cluster_name):

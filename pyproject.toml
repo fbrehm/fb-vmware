@@ -33,6 +33,7 @@ dependencies = [
     "pyvmomi",
     "PyYAML",
     "requests",
+    "rich",
     "semver",
     "six",
 ]

@@ -37,7 +37,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -64,6 +64,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         "usage_pc",
     )
     default_sort_keys = ["vsphere_name", "cluster_name"]
+
+    show_simulate_option = False
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -125,8 +127,6 @@ class GetStorageClusterListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetStorageClusterListApp, self).init_arg_parser()
-
         output_options = self.arg_parser.add_argument_group(_("Output options"))
 
         output_options.add_argument(
@@ -152,6 +152,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 default=format_list(self.default_sort_keys, do_repr=True),
             ),
         )
+
+        super(GetStorageClusterListApp, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):

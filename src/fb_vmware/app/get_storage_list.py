@@ -37,7 +37,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -66,6 +66,8 @@ class GetStorageListApp(BaseVmwareApplication):
         "usage_pc",
     )
     default_sort_keys = ["vsphere_name", "dc", "ds_name"]
+
+    show_simulate_option = False
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -141,8 +143,6 @@ class GetStorageListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetStorageListApp, self).init_arg_parser()
-
         output_options = self.arg_parser.add_argument_group(_("Output options"))
 
         output_options.add_argument(
@@ -187,6 +187,8 @@ class GetStorageListApp(BaseVmwareApplication):
                 default=format_list(self.default_sort_keys, do_repr=True),
             ),
         )
+
+        super(GetStorageListApp, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):

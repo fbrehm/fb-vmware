@@ -32,7 +32,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.4.0"
+__version__ = "1.0.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -49,6 +49,8 @@ class GetStorageClusterInfoAppError(VmwareAppError):
 # =============================================================================
 class GetStorageClusterInfoApp(BaseVmwareApplication):
     """Class for the application objects."""
+
+    show_simulate_option = False
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -86,8 +88,6 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Initiate the argument parser."""
-        super(GetStorageClusterInfoApp, self).init_arg_parser()
-
         self.arg_parser.add_argument(
             "clusters",
             metavar="CLUSTER",
@@ -95,6 +95,8 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
             nargs="+",
             help=_("Names of the datastore clusters to get information."),
         )
+
+        super(GetStorageClusterInfoApp, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):

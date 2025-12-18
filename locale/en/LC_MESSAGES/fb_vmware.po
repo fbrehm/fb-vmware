@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fb_vmware \n"
 "Report-Msgid-Bugs-To: frank@brehm-online.com\n"
-"POT-Creation-Date: 2025-12-18 15:07+0100\n"
+"POT-Creation-Date: 2025-12-18 16:26+0100\n"
 "PO-Revision-Date: 2025-02-05 11:40+0100\n"
 "Last-Translator: Frank Brehm <frank@brehm-online.com>\n"
 "Language: en_US\n"
@@ -67,33 +67,37 @@ msgstr "Checking for configured vSphere instance {!r} …"
 msgid "vSphere {!r} not found in list of configured vSphere instances."
 msgstr ""
 
-#: src/fb_vmware/app/__init__.py:197
+#: src/fb_vmware/app/__init__.py:191
+msgid "vSphere options"
+msgstr ""
+
+#: src/fb_vmware/app/__init__.py:198
 msgid "The vSphere names from configuration, in which the VMs should be searched."
 msgstr ""
 
-#: src/fb_vmware/app/__init__.py:204
+#: src/fb_vmware/app/__init__.py:207
 msgid "Got command line arguments:"
 msgstr ""
 
-#: src/fb_vmware/app/__init__.py:210
+#: src/fb_vmware/app/__init__.py:213
 msgid "Initializing vSphere handlers ..."
 msgstr "Initializing vSphere handlers …"
 
-#: src/fb_vmware/app/__init__.py:223
+#: src/fb_vmware/app/__init__.py:226
 #, python-brace-format
 msgid "Initializing handler for vSphere {!r} ..."
 msgstr "Initializing handler for vSphere {!r} …"
 
-#: src/fb_vmware/app/__init__.py:243
+#: src/fb_vmware/app/__init__.py:246
 #, python-brace-format
 msgid "Could not initialize {} object from:"
 msgstr ""
 
-#: src/fb_vmware/app/__init__.py:253
+#: src/fb_vmware/app/__init__.py:256
 msgid "Cleaning up ..."
 msgstr "Cleaning up …"
 
-#: src/fb_vmware/app/__init__.py:257
+#: src/fb_vmware/app/__init__.py:260
 #, python-brace-format
 msgid "Closing vSphere object {!r} ..."
 msgstr "Closing vSphere object {!r} …"
@@ -123,13 +127,13 @@ msgstr ""
 msgid "Filter output for offline hosts and templates."
 msgstr ""
 
-#: src/fb_vmware/app/get_host_list.py:150 src/fb_vmware/app/get_storage_cluster_list.py:125
-#: src/fb_vmware/app/get_storage_list.py:145 src/fb_vmware/app/get_vm_list.py:277
+#: src/fb_vmware/app/get_host_list.py:150 src/fb_vmware/app/get_storage_cluster_list.py:128
+#: src/fb_vmware/app/get_storage_list.py:144 src/fb_vmware/app/get_vm_list.py:277
 msgid "Output options"
 msgstr ""
 
-#: src/fb_vmware/app/get_host_list.py:160 src/fb_vmware/app/get_storage_cluster_list.py:143
-#: src/fb_vmware/app/get_storage_list.py:182 src/fb_vmware/app/get_vm_list.py:295
+#: src/fb_vmware/app/get_host_list.py:160 src/fb_vmware/app/get_storage_cluster_list.py:146
+#: src/fb_vmware/app/get_storage_list.py:181 src/fb_vmware/app/get_vm_list.py:295
 #, python-brace-format
 msgid ""
 "The keys for sorting the output. Available keys are: {avail}. The default sorting keys are: "
@@ -148,8 +152,8 @@ msgid "Got a {c} for pattern {p!r}: {e}"
 msgstr ""
 
 #: src/fb_vmware/app/get_host_list.py:190 src/fb_vmware/app/get_network_list.py:98
-#: src/fb_vmware/app/get_storage_cluster_info.py:110 src/fb_vmware/app/get_storage_cluster_list.py:165
-#: src/fb_vmware/app/get_storage_list.py:210 src/fb_vmware/app/get_vm_info.py:105
+#: src/fb_vmware/app/get_storage_cluster_info.py:110 src/fb_vmware/app/get_storage_cluster_list.py:170
+#: src/fb_vmware/app/get_storage_list.py:211 src/fb_vmware/app/get_vm_info.py:105
 #: src/fb_vmware/app/get_vm_list.py:363
 #, python-brace-format
 msgid "Starting {a!r}, version {v!r} ..."
@@ -214,7 +218,7 @@ msgstr ""
 
 #: src/fb_vmware/app/get_host_list.py:360 src/fb_vmware/app/get_network_list.py:318
 #: src/fb_vmware/app/get_network_list.py:451 src/fb_vmware/app/get_network_list.py:544
-#: src/fb_vmware/app/get_storage_cluster_list.py:360 src/fb_vmware/app/get_vm_list.py:471
+#: src/fb_vmware/app/get_vm_list.py:471
 #, python-brace-format
 msgid "Line template: {}"
 msgstr ""
@@ -231,7 +235,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: src/fb_vmware/app/get_host_list.py:417 src/fb_vmware/app/get_network_list.py:568
-#: src/fb_vmware/app/get_storage_cluster_info.py:285 src/fb_vmware/app/get_storage_cluster_list.py:411
+#: src/fb_vmware/app/get_storage_cluster_info.py:285 src/fb_vmware/app/get_storage_cluster_list.py:399
 #: src/fb_vmware/app/get_storage_list.py:464 src/fb_vmware/app/get_vm_info.py:392
 #: src/fb_vmware/app/get_vm_list.py:660
 #, python-brace-format
@@ -270,7 +274,7 @@ msgid "No Distributed Virtual Switches found."
 msgstr ""
 
 #: src/fb_vmware/app/get_network_list.py:262 src/fb_vmware/app/get_network_list.py:507
-#: src/fb_vmware/app/get_storage_cluster_list.py:318 src/fb_vmware/app/get_storage_list.py:410
+#: src/fb_vmware/app/get_storage_cluster_list.py:347 src/fb_vmware/app/get_storage_list.py:408
 #: src/fb_vmware/app/get_vm_list.py:414 src/fb_vmware/app/get_vm_list.py:427
 msgid "Data Center"
 msgstr ""
@@ -332,7 +336,7 @@ msgstr ""
 msgid "Tries to get information about the given datastore cluster in VMware vSphere and print it out."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:96
+#: src/fb_vmware/app/get_storage_cluster_info.py:94
 msgid "Names of the datastore clusters to get information."
 msgstr ""
 
@@ -357,27 +361,27 @@ msgstr ""
 msgid "Datastore cluster total"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:191 src/fb_vmware/app/get_storage_list.py:408
+#: src/fb_vmware/app/get_storage_cluster_info.py:191 src/fb_vmware/app/get_storage_list.py:406
 msgid "Datastore"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:193 src/fb_vmware/app/get_storage_cluster_list.py:319
-#: src/fb_vmware/app/get_storage_list.py:414
+#: src/fb_vmware/app/get_storage_cluster_info.py:193 src/fb_vmware/app/get_storage_cluster_list.py:349
+#: src/fb_vmware/app/get_storage_list.py:412
 msgid "Capacity in GB"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:198 src/fb_vmware/app/get_storage_cluster_list.py:321
-#: src/fb_vmware/app/get_storage_list.py:417
+#: src/fb_vmware/app/get_storage_cluster_info.py:198 src/fb_vmware/app/get_storage_cluster_list.py:352
+#: src/fb_vmware/app/get_storage_list.py:415
 msgid "Calculated usage in GB"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:202 src/fb_vmware/app/get_storage_cluster_list.py:322
-#: src/fb_vmware/app/get_storage_list.py:420
+#: src/fb_vmware/app/get_storage_cluster_info.py:202 src/fb_vmware/app/get_storage_cluster_list.py:355
+#: src/fb_vmware/app/get_storage_list.py:418
 msgid "Usage in percent"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_info.py:204 src/fb_vmware/app/get_storage_cluster_list.py:320
-#: src/fb_vmware/app/get_storage_list.py:423
+#: src/fb_vmware/app/get_storage_cluster_info.py:204 src/fb_vmware/app/get_storage_cluster_list.py:358
+#: src/fb_vmware/app/get_storage_list.py:421
 msgid "Free space in GB"
 msgstr ""
 
@@ -404,69 +408,85 @@ msgstr "Searching for datastore cluster {dsc} in vSphere {vs} …"
 msgid "User interrupt."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:79
+#: src/fb_vmware/app/get_storage_cluster_list.py:84
 msgid "Tries to get a list of all datastore clusters in VMware vSphere and print it out."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:132
+#: src/fb_vmware/app/get_storage_cluster_list.py:135
 msgid "Don't print the totals of all storage clusters."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:211
+#: src/fb_vmware/app/get_storage_cluster_list.py:216
 msgid "Getting all vSphere storage clusters ..."
 msgstr "Getting all vSphere storage clusters …"
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:276 src/fb_vmware/app/get_storage_list.py:339
-#: src/fb_vmware/app/get_storage_list.py:408 src/fb_vmware/app/get_vm_info.py:293
+#: src/fb_vmware/app/get_storage_cluster_list.py:281 src/fb_vmware/app/get_storage_cluster_list.py:345
+#: src/fb_vmware/app/get_storage_list.py:340 src/fb_vmware/app/get_storage_list.py:406
+#: src/fb_vmware/app/get_vm_info.py:293
 msgid "Total"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:388
+#: src/fb_vmware/app/get_storage_cluster_list.py:303
+msgid "All datastore clusters"
+msgstr ""
+
+#: src/fb_vmware/app/get_storage_cluster_list.py:327
 #, python-brace-format
 msgid "Found one VMware storage cluster."
 msgid_plural "Found {} VMware storage clusters."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:393
+#: src/fb_vmware/app/get_storage_cluster_list.py:332
 msgid "No VMware storage clusters found."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:84
+#: src/fb_vmware/app/get_storage_cluster_list.py:346 src/fb_vmware/app/get_storage_list.py:407
+msgid "vSphere"
+msgstr ""
+
+#: src/fb_vmware/app/get_storage_list.py:85
 msgid "Tries to get a list of all datastores in VMware vSphere and print it out."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:152
+#: src/fb_vmware/app/get_storage_list.py:151
 msgid "Don't print local datastores on the ESX hosts."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:160
+#: src/fb_vmware/app/get_storage_list.py:159
 msgid "Don't print the totals of all datastores."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:169
+#: src/fb_vmware/app/get_storage_list.py:168
 msgid ""
 "Print out a more detailled info about the datastores, e.g. the number of connected hosts. Tooks "
 "significant more time to retrieve the data from vSphere."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:259
+#: src/fb_vmware/app/get_storage_list.py:260
 msgid "Getting all vSphere datastores ..."
 msgstr "Getting all vSphere datastoress …"
 
-#: src/fb_vmware/app/get_storage_list.py:385
+#: src/fb_vmware/app/get_storage_list.py:364
 msgid "All datastores"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:409
-msgid "vSphere"
+#: src/fb_vmware/app/get_storage_list.py:388
+#, python-brace-format
+msgid "Found one VMware datastore."
+msgid_plural "Found {} VMware datastores."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/fb_vmware/app/get_storage_list.py:393
+msgid "No VMware datastores found."
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:411 src/fb_vmware/app/get_vm_list.py:428
+#: src/fb_vmware/app/get_storage_list.py:409 src/fb_vmware/app/get_vm_list.py:428
 msgid "Cluster"
 msgstr ""
 
-#: src/fb_vmware/app/get_storage_list.py:412
+#: src/fb_vmware/app/get_storage_list.py:410
 msgid "Connected Hosts"
 msgstr ""
 
@@ -845,7 +865,7 @@ msgstr "Trying to get all datastores from vSphere …"
 msgid "Get all datastores in DC {!r} ..."
 msgstr "Get all datastores in DC {!r} …"
 
-#: src/fb_vmware/app/get_storage_list.py:268 src/fb_vmware/connect.py:415 src/fb_vmware/connect.py:417
+#: src/fb_vmware/app/get_storage_list.py:269 src/fb_vmware/connect.py:415 src/fb_vmware/connect.py:417
 msgid "Found datastores:"
 msgstr ""
 
@@ -877,7 +897,7 @@ msgstr "Trying to get all datastore clusters from vSphere …"
 msgid "Get all datastore clusters in DC {!r} ..."
 msgstr "Get all datastore clusters in DC {!r} …"
 
-#: src/fb_vmware/app/get_storage_cluster_list.py:220 src/fb_vmware/connect.py:537
+#: src/fb_vmware/app/get_storage_cluster_list.py:225 src/fb_vmware/connect.py:537
 #: src/fb_vmware/connect.py:541
 msgid "Found datastore clusters:"
 msgstr ""

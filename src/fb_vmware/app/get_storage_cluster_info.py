@@ -135,8 +135,6 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
             if not self.show_ds_cluster(cluster_name):
                 ret = 1
 
-        print()
-
         return ret
 
     # -------------------------------------------------------------------------

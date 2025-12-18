@@ -24,6 +24,7 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich import box
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
@@ -36,7 +37,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -353,39 +354,19 @@ class GetStorageListApp(BaseVmwareApplication):
         return datastore_list
 
     # -------------------------------------------------------------------------
-    def _get_ds_fields_len(self, datastore_list, labels):
-
-        field_length = {}
-
-        for label in labels.keys():
-            field_length[label] = len(labels[label])
-
-        for ds in datastore_list:
-            for label in labels.keys():
-                field = ds[label]
-                if len(field) > field_length[label]:
-                    field_length[label] = len(field)
-
-        if self.totals:
-            for label in labels.keys():
-                field = self.totals[label]
-                if len(field) > field_length[label]:
-                    field_length[label] = len(field)
-
-        return field_length
-
-    # -------------------------------------------------------------------------
     def print_datastores(self, all_datastores):
         """Print on STDOUT all information about all datastore clusters."""
         show_footer = False
-        if self.print_total:
+        if self.print_total and not self.quiet:
             show_footer = True
 
         show_header = True
-        table_title = _("All datastores")
+        table_title = _("All datastores") + "\n"
+        box_style = box.ROUNDED
         if self.quiet:
             show_header = False
             table_title = None
+            box_style = None
 
         datastore_list = self._get_datastore_list(all_datastores)
 
@@ -398,9 +379,26 @@ class GetStorageListApp(BaseVmwareApplication):
                 else:
                     datastore_list.sort(key=itemgetter(key), reverse=True)
 
+        if self.quiet:
+            caption = None
+        else:
+            count = len(datastore_list)
+            if count:
+                caption = "\n" + ngettext(
+                    "Found one VMware datastore.",
+                    "Found {} VMware datastores.",
+                    count,
+                ).format(count)
+            else:
+                caption = "\n" + _("No VMware datastores found.")
+
         ds_table = Table(
             title=table_title,
             title_style="bold cyan",
+            caption=caption,
+            caption_style="default on default",
+            caption_justify="left",
+            box=box_style,
             show_header=show_header,
             show_footer=show_footer,
         )
@@ -431,6 +429,7 @@ class GetStorageListApp(BaseVmwareApplication):
                 used_pc_out.stylize("bold red")
             elif datastore["usage_pc"] >= 0.8:
                 used_pc_out.stylize("bold yellow")
+
             ds_table.add_row(
                 datastore["ds_name"],
                 datastore["vsphere_name"],
@@ -446,7 +445,8 @@ class GetStorageListApp(BaseVmwareApplication):
         console = Console()
         console.print(ds_table)
 
-        return
+        if not self.quiet:
+            print()
 
 
 # =============================================================================

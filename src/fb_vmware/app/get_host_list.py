@@ -37,7 +37,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -333,7 +333,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         table.add_column(header=_("Memory in GiB"), justify="right")
         table.add_column(header=_("Power State"))
         table.add_column(header=_("Connect state"))
-        table.add_column(header=_("StandBy state"))
+        table.add_column(header=_("StandBy state"), justify="center")
         table.add_column(header=_("Maintenance"), justify="center")
 
         for host in hosts:

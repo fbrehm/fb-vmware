@@ -38,7 +38,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -187,7 +187,6 @@ class BaseVmwareApplication(FbConfigApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Initiate the argument parser."""
-
         vsphere_options = self.arg_parser.add_argument_group(_("vSphere options"))
 
         vsphere_options.add_argument(

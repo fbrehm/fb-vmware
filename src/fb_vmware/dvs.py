@@ -315,6 +315,7 @@ class VsphereDVS(VsphereObject):
                 break
 
         return obj
+
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """

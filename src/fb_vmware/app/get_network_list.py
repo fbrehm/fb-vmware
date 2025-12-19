@@ -212,10 +212,8 @@ class GetNetworkListApp(BaseVmwareApplication):
         box_style = box.ROUNDED
         if self.quiet:
             show_header = False
-            table_title = None
+            title = None
             box_style = None
-        #print(self.colored(title, "cyan"))
-        #print(self.colored("=" * len(title), "cyan"))
 
         # -----------------------------
         def get_contact(dvs):

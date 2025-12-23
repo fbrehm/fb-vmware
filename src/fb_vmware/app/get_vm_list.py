@@ -26,6 +26,10 @@ from fb_tools.common import to_bool
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich import box
+from rich.table import Table
+from rich.text import Text
+
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
@@ -33,7 +37,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.11.1"
+__version__ = "1.12.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -131,6 +135,7 @@ class GetVmListApplication(BaseVmwareApplication):
 
         self._vm_pattern = self.default_vm_pattern
         self._details = False
+        self.count_templates = None
 
         self.sort_keys = self.default_sort_keys
 
@@ -341,7 +346,7 @@ class GetVmListApplication(BaseVmwareApplication):
                     else:
                         LOG.warn(
                             _(
-                                "Sorting key {!r} not usable, if not detailed output " "was given."
+                                "Sorting key {!r} not usable, if not detailed output was given."
                             ).format(key)
                         )
                 if not self.sort_keys:
@@ -397,99 +402,101 @@ class GetVmListApplication(BaseVmwareApplication):
         if self.verbose > 1:
             LOG.debug(_("Using sorting keys:") + " " + format_list(self.sort_keys, do_repr=True))
 
-        if self.details:
-            self.print_vms_detailed(all_vms)
-        else:
-            self.print_vms(all_vms)
+        self.print_virtual_machines(all_vms)
 
         return ret
 
     # -------------------------------------------------------------------------
-    def print_vms(self, all_vms):
+    def print_virtual_machines(self, all_vms):
         """Print out on STDOUT the list of found VMs."""
-        label_list = ("name", "vsphere", "dc", "path")
-        labels = {
-            "name": _("Host"),
-            "vsphere": "vSphere",
-            "dc": _("Data Center"),
-            "path": _("Path"),
-        }
-
-        self._print_vms(all_vms, label_list, labels)
-
-    # -------------------------------------------------------------------------
-    def print_vms_detailed(self, all_vms):
-        """Print out on STDOUT the list of found VMs in a detailled way."""
-        label_list = self.avail_sort_keys
-        labels = {
-            "name": "VM/Template",
-            "vsphere": "vSphere",
-            "dc": _("Data Center"),
-            "cluster": _("Cluster"),
-            "path": _("Path"),
-            "type": _("Type"),
-            "onl_str": _("Online Status"),
-            "cfg_ver": _("Config Version"),
-            "os": _("Operating System"),
-        }
-
-        self._print_vms(all_vms, label_list, labels)
-
-    # -------------------------------------------------------------------------
-    def _print_vms(self, all_vms, label_list, labels):
-
-        str_lengths = {}
-        for label in labels.keys():
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for cdata in all_vms:
-            for field in ("cluster", "path", "type", "cfg_ver", "os"):
-                if field in labels and cdata[field] is None:
-                    cdata[field] = "~"
-            for label in labels.keys():
-                val = cdata[label]
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
         if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
+            LOG.debug("Print out VM list: " + pp(all_vms))
 
         all_vms.sort(key=itemgetter(*self.sort_keys))
 
-        for cdata in all_vms:
-            count += 1
+        show_header = True
+        title = _("Virtual Machines")
+        title += "\n" + ("=" * len(title))
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            title = None
+            box_style = None
 
-            print(tpl.format(**cdata))
-
-        if not self.quiet:
-            print()
-            if count == 0:
-                msg = _("Found no VMware VMs.")
+        if self.quiet:
+            caption = None
+        else:
+            count = len(all_vms)
+            if count:
+                caption = "\n" + ngettext(
+                    "Found one virtual machine.",
+                    "Found {} virtual machines.",
+                    count,
+                ).format(count)
             else:
-                msg = ngettext("Found one VMware VM.", "Found {} VMware VMs.", count).format(count)
-            print(msg)
-            print()
+                caption = "\n" + _("No virtual machines found.")
+
+            if self.count_templates is not None:
+                if self.count_templates:
+                    caption += "\n" + ngettext(
+                        "One VM of them is a template.",
+                        "{} VMs of them are templates.",
+                        self.count_templates,
+                    ).format(self.count_templates)
+            caption += "\n"
+
+        table = Table(
+            title=title,
+            title_style="bold cyan",
+            caption=caption,
+            caption_style="default on default",
+            caption_justify="left",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
+        )
+
+        table.add_column(header="VM/Template")
+        table.add_column(header="vSphere")
+        table.add_column(header=_("Data Center"))
+        if self.details:
+            table.add_column(header=_("Cluster"))
+        table.add_column(header=_("Path"))
+        if self.details:
+            table.add_column(header=_("Type"))
+            table.add_column(header=_("Online Status"))
+            table.add_column(header=_("Config Version"))
+            table.add_column(header=_("Operating System"))
+
+        for vm in all_vms:
+
+            if self.details:
+                online_status = Text(vm["onl_str"], style="bold green")
+                if vm["is_template"]:
+                    online_status = Text(vm["onl_str"], style="bold cyan")
+                elif not vm["is_online"]:
+                    online_status = Text(vm["onl_str"], style="bold red")
+
+                table.add_row(
+                    vm["name"],
+                    vm["vsphere"],
+                    vm["dc"],
+                    vm["cluster"],
+                    vm["path"],
+                    vm["type"],
+                    online_status,
+                    vm["cfg_ver"],
+                    vm["os"],
+                )
+            else:
+                table.add_row(
+                    vm["name"],
+                    vm["vsphere"],
+                    vm["dc"],
+                    vm["path"],
+                )
+
+        self.rich_console.print(table)
 
     # -------------------------------------------------------------------------
     def get_vms(self, vsphere_name, re_name=None):
@@ -518,6 +525,8 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def mangle_vmlist_no_details(self, vm_list, vsphere_name):
         """Prepare the non-detailled data about found VMs for output."""
+        if self.verbose > 1:
+            LOG.debug(_("Performing VM list ..."))
         if self.verbose > 3:
             LOG.debug("Mangling VM list:\n" + pp(vm_list))
 
@@ -553,7 +562,11 @@ class GetVmListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def mangle_vmlist_details(self, vm_list, vsphere_name):
         """Prepare the detailled data about found VMs for output."""
+        if self.verbose > 1:
+            LOG.debug(_("Performing detailled VM list ..."))
         vms = []
+
+        self.count_templates = 0
 
         first = True
         for vm in sorted(vm_list, key=attrgetter("name", "path")):
@@ -623,6 +636,8 @@ class GetVmListApplication(BaseVmwareApplication):
             "onl_str": "Online",
             "cfg_ver": vm.config_version,
             "os": vm.guest_id,
+            "is_online": True,
+            "is_template": False,
         }
 
         if cdata["path"]:
@@ -638,9 +653,12 @@ class GetVmListApplication(BaseVmwareApplication):
 
         if not vm.online:
             cdata["onl_str"] = "Offline"
+            cdata["is_online"] = False
 
         if vm.template:
             cdata["type"] = "VMware Template"
+            cdata["is_template"] = True
+            self.count_templates += 1
 
         return cdata
 

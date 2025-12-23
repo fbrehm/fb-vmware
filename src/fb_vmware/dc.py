@@ -142,7 +142,8 @@ class VsphereDatacenter(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.Datacenter, True)
+            content.rootFolder, vim.Datacenter, True
+        )
         for c in container.view:
             if c.name == self.name:
                 obj = c

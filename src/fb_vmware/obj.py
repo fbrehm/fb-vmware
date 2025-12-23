@@ -226,7 +226,9 @@ class VsphereObject(FbBaseObject):
         """Return the appropriate PyVMomi object for the current object."""
         raise RuntimeError(
             "The method get_pyvmomi_obj() has to be redefined for class {}.".format(
-                self.__class__.__name__))
+                self.__class__.__name__
+            )
+        )
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

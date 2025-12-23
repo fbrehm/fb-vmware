@@ -205,7 +205,7 @@ class GetVmApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def _print_ctrlrs(self, vm):
 
-        ctrl_lbl = _("Controller") + ':'
+        ctrl_lbl = _("Controller") + ":"
         len_ctrl_lbl = len(ctrl_lbl)
 
         len_no_disk = 1
@@ -285,8 +285,13 @@ class GetVmApplication(BaseVmwareApplication):
                     ctrlr_nr = ctrlr.bus_nr
                     break
             msg = line_template.format(
-                la=label, n=disk.label, s=disk.size_gb, ctrl_lbl=ctrl_lbl, c=ctrlr_nr,
-                file_lbl=file_lbl, f=disk.file_name
+                la=label,
+                n=disk.label,
+                s=disk.size_gb,
+                ctrl_lbl=ctrl_lbl,
+                c=ctrlr_nr,
+                file_lbl=file_lbl,
+                f=disk.file_name,
             )
             print(msg)
         if len(vm.disks) > 1:
@@ -355,8 +360,7 @@ class GetVmApplication(BaseVmwareApplication):
                     vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
                 )
             )
-            vm = vsphere.get_vm_direct(
-                vm_name, vsphere_name=vsphere_name, no_error=True)
+            vm = vsphere.get_vm_direct(vm_name, vsphere_name=vsphere_name, no_error=True)
             # vm = vsphere.get_vm(vm_name, vsphere_name=vsphere_name, no_error=True)
             if not vm:
                 continue

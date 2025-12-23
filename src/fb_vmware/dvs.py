@@ -308,7 +308,8 @@ class VsphereDVS(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.DistributedVirtualSwitch, True)
+            content.rootFolder, vim.DistributedVirtualSwitch, True
+        )
         for c in container.view:
             if c.name == self.name:
                 obj = c
@@ -733,7 +734,8 @@ class VsphereDvPortGroup(VsphereNetwork):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.dvs.DistributedVirtualPortgroup, True)
+            content.rootFolder, vim.dvs.DistributedVirtualPortgroup, True
+        )
         for c in container.view:
             if c.name == self.name:
                 obj = c

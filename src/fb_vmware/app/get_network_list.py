@@ -32,7 +32,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = "1.8.2"
+__version__ = "1.8.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -422,12 +422,61 @@ class GetNetworkListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_networks(self):
         """Print on STDOUT all information about Virtual Networks."""
-        all_networks = []
-
         print()
+
+        show_header = True
         title = _("Virtual Networks")
-        print(self.colored(title, "cyan"))
-        print(self.colored("=" * len(title), "cyan"))
+        title += "\n" + ("=" * len(title))
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            title = None
+            box_style = None
+
+        all_networks = self._perform_networks()
+
+        if not len(all_networks):
+            c_title = Text(title, style="bold cyan")
+            self.rich_console.print(c_title)
+            print()
+            print(_("No Virtual Networks found."))
+            return
+
+        sort_keys = ["vsphere", "name"]
+        all_networks.sort(key=itemgetter(*sort_keys))
+
+        table = Table(
+            title=title,
+            title_style="bold cyan",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
+        )
+
+        table.add_column(header=_("Name"))
+        table.add_column(header=_("vSphere"))
+        table.add_column(header=_("Data Center"))
+        table.add_column(header=_("Network"))
+        table.add_column(header=_("Accessible"), justify="center")
+
+        for network in all_networks:
+            table.add_row(
+                network["name"],
+                network["vsphere"],
+                network["dc"],
+                network["network"],
+                network["accessible"],
+            )
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
+            print()
+
+    # -------------------------------------------------------------------------
+    def _perform_networks(self):
+
+        all_networks = []
 
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].networks.keys():
@@ -435,9 +484,12 @@ class GetNetworkListApp(BaseVmwareApplication):
                 network = "~"
                 if this_network.network:
                     network = str(this_network.network)
+
                 accessible = "No"
                 if this_network.accessible:
-                    accessible = _("Yes")
+                    accessible = Text(_("Yes"), style="bold green")
+                else:
+                    accessible = Text(_("No"), style="bold red")
 
                 dc_name = "~"
                 if this_network.dc_name:
@@ -452,65 +504,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                 }
                 all_networks.append(net)
 
-        if len(all_networks):
-            self._print_networks(all_networks)
-            return
-
-        print()
-        print(_("No Virtual Networks found."))
-
-    # -------------------------------------------------------------------------
-    def _print_networks(self, all_networks):
-
-        labels = {
-            "vsphere": "vSphere",
-            "dc": _("Data Center"),
-            "name": _("Name"),
-            "network": _("Network"),
-            "accessible": _("Accessible"),
-        }
-        label_list = ("name", "vsphere", "dc", "network", "accessible")
-
-        str_lengths = {}
-        for label in labels:
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for net in all_networks:
-            for label in labels.keys():
-                val = net[label]
-                if val is None:
-                    val = "-"
-                    net[label] = val
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
-        if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
-
-        for net in all_networks:
-            count += 1
-            print(tpl.format(**net))
+        return all_networks
 
 
 # =============================================================================

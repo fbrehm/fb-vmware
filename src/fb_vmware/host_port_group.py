@@ -20,7 +20,6 @@ except ImportError:
 
 # Third party modules
 from fb_tools.common import pp
-
 # from fb_tools.common import to_bool
 from fb_tools.obj import FbBaseObject
 from fb_tools.xlate import format_list

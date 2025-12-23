@@ -21,7 +21,6 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
@@ -33,7 +32,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = "1.8.1"
+__version__ = "1.8.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -259,8 +258,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         if not len(all_dvs):
             c_title = Text(title, style="bold cyan")
-            console = Console()
-            console.print(c_title)
+            self.rich_console.print(c_title)
             print()
             print(_("No Distributed Virtual Switches found."))
             return
@@ -300,8 +298,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                 dvs["description"],
             )
 
-        console = Console()
-        console.print(table)
+        self.rich_console.print(table)
 
         if not self.quiet:
             print()
@@ -327,8 +324,7 @@ class GetNetworkListApp(BaseVmwareApplication):
 
         if not len(all_dvpgs):
             c_title = Text(title, style="bold cyan")
-            console = Console()
-            console.print(c_title)
+            self.rich_console.print(c_title)
             print()
             print(_("No Distributed Virtual Port Groups found."))
             return
@@ -368,8 +364,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                 dvpg["description"],
             )
 
-        console = Console()
-        console.print(table)
+        self.rich_console.print(table)
 
         if not self.quiet:
             print()

@@ -26,7 +26,6 @@ from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
@@ -37,7 +36,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -390,8 +389,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 
             table.add_row(*row)
 
-        console = Console()
-        console.print(table)
+        self.rich_console.print(table)
 
         if not self.quiet:
             print()

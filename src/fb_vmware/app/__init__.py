@@ -25,6 +25,9 @@ from fb_tools.multi_config import DEFAULT_ENCODING
 
 import pytz
 
+from rich.console import Console
+from rich.console import _TERM_COLORS
+
 # Own modules
 from .. import __version__ as GLOBAL_VERSION
 from ..config import VmwareConfiguration
@@ -38,7 +41,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.3.2"
+__version__ = "1.4.0"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -56,6 +59,12 @@ class VmwareAppError(FbAppError):
 # =============================================================================
 class BaseVmwareApplication(FbConfigApplication):
     """Base class for all VMware/vSphere application classes."""
+
+    term_colors = {
+        "kitty": "256",
+        "256color": "256",
+        "16color": "standard",
+    }
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -81,6 +90,7 @@ class BaseVmwareApplication(FbConfigApplication):
         """Initialize a BaseVmwareApplication object."""
         self.req_vspheres = None
         self.do_vspheres = []
+        self.rich_console = None
 
         if base_dir is None:
             base_dir = pathlib.Path(os.getcwd()).resolve()
@@ -152,6 +162,23 @@ class BaseVmwareApplication(FbConfigApplication):
 
         if self.verbose > 2:
             LOG.debug(_("{what} of {app} ...").format(what="post_init()", app=self.appname))
+
+        args_color = getattr(self.args, "color", "auto")
+        if args_color == "auto":
+            self.rich_console = Console()
+        else:
+            color_system = None
+            if args_color == "yes":
+                color_term = os.environ.get("COLORTERM", "").strip().lower()
+                if color_term in ("truecolor", "24bit"):
+                    color_system = "truecolor"
+                else:
+                    color_system = "standard"
+                    term = os.environ.get("TERM", "").strip().lower()
+                    _term_name, _hyphen, colors = term.rpartition("-")
+                    color_system = self.term_colors.get(colors, "standard")
+
+            self.rich_console = Console(color_system=color_system)
 
         if not self.cfg.vsphere.keys():
             msg = _("Did not found any configured vSphere environments.")

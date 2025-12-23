@@ -25,7 +25,6 @@ from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
@@ -37,7 +36,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -444,8 +443,7 @@ class GetStorageListApp(BaseVmwareApplication):
                 datastore["free_space_gb"],
             )
 
-        console = Console()
-        console.print(ds_table)
+        self.rich_console.print(ds_table)
 
         if not self.quiet:
             print()

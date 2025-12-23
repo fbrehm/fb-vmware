@@ -25,7 +25,6 @@ from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
@@ -37,7 +36,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.4.1"
+__version__ = "1.4.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -379,8 +378,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 cluster["free_space_gb"],
             )
 
-        console = Console()
-        console.print(table)
+        self.rich_console.print(table)
 
         if not self.quiet:
             print()

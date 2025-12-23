@@ -22,7 +22,6 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
-from rich.console import Console
 from rich.table import Table
 
 # Own modules
@@ -32,7 +31,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -232,8 +231,7 @@ class GetStorageClusterInfoApp(BaseVmwareApplication):
         dsc_table.add_row(_("Connected hosts"), hosts_table)
         dsc_table.add_row("", "")
 
-        console = Console()
-        console.print(dsc_table)
+        self.rich_console.print(dsc_table)
 
     # -------------------------------------------------------------------------
     def _get_ds_cluster_obj(self, cluster_name):

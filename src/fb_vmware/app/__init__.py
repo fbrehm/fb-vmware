@@ -26,6 +26,7 @@ from fb_tools.multi_config import DEFAULT_ENCODING
 import pytz
 
 from rich.console import Console
+from rich.prompt import Prompt
 
 # Own modules
 from .. import __version__ as GLOBAL_VERSION
@@ -40,7 +41,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.4.1"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -64,6 +65,8 @@ class BaseVmwareApplication(FbConfigApplication):
         "256color": "256",
         "16color": "standard",
     }
+
+    default_all_vspheres = True
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -204,15 +207,19 @@ class BaseVmwareApplication(FbConfigApplication):
 
         if self.req_vspheres:
             self.do_vspheres = copy.copy(self.req_vspheres)
-        else:
+        elif self.default_all_vspheres:
             for vs_name in self.cfg.vsphere.keys():
                 self.do_vspheres.append(vs_name)
-
-        self.init_vsphere_handlers()
 
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Initiate the argument parser."""
+        self.add_vsphere_argument()
+        super(BaseVmwareApplication, self).init_arg_parser()
+
+    # -------------------------------------------------------------------------
+    def add_vsphere_argument(self):
+        """Add a commandline option for selecting the vSphere to use."""
         vsphere_options = self.arg_parser.add_argument_group(_("vSphere options"))
 
         vsphere_options.add_argument(
@@ -223,13 +230,43 @@ class BaseVmwareApplication(FbConfigApplication):
             help=_("The vSphere names from configuration, in which the VMs should be searched."),
         )
 
-        super(BaseVmwareApplication, self).init_arg_parser()
-
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
         """Evaluate the command line parameters. Maybe overridden."""
         if self.verbose > 2:
             LOG.debug(_("Got command line arguments:") + "\n" + pp(self.args))
+
+    # -------------------------------------------------------------------------
+    def pre_run(self):
+        """Execute some actions before the main routine."""
+        LOG.debug(_("Actions before running main routine."))
+
+        self.init_vsphere_handlers()
+
+    # -------------------------------------------------------------------------
+    def select_vsphere(self):
+        """Select exact one of the configured vSpheres."""
+        if self.do_vspheres and len(self.do_vspheres) == 1:
+            return self.do_vspheres[0]
+
+        if self.do_vspheres:
+            msg = _("There are multiple vSpheres selected on commandline.")
+            raise VmwareAppError(msg)
+
+        if not self.cfg.vsphere.keys():
+            msg = _("There are no configured vSpheres available.")
+            raise VmwareAppError(msg)
+
+        vspheres = []
+        for vs_name in self.cfg.vsphere.keys():
+            vspheres.append(vs_name)
+
+        vsphere = Prompt.ask(
+            _("Select the vSphere to search for the a storage location"),
+            choices=vspheres, show_choices=True, console=self.rich_console,
+        )
+
+        return vsphere
 
     # -------------------------------------------------------------------------
     def init_vsphere_handlers(self):

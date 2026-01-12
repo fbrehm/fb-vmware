@@ -26,7 +26,7 @@ from fb_tools.multi_config import DEFAULT_ENCODING
 import pytz
 
 from rich.console import Console
-from rich.prompt import Prompt
+from rich.prompt import InvalidResponse, Prompt, PromptBase, PromptType
 
 # Own modules
 from .. import __version__ as GLOBAL_VERSION
@@ -41,7 +41,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -54,6 +54,44 @@ class VmwareAppError(FbAppError):
     """Base exception class for all exceptions in all VMware/vSphere application classes."""
 
     pass
+
+
+# =============================================================================
+class PositiveIntPrompt(PromptBase[int]):
+    """A prompt that returns an positive integer greater than zero.
+
+    Example:
+        >>> burrito_count = PositiveIntPrompt.ask("How many burritos do you want to order")
+
+    """
+
+    response_type = int
+    validate_error_message = "[prompt.invalid]" + _(
+        "Please enter a valid positive integer number greater than zero."
+    )
+
+    # -------------------------------------------------------------------------
+    def process_response(self, value: str) -> PromptType:
+        """Process response from user, convert to prompt type.
+
+        Args:
+            value (str): String typed by user.
+
+        Raises:
+            InvalidResponse: If ``value`` is invalid.
+
+        Returns:
+            PromptType: The value to be returned from ask method.
+        """
+        value = value.strip()
+        try:
+            return_value: PromptType = self.response_type(value)
+            if return_value <= 0:
+                raise InvalidResponse(self.validate_error_message)
+        except ValueError:
+            raise InvalidResponse(self.validate_error_message)
+
+        return return_value
 
 
 # =============================================================================
@@ -263,10 +301,69 @@ class BaseVmwareApplication(FbConfigApplication):
 
         vsphere = Prompt.ask(
             _("Select the vSphere to search for the a storage location"),
-            choices=vspheres, show_choices=True, console=self.rich_console,
+            choices=vspheres,
+            show_choices=True,
+            console=self.rich_console,
         )
 
         return vsphere
+
+    # -------------------------------------------------------------------------
+    def select_datacenter(self, vs_name, dc_name=None):
+        """Select a virtual datacenter from given vSphere."""
+        if not vs_name:
+            raise VmwareAppError(_("No vSphere name given."))
+        if vs_name not in self.vsphere:
+            raise VmwareAppError(
+                _("vSphere {} is not an active vSphere.").format(self.colored(vs_name, "RED"))
+            )
+
+        vsphere = self.vsphere[vs_name]
+        vsphere.get_datacenters()
+        dc_list = []
+        for _dc_name in vsphere.datacenters.keys():
+            dc_list.append(_dc_name)
+
+        if not len(dc_list):
+            msg = _("Did not found virtual datacenters in vSphere {}.").format(
+                self.colored(vs_name, "RED")
+            )
+            LOG.error(msg)
+            return None
+
+        if self.verbose > 2:
+            LOG.debug(f"Found datacenters in vSphere {vs_name}:\n" + pp(dc_list))
+
+        if dc_name:
+            if dc_name in dc_list:
+                return dc_name
+            msg = _("Datacenter {dc} does not exists in vSphere {vs}.").format(
+                dc=self.colored(dc_name, "RED"), vs=self.colored(vs_name, "CYAN")
+            )
+            LOG.error(msg)
+            return None
+
+        if len(dc_list) == 1:
+            if self.verbose > 0:
+                LOG.debug(
+                    f"Automatic select of datacenter {dc_list[0]!r}, because it is the only one."
+                )
+            return dc_list[0]
+
+        dc_name = Prompt.ask(
+            _("Select a virtual datacenter to search for the a storage location"),
+            choices=dc_list,
+            show_choices=True,
+            console=self.rich_console,
+        )
+
+        return dc_name
+
+    # -------------------------------------------------------------------------
+    def prompt_for_disk_size(self):
+        """Ask for the size of a virtual disk in GiByte."""
+        disk_size_gb = PositiveIntPrompt.ask(_("Get the size of the virtual disk in GiByte"))
+        return disk_size_gb
 
     # -------------------------------------------------------------------------
     def init_vsphere_handlers(self):

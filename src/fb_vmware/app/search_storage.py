@@ -30,7 +30,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -94,7 +94,6 @@ class SearchStorageApp(BaseVmwareApplication):
             dest="size",
             type=int,
             metavar=_("GBYTE"),
-            required=True,
             action=NonNegativeIntegerOptionAction,
             may_zero=False,
             help=_(
@@ -102,14 +101,7 @@ class SearchStorageApp(BaseVmwareApplication):
             ),
         )
 
-        super(SearchStorageApp, self).init_arg_parser()
-
-    # -------------------------------------------------------------------------
-    def add_vsphere_argument(self):
-        """Add a commandline option for selecting the vSphere to use."""
-        vsphere_options = self.arg_parser.add_argument_group(_("vSphere options"))
-
-        vsphere_options.add_argument(
+        search_options.add_argument(
             "--vs",
             "--vsphere",
             dest="req_vsphere",
@@ -117,6 +109,22 @@ class SearchStorageApp(BaseVmwareApplication):
                 "The vSphere name from configuration, in which the storage should be searched."
             ),
         )
+
+        search_options.add_argument(
+            "-D",
+            "--dc",
+            "--datacenter",
+            metavar=_("DATACENTER"),
+            dest="dc",
+            help=_("The virtual datacenter in vSphere, in which the storage should be searched."),
+        )
+
+        super(SearchStorageApp, self).init_arg_parser()
+
+    # -------------------------------------------------------------------------
+    def add_vsphere_argument(self):
+        """Add a commandline option for selecting the vSphere to use."""
+        pass
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
@@ -128,23 +136,38 @@ class SearchStorageApp(BaseVmwareApplication):
             self.args.req_vsphere = [vsphere]
             LOG.info(_("Selected vSphere: {}").format(self.colored(vsphere, "CYAN")))
 
-        self.disk_size_gb = self.args.size
+        if getattr(self.args, "dc", None) is not None and self.args.dc.strip() != "":
+            self.dc = self.args.dc.strip()
+
+        if getattr(self.args, "size", None) is not None:
+            self.disk_size_gb = self.args.size
 
     # -------------------------------------------------------------------------
     def pre_run(self):
         """Execute some actions before the main routine."""
+        if self.disk_size_gb is None:
+            self.disk_size_gb = self.prompt_for_disk_size()
+
         vs_name = self.select_vsphere()
         self.do_vspheres = [vs_name]
-        LOG.debug(
-            _("Searching a storage location in vSphere {vs} for a disk of {sz}.").format(
-                vs=self.colored(vs_name, "CYAN"),
-                sz=self.colored(str(self.disk_size_gb) + ' GiByte', "CYAN"),
-            )
-        )
 
         super(SearchStorageApp, self).pre_run()
-
         self.cur_vsphere = self.vsphere[vs_name]
+
+        dc_name = self.select_datacenter(vs_name, self.dc)
+        if dc_name is None:
+            self.exit(1)
+
+        LOG.info(
+            _(
+                "Searching a storage location in vSphere {vs}, virtual datacenter {dc} "
+                "for a disk of {sz}."
+            ).format(
+                vs=self.colored(vs_name, "CYAN"),
+                dc=self.colored(dc_name, "CYAN"),
+                sz=self.colored(str(self.disk_size_gb) + " GiByte", "CYAN"),
+            )
+        )
 
     # -------------------------------------------------------------------------
     def _run(self):

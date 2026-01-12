@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -62,6 +62,15 @@ class VsphereDatastore(VsphereObject):
         "verbose",
         "version",
     )
+
+    valid_storage_types = (
+        'NFS',
+        'SSD',
+        'HDD',
+        'LOCAL',
+    )
+
+    default_storage_type = 'HDD'
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -109,7 +118,7 @@ class VsphereDatastore(VsphereObject):
             self._url = str(url)
         self._for_k8s = False
 
-        self._storage_type = "unknown"
+        self._storage_type = self.default_storage_type
 
         self._calculated_usage = 0.0
 
@@ -285,7 +294,7 @@ class VsphereDatastore(VsphereObject):
     # -----------------------------------------------------------
     @property
     def storage_type(self):
-        """Return the type of storage volume, such as SAS or SATA or SSD."""
+        """Return the type of storage volume, such as HDD or SSD."""
         return self._storage_type
 
     # -----------------------------------------------------------
@@ -429,16 +438,19 @@ class VsphereDatastore(VsphereObject):
             return "NFS"
 
         if "-sas-" in name.lower():
-            return "SAS"
+            return "HDD"
 
         if "-ssd-" in name.lower():
             return "SSD"
 
         if "-sata-" in name.lower():
-            return "SATA"
+            return "HDD"
+
+        if "-hdd-" in name.lower():
+            return "HDD"
 
         if cls.re_vmcb_fs.search(name):
-            return "SATA"
+            return "HDD"
 
         if cls.re_local_ds.search(name):
             return "LOCAL"

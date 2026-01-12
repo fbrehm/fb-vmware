@@ -32,7 +32,7 @@ from .errors import VSphereNameError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.6.0"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -54,6 +54,13 @@ class VsphereDsCluster(VsphereObject):
         "verbose",
         "version",
     )
+
+    valid_storage_types = (
+        'SSD',
+        'HDD',
+    )
+
+    default_storage_type = 'HDD'
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -81,6 +88,7 @@ class VsphereDsCluster(VsphereObject):
         self.compute_clusters = None
 
         self._calculated_usage = 0.0
+        self._storage_type = self.default_storage_type
 
         super(VsphereDsCluster, self).__init__(
             name=name,
@@ -96,6 +104,10 @@ class VsphereDsCluster(VsphereObject):
 
         self.vsphere = vsphere
         self.dc_name = dc_name
+
+        st_type = self.storage_type_by_name(self.name)
+        if st_type:
+            self._storage_type = st_type
 
         if initialized is not None:
             self.initialized = initialized
@@ -182,6 +194,30 @@ class VsphereDsCluster(VsphereObject):
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
+
+    # -----------------------------------------------------------
+    @property
+    def storage_type(self):
+        """Return the type of storage volume, such as HDD or SSD."""
+        return self._storage_type
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def storage_type_by_name(cls, name):
+        """Guess the storage type by its name. May be overridden in descentant classes."""
+        if "-sas-" in name.lower():
+            return "HDD"
+
+        if "-ssd-" in name.lower():
+            return "SSD"
+
+        if "-sata-" in name.lower():
+            return "HDD"
+
+        if "-hdd-" in name.lower():
+            return "HDD"
+
+        return None
 
     # -------------------------------------------------------------------------
     @classmethod
@@ -329,6 +365,7 @@ class VsphereDsCluster(VsphereObject):
         res["dc_name"] = self.dc_name
         res["free_space"] = self.free_space
         res["free_space_gb"] = self.free_space_gb
+        res["storage_type"] = self.storage_type
         res["vsphere"] = self.vsphere
 
         return res

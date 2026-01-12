@@ -503,7 +503,7 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_ds_clusters(self, vsphere_name=None, disconnect=False):
+    def get_ds_clusters(self, vsphere_name=None, search_in_dc=None, disconnect=False):
         """Get all datastores clusters from vSphere as VsphereDsCluster objects."""
         LOG.debug(_("Trying to get all datastore clusters from vSphere ..."))
         self.ds_clusters = VsphereDsClusterDict()
@@ -519,7 +519,11 @@ class VsphereConnection(BaseVsphereHandler):
 
             self.get_datacenters()
             content = self.service_instance.RetrieveContent()
+
             for dc_name in self.datacenters.keys():
+                if search_in_dc is not None:
+                    if dc_name != search_in_dc:
+                        continue
                 if self.verbose > 0:
                     LOG.debug(_("Get all datastore clusters in DC {!r} ...").format(dc_name))
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)

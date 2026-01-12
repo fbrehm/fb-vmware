@@ -36,7 +36,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -295,6 +295,8 @@ class GetStorageListApp(BaseVmwareApplication):
                 datastore = {}
                 datastore["is_total"] = False
 
+                datastore["storage_type"] = ds.storage_type
+
                 datastore["ds_name"] = ds_name
 
                 if hasattr(ds, "hosts"):
@@ -405,6 +407,7 @@ class GetStorageListApp(BaseVmwareApplication):
         )
 
         ds_table.add_column(header=_("Datastore"), footer=_("Total"))
+        ds_table.add_column(header=_("Type"), footer="", justify="center")
         ds_table.add_column(header=_("vSphere"), footer="")
         ds_table.add_column(header=_("Data Center"), footer="")
         ds_table.add_column(header=_("Cluster"), footer="")
@@ -433,6 +436,7 @@ class GetStorageListApp(BaseVmwareApplication):
 
             ds_table.add_row(
                 datastore["ds_name"],
+                datastore["storage_type"],
                 datastore["vsphere_name"],
                 datastore["dc"],
                 datastore["cluster"],

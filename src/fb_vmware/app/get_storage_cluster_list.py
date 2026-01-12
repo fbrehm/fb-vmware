@@ -36,7 +36,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.4.2"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -249,6 +249,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 cluster["vsphere_name"] = vsphere_name
                 cluster["dc"] = cl.dc_name
 
+                cluster["storage_type"] = cl.storage_type
+
                 cluster["capacity"] = cl.capacity_gb
                 cluster["capacity_gb"] = format_decimal(cl.capacity_gb, format="#,##0")
                 total_capacity += cl.capacity_gb
@@ -280,6 +282,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
         self.totals = {
             "cluster_name": _("Total"),
+            "storage_type": "",
             "vsphere_name": "",
             "dc": "",
             "is_total": True,
@@ -344,6 +347,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         )
 
         table.add_column(header="Cluster", footer=_("Total"))
+        table.add_column(header=_("Type"), justify="center", footer="")
         table.add_column(header=_("vSphere"), footer="")
         table.add_column(header=_("Data Center"), footer="")
         table.add_column(
@@ -370,6 +374,7 @@ class GetStorageClusterListApp(BaseVmwareApplication):
 
             table.add_row(
                 cluster["cluster_name"],
+                cluster["storage_type"],
                 cluster["vsphere_name"],
                 cluster["dc"],
                 cluster["capacity_gb"],

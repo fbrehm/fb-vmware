@@ -41,12 +41,17 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
+
+Prompt.validate_error_message = "[prompt.invalid]" + _("Please enter a valid value")
+Prompt.illegal_choice_message = (
+    "[prompt.invalid.choice]" + _("Please select one of the available options")
+)
 
 
 # =============================================================================

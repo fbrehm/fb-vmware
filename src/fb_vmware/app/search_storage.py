@@ -18,19 +18,24 @@ import sys
 # from fb_tools.argparse_actions import RegexOptionAction
 # from fb_tools.common import pp
 # from fb_tools.spinner import Spinner
-# from fb_tools.xlate import format_list
+from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication
+
 # from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..argparse_actions import NonNegativeIntegerOptionAction
+
+# from ..datastore import VsphereDatastore
 from ..datastore import VsphereDatastoreDict
+from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
+
 # from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.2.2"
+__version__ = "0.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -43,6 +48,11 @@ class SearchStorageApp(BaseVmwareApplication):
 
     show_simulate_option = False
     default_all_vspheres = False
+
+    valid_storage_types = []
+    for storage_type in VsphereDsCluster.valid_storage_types:
+        valid_storage_types.append(storage_type.lower())
+    valid_storage_types.append("any")
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -71,6 +81,7 @@ class SearchStorageApp(BaseVmwareApplication):
         self.cluster = None
 
         self.disk_size_gb = None
+        self.storage_type = None
 
         super(SearchStorageApp, self).__init__(
             appname=appname,
@@ -101,6 +112,19 @@ class SearchStorageApp(BaseVmwareApplication):
             ),
         )
 
+        typelist = format_list(self.valid_storage_types, do_repr=True)
+        help_msg = _(
+            "The required storage type of the resulting volume. Valid types are {types}."
+        ).format(types=typelist, deflt="any")
+        search_options.add_argument(
+            "-T",
+            "--type",
+            "--storage-type",
+            metavar=_("TYPE"),
+            choices=self.valid_storage_types,
+            help=help_msg,
+        )
+
         search_options.add_argument(
             "--vs",
             "--vsphere",
@@ -119,6 +143,16 @@ class SearchStorageApp(BaseVmwareApplication):
             help=_("The virtual datacenter in vSphere, in which the storage should be searched."),
         )
 
+        search_options.add_argument(
+            "--cluster",
+            metavar=_("CLUSTER"),
+            dest="cluster",
+            help=_(
+                "The computing cluster, which should be connected with the datastore cluster "
+                "or datastore in result."
+            ),
+        )
+
         super(SearchStorageApp, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
@@ -131,6 +165,9 @@ class SearchStorageApp(BaseVmwareApplication):
         """Evaluate command line parameters."""
         super(SearchStorageApp, self).perform_arg_parser()
 
+        if getattr(self.args, "size", None) is not None:
+            self.disk_size_gb = self.args.size
+
         if self.args.req_vsphere:
             vsphere = self.args.req_vsphere
             self.args.req_vsphere = [vsphere]
@@ -139,8 +176,8 @@ class SearchStorageApp(BaseVmwareApplication):
         if getattr(self.args, "dc", None) is not None and self.args.dc.strip() != "":
             self.dc = self.args.dc.strip()
 
-        if getattr(self.args, "size", None) is not None:
-            self.disk_size_gb = self.args.size
+        if getattr(self.args, "cluster", None) is not None and self.args.cluster.strip() != "":
+            self.cluster = self.args.cluster.strip()
 
     # -------------------------------------------------------------------------
     def pre_run(self):

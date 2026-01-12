@@ -30,7 +30,7 @@ from ..ds_cluster import VsphereDsClusterDict
 # from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

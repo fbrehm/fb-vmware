@@ -279,8 +279,8 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_clusters(self, disconnect=False):
-        """Get all clusters from vSphere as VsphereCluster objects."""
+    def get_clusters(self, search_in_dc=None, disconnect=False):
+        """Get all computing clusters from vSphere as VsphereCluster objects."""
         LOG.debug(_("Trying to get all clusters from vSphere ..."))
 
         self.clusters = []
@@ -292,7 +292,13 @@ class VsphereConnection(BaseVsphereHandler):
 
             self.get_datacenters()
             content = self.service_instance.RetrieveContent()
+
             for dc_name in self.datacenters.keys():
+                if search_in_dc is not None:
+                    if dc_name != search_in_dc:
+                        continue
+                if self.verbose > 1:
+                    LOG.debug(_("Get all computing clusters in DC {!r} ...").format(dc_name))
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)
 
                 for child in dc.hostFolder.childEntity:
@@ -375,7 +381,12 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_datastores(
-        self, vsphere_name=None, no_local_ds=True, disconnect=False, detailled=False
+        self,
+        vsphere_name=None,
+        no_local_ds=True,
+        search_in_dc=None,
+        disconnect=False,
+        detailled=False,
     ):
         """Get all datastores from vSphere as VsphereDatastore objects."""
         LOG.debug(_("Trying to get all datastores from vSphere ..."))
@@ -393,7 +404,10 @@ class VsphereConnection(BaseVsphereHandler):
             self.get_datacenters()
             content = self.service_instance.RetrieveContent()
             for dc_name in self.datacenters.keys():
-                if self.verbose > 0:
+                if search_in_dc is not None:
+                    if dc_name != search_in_dc:
+                        continue
+                if self.verbose > 1:
                     LOG.debug(_("Get all datastores in DC {!r} ...").format(dc_name))
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)
                 for child in dc.datastoreFolder.childEntity:
@@ -524,7 +538,7 @@ class VsphereConnection(BaseVsphereHandler):
                 if search_in_dc is not None:
                     if dc_name != search_in_dc:
                         continue
-                if self.verbose > 0:
+                if self.verbose > 1:
                     LOG.debug(_("Get all datastore clusters in DC {!r} ...").format(dc_name))
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)
                 for child in dc.datastoreFolder.childEntity:

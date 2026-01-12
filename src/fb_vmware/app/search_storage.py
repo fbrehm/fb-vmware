@@ -16,21 +16,21 @@ import pathlib
 import sys
 
 # from fb_tools.argparse_actions import RegexOptionAction
-from fb_tools.common import pp
-from fb_tools.spinner import Spinner
-from fb_tools.xlate import format_list
+# from fb_tools.common import pp
+# from fb_tools.spinner import Spinner
+# from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication
-from . import VmwareAppError
+# from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..argparse_actions import NonNegativeIntegerOptionAction
 from ..datastore import VsphereDatastoreDict
 from ..ds_cluster import VsphereDsClusterDict
-from ..errors import VSphereExpectedError
+# from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext

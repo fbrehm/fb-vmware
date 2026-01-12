@@ -11,16 +11,16 @@ from __future__ import absolute_import
 # Standard modules
 import argparse
 import logging
-import os
-from pathlib import Path
+# import os
+# from pathlib import Path
 
 # Third party modules
-from fb_tools.common import is_sequence
+# from fb_tools.common import is_sequence
 
 # Own modules
 from .xlate import XLATOR
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -40,7 +40,7 @@ class NonNegativeIntegerOptionAction(argparse.Action):
         self.may_zero = bool(may_zero)
 
         super(NonNegativeIntegerOptionAction, self).__init__(
-            option_strings=option_strings, *args, **kwargs
+            *args, **kwargs, option_strings=option_strings,
         )
 
     # -------------------------------------------------------------------------

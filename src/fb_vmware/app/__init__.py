@@ -32,6 +32,7 @@ from rich.prompt import InvalidResponse, Prompt, PromptBase, PromptType
 from .. import __version__ as GLOBAL_VERSION
 from ..config import VmwareConfiguration
 from ..connect import VsphereConnection
+from ..ds_cluster import VsphereDsCluster
 from ..errors import VSphereExpectedError
 from ..xlate import DOMAIN
 from ..xlate import LOCALE_DIR
@@ -41,7 +42,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.7.0"
+__version__ = "1.7.1"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -285,6 +286,45 @@ class BaseVmwareApplication(FbConfigApplication):
         LOG.debug(_("Actions before running main routine."))
 
         self.init_vsphere_handlers()
+
+    # -------------------------------------------------------------------------
+    def select_storage_type(self, storage_type=None):
+        """Select a storage type for a virtual disk to create."""
+        types = {}
+        type_list = []
+        for st_type in VsphereDsCluster.valid_storage_types:
+            types[st_type.lower()] = st_type
+            type_list.append(st_type.lower())
+        types["any"] = "Any"
+        type_list.append("any")
+
+        if storage_type is not None:
+            if self.verbose > 2:
+                LOG.debug(f"Checking for storage type {storage_type!r} ...")
+            st_type = storage_type.lower()
+            if st_type in types:
+                return types[st_type]
+            msg = _("Invalid storage type {} given.").format(self.colored(st_type, "RED"))
+            raise VmwareAppError(msg)
+
+        if len(types) == 1:
+            idx = [types.keys()][0]
+            st_type = types[idx]
+            if self.verbose > 0:
+                LOG.debug(
+                    f"Automatic select of storage type {st_type!r}, because it is the only one."
+                )
+            return st_type
+
+        st_type = Prompt.ask(
+            _("Select a storage type to search for the a storage location"),
+            choices=type_list,
+            show_choices=True,
+            case_sensitive=False,
+            console=self.rich_console,
+        )
+
+        return types[st_type.lower()]
 
     # -------------------------------------------------------------------------
     def select_vsphere(self):

@@ -16,26 +16,19 @@ import pathlib
 import sys
 
 # from fb_tools.argparse_actions import RegexOptionAction
-# from fb_tools.common import pp
-# from fb_tools.spinner import Spinner
+from fb_tools.common import pp
 from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication
-
-# from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..argparse_actions import NonNegativeIntegerOptionAction
-
-# from ..datastore import VsphereDatastore
 from ..datastore import VsphereDatastoreDict
 from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
-
-# from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -165,8 +158,13 @@ class SearchStorageApp(BaseVmwareApplication):
         """Evaluate command line parameters."""
         super(SearchStorageApp, self).perform_arg_parser()
 
+        LOG.debug("Given arguments:\n" + pp(self.args))
+
         if getattr(self.args, "size", None) is not None:
             self.disk_size_gb = self.args.size
+
+        if getattr(self.args, "type", None) is not None:
+            self.storage_type = getattr(self.args, "type", None)
 
         if self.args.req_vsphere:
             vsphere = self.args.req_vsphere
@@ -184,6 +182,11 @@ class SearchStorageApp(BaseVmwareApplication):
         """Execute some actions before the main routine."""
         if self.disk_size_gb is None:
             self.disk_size_gb = self.prompt_for_disk_size()
+
+        storage_type = self.select_storage_type(self.storage_type)
+        if storage_type is None:
+            self.exit(1)
+        self.storage_type = storage_type
 
         vs_name = self.select_vsphere()
         self.do_vspheres = [vs_name]
@@ -205,13 +208,14 @@ class SearchStorageApp(BaseVmwareApplication):
             _(
                 "Searching a storage location in vSphere {vs}, virtual datacenter {dc} "
                 "connected with the {cl_type} {cl} "
-                "for a disk of {sz}."
+                "for a disk of {sz} of type {st_type}."
             ).format(
                 vs=self.colored(vs_name, "CYAN"),
                 dc=self.colored(dc_name, "CYAN"),
                 cl_type=cluster_type,
                 cl=self.colored(cluster_name, "CYAN"),
                 sz=self.colored(str(self.disk_size_gb) + " GiByte", "CYAN"),
+                st_type=self.colored(storage_type, "CYAN"),
             )
         )
 

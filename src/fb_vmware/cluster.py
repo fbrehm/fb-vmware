@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 
@@ -397,10 +397,10 @@ class VsphereCluster(VsphereObject):
             "hosts_total": data.summary.numHosts,
             "mem_mb_effective": data.summary.effectiveMemory,
             "mem_total": data.summary.totalMemory,
-            "standalone": False,
+            "standalone": True,
         }
-        if isinstance(data, vim.ComputeResource):
-            params["standalone"] = True
+        if isinstance(data, vim.ClusterComputeResource):
+            params["standalone"] = False
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))

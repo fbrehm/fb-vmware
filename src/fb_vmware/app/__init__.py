@@ -41,7 +41,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.6.1"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -49,8 +49,8 @@ _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
 
 Prompt.validate_error_message = "[prompt.invalid]" + _("Please enter a valid value")
-Prompt.illegal_choice_message = (
-    "[prompt.invalid.choice]" + _("Please select one of the available options")
+Prompt.illegal_choice_message = "[prompt.invalid.choice]" + _(
+    "Please select one of the available options"
 )
 
 
@@ -356,13 +356,85 @@ class BaseVmwareApplication(FbConfigApplication):
             return dc_list[0]
 
         dc_name = Prompt.ask(
-            _("Select a virtual datacenter to search for the a storage location"),
-            choices=dc_list,
+            _("Select a virtual datacenter to search for the storage location"),
+            choices=sorted(dc_list, key=str.lower),
             show_choices=True,
             console=self.rich_console,
         )
 
         return dc_name
+
+    # -------------------------------------------------------------------------
+    def select_computing_cluster(self, vs_name, dc_name, cluster_name=None):
+        """Select a cluster computing resource or computing resource in a datacenter."""
+        if not vs_name:
+            raise VmwareAppError(_("No vSphere name given."))
+        if vs_name not in self.vsphere:
+            raise VmwareAppError(
+                _("vSphere {} is not an active vSphere.").format(self.colored(vs_name, "RED"))
+            )
+        vsphere = self.vsphere[vs_name]
+
+        if not dc_name:
+            raise VmwareAppError(_("No virtual databenter name given."))
+        vsphere.get_datacenters()
+        if dc_name not in vsphere.datacenters:
+            msg = _("Datacenter {dc} not found in vSphere {vs}.").format(
+                dc=self.colored(dc_name, "RED"), vs=self.colored(vs_name, "CYAN")
+            )
+
+        cluster_list = []
+        cluster_type = {}
+        vsphere.get_clusters(search_in_dc=dc_name)
+        for _cluster in vsphere.clusters:
+            cluster_list.append(_cluster.name)
+            cluster_type[_cluster.name] = _("cluster computing resource")
+            if _cluster.standalone:
+                cluster_type[_cluster.name] = _("host computing resource")
+
+        if not len(cluster_list):
+            msg = _("Did not found computing resources in dc {dc} in vSphere {vs}.").format(
+                dc=self.colored(dc_name, "RED"),
+                vs=self.colored(vs_name, "RED"),
+            )
+            LOG.error(msg)
+            return (None, None)
+
+        if self.verbose > 1:
+            msg = f"Found computing resources in datacenter {dc_name} in vSphere {vs_name}:\n"
+            msg += pp(cluster_type)
+            LOG.debug(msg)
+
+        if cluster_name:
+            if cluster_name in cluster_list:
+                return (cluster_name, cluster_type[cluster_name])
+            msg = _(
+                "Computing resource {cl} does not exists in datacenter {dc} in vSphere {vs}."
+            ).format(
+                cl=self.colored(cluster_name, "RED"),
+                dc=self.colored(dc_name, "CYAN"),
+                vs=self.colored(vs_name, "CYAN"),
+            )
+            LOG.error(msg)
+            return (None, None)
+
+        if len(cluster_list) == 1:
+            if self.verbose > 0:
+                LOG.debug(
+                    f"Automatic select of computing resource {cluster_list[0]!r}, "
+                    "because it is the only one."
+                )
+            cluster_name = cluster_list[0]
+            return (cluster_name, cluster_type[cluster_name])
+
+        cluster_name = Prompt.ask(
+            _("Select a computing resource, which should be conneted with the storage location"),
+            choices=sorted(cluster_list, key=str.lower),
+            show_choices=True,
+            console=self.rich_console,
+        )
+
+        return (cluster_name, cluster_type[cluster_name])
 
     # -------------------------------------------------------------------------
     def prompt_for_disk_size(self):

@@ -22,17 +22,20 @@ from fb_tools.xlate import format_list
 
 # Own modules
 from . import BaseVmwareApplication
+
 # from . import VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..argparse_actions import NonNegativeIntegerOptionAction
+
 # from ..datastore import VsphereDatastore
 from ..datastore import VsphereDatastoreDict
 from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
+
 # from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -192,13 +195,22 @@ class SearchStorageApp(BaseVmwareApplication):
         if dc_name is None:
             self.exit(1)
 
+        (cluster_name, cluster_type) = self.select_computing_cluster(
+            vs_name=vs_name, dc_name=dc_name, cluster_name=self.cluster
+        )
+        if cluster_name[0] is None:
+            self.exit(1)
+
         LOG.info(
             _(
                 "Searching a storage location in vSphere {vs}, virtual datacenter {dc} "
+                "connected with the {cl_type} {cl} "
                 "for a disk of {sz}."
             ).format(
                 vs=self.colored(vs_name, "CYAN"),
                 dc=self.colored(dc_name, "CYAN"),
+                cl_type=cluster_type,
+                cl=self.colored(cluster_name, "CYAN"),
                 sz=self.colored(str(self.disk_size_gb) + " GiByte", "CYAN"),
             )
         )

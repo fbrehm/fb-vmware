@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = "1.3.0"
+__version__ = "1.4.0"
 
 _ = XLATOR.gettext
 
@@ -176,23 +176,37 @@ class VSphereVmNotFoundError(VSphereExpectedError):
 
 # =============================================================================
 class VSphereNoDatastoreFoundError(VSphereExpectedError):
-    """Error class for the case, if no SAN based data store was with enogh free space was found."""
+    """Error class for the case, if no datastore was with enough free space was found."""
 
     # -------------------------------------------------------------------------
-    def __init__(self, needed_bytes):
+    def __init__(self, needed_gb):
         """Initialize the VSphereNoDatastoreFoundError object."""
-        self.needed_bytes = int(needed_bytes)
+        self.needed_gb = int(needed_gb)
 
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        mb = float(self.needed_bytes) / 1024.0 / 1024.0
-        gb = mb / 1024.0
-
         msg = _(
-            "No SAN based datastore found with at least {m:0.0f} MiB == {g:0.1f} GiB "
-            "available space found."
-        ).format(m=mb, g=gb)
+            "No datastore found with at least {:d} GiB available space found."
+        ).format(self.needed_gb)
+        return msg
+
+
+# =============================================================================
+class VSphereNoDsClusterFoundError(VSphereExpectedError):
+    """Error class for the case, if no datastore cluster with enough free space was found."""
+
+    # -------------------------------------------------------------------------
+    def __init__(self, needed_gb):
+        """Initialize the VSphereNoDsClusterFoundError object."""
+        self.needed_gb = int(needed_gb)
+
+    # -------------------------------------------------------------------------
+    def __str__(self):
+        """Typecast into a string."""
+        msg = _(
+            "No datastore cluster found with at least {:d} GiB available space found."
+        ).format(self.needed_gb)
         return msg
 
 
@@ -275,6 +289,13 @@ class TimeoutCreateVmError(VSphereExpectedError):
         else:
             msg = _("Timeout on creating VM {!r}.").format(self.vm)
         return msg
+
+
+# =============================================================================
+class FbVMWareRuntimeError(FbVMWareError, RuntimeError):
+    """Runtime error in a module of this package."""
+
+    pass
 
 
 # =============================================================================

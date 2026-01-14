@@ -28,9 +28,12 @@ from ..datastore import VsphereDatastoreDict
 from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
+from ..errors import VSphereNoDatastoreFoundError
+from ..errors import VSphereNoDsClusterFoundError
+
 from ..xlate import XLATOR
 
-__version__ = "0.5.1"
+__version__ = "0.6.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -211,8 +214,8 @@ class SearchStorageApp(BaseVmwareApplication):
         )
         if cluster_name[0] is None:
             self.exit(1)
-        self.cluster = cluster_name[0]
-        self.cluster_type = cluster_name[1]
+        self.cluster = cluster_name
+        self.cluster_type = cluster_type
 
         LOG.info(
             _(
@@ -222,8 +225,8 @@ class SearchStorageApp(BaseVmwareApplication):
             ).format(
                 vs=self.colored(vs_name, "CYAN"),
                 dc=self.colored(dc_name, "CYAN"),
-                cl_type=cluster_type,
-                cl=self.colored(cluster_name, "CYAN"),
+                cl_type=self.cluster_type,
+                cl=self.colored(self.cluster, "CYAN"),
                 sz=self.colored(str(self.disk_size_gb) + " GiByte", "CYAN"),
                 st_type=self.colored(storage_type, "CYAN"),
             )
@@ -237,6 +240,7 @@ class SearchStorageApp(BaseVmwareApplication):
         ret = 0
         try:
             self.get_storages()
+            self.search_for_space()
         finally:
             self.cleaning_up()
 
@@ -351,6 +355,8 @@ class SearchStorageApp(BaseVmwareApplication):
                     vsphere_name=self.vsphere_name,
                     search_in_dc=self.dc,
                     warn_if_empty=False,
+                    detailled=True,
+                    no_local_ds=False,
                 )
             except VSphereExpectedError as e:
                 LOG.error(str(e))
@@ -372,6 +378,58 @@ class SearchStorageApp(BaseVmwareApplication):
 
         if self.verbose > 0:
             LOG.debug(_("Found datastores:") + "\n" + pp(self.datastores.as_list()))
+
+    # -------------------------------------------------------------------------
+    def search_for_space(self):
+        """Search in evaluated datastore clusters and datastores for space for a virtual disk."""
+        if self.ds_clusters:
+            LOG.info(_("Searching for space in evaluated datastore clusters."))
+            # LOG.debug(f"Datastore cluster must be connected with computing cluster {self.cluster!r}")
+            try:
+                ds_cluster = self.ds_clusters.search_space(
+                    needed_gb=self.disk_size_gb,
+                    storage_type=self.storage_type,
+                    reserve_space=False,
+                    compute_cluster=self.cluster,
+                )
+
+                msg = "\n " + self.colored("*", "GREEN") + " "
+                msg += _("Found usable datastore cluster:") + "\n\n"
+                msg += "   " + self.colored(ds_cluster, "CYAN") + "\n"
+
+                print(msg)
+                self.exit(0)
+            except VSphereNoDsClusterFoundError as e:
+                print()
+                LOG.warn(str(e))
+
+        if self.datastores:
+            LOG.info(_("Searching for space in evaluated datastores."))
+            # LOG.debug(f"Datastore must be connected with computing cluster {self.cluster!r}")
+            try:
+                datastore = self.datastores.search_space(
+                    needed_gb=self.disk_size_gb,
+                    storage_type=self.storage_type,
+                    reserve_space=False,
+                    compute_cluster=self.cluster,
+                    use_local=True,
+                )
+
+                msg = "\n " + self.colored("*", "GREEN") + " "
+                msg += _("Found usable datastore:") + "\n\n"
+                msg += "   " + self.colored(datastore, "CYAN") + "\n"
+
+                print(msg)
+                self.exit(0)
+            except VSphereNoDatastoreFoundError as e:
+                print()
+                LOG.warn(str(e))
+
+
+        print()
+        LOG.warn(_("No datastore cluster or datastore for the given volume."))
+        self.exit(3)
+
 
     # -------------------------------------------------------------------------
     def post_run(self):

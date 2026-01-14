@@ -30,10 +30,9 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..errors import VSphereNoDatastoreFoundError
 from ..errors import VSphereNoDsClusterFoundError
-
 from ..xlate import XLATOR
 
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -384,7 +383,8 @@ class SearchStorageApp(BaseVmwareApplication):
         """Search in evaluated datastore clusters and datastores for space for a virtual disk."""
         if self.ds_clusters:
             LOG.info(_("Searching for space in evaluated datastore clusters."))
-            # LOG.debug(f"Datastore cluster must be connected with computing cluster {self.cluster!r}")
+            # LOG.debug(
+            #     f"Datastore cluster must be connected with computing cluster {self.cluster!r}")
             try:
                 ds_cluster = self.ds_clusters.search_space(
                     needed_gb=self.disk_size_gb,
@@ -425,11 +425,9 @@ class SearchStorageApp(BaseVmwareApplication):
                 print()
                 LOG.warn(str(e))
 
-
         print()
         LOG.warn(_("No datastore cluster or datastore for the given volume."))
         self.exit(3)
-
 
     # -------------------------------------------------------------------------
     def post_run(self):

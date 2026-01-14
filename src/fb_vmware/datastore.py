@@ -27,13 +27,14 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import FbVMWareRuntimeError
 from .errors import VSphereHandlerError
 from .errors import VSphereNameError
 from .errors import VSphereNoDatastoreFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -65,13 +66,13 @@ class VsphereDatastore(VsphereObject):
     )
 
     valid_storage_types = (
-        'NFS',
-        'SSD',
-        'HDD',
-        'LOCAL',
+        "NFS",
+        "SSD",
+        "HDD",
+        "LOCAL",
     )
 
-    default_storage_type = 'HDD'
+    default_storage_type = "HDD"
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -438,7 +439,7 @@ class VsphereDatastore(VsphereObject):
                         cr = parent_name
 
                 # hostlist[host_name] = (parents[1][1], parents[3][1])
-                hostlist[host_name]  = {
+                hostlist[host_name] = {
                     "dc": dc,
                     "cr": cr,
                 }

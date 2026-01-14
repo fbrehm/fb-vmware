@@ -18,7 +18,7 @@ from fb_tools.errors import FbHandlerError
 # Own modules
 from .xlate import XLATOR
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
 
 _ = XLATOR.gettext
 
@@ -186,9 +186,9 @@ class VSphereNoDatastoreFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _(
-            "No datastore found with at least {:d} GiB available space found."
-        ).format(self.needed_gb)
+        msg = _("No datastore found with at least {:d} GiB available space found.").format(
+            self.needed_gb
+        )
         return msg
 
 
@@ -204,9 +204,9 @@ class VSphereNoDsClusterFoundError(VSphereExpectedError):
     # -------------------------------------------------------------------------
     def __str__(self):
         """Typecast into a string."""
-        msg = _(
-            "No datastore cluster found with at least {:d} GiB available space found."
-        ).format(self.needed_gb)
+        msg = _("No datastore cluster found with at least {:d} GiB available space found.").format(
+            self.needed_gb
+        )
         return msg
 
 

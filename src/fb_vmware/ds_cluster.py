@@ -35,7 +35,7 @@ from .errors import VSphereNoDsClusterFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.0"
+__version__ = "1.8.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -665,7 +665,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
         reserve_space=True,
         compute_cluster=None,
     ):
-        """Find a datastore cluster in dict with the given minimum free space and the given type."""
+        """Find a datastore cluster with the given minimum free space and the given type."""
         st_type = storage_type.lower()
         search_chains = {
             "any": ("hdd", "ssd"),

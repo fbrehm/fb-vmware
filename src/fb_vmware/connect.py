@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.10.1"
+__version__ = "2.11.0"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -385,6 +385,7 @@ class VsphereConnection(BaseVsphereHandler):
         vsphere_name=None,
         no_local_ds=True,
         search_in_dc=None,
+        warn_if_empty=True,
         disconnect=False,
         detailled=False,
     ):
@@ -429,7 +430,7 @@ class VsphereConnection(BaseVsphereHandler):
                     LOG.debug(_("Found datastores:") + "\n" + pp(self.datastores.as_list()))
                 else:
                     LOG.debug(_("Found datastores:") + "\n" + pp(list(self.datastores.keys())))
-        else:
+        elif warn_if_empty:
             raise VSphereNoDatastoresFoundError()
 
         for ds_name, ds in self.datastores.items():
@@ -517,7 +518,14 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_ds_clusters(self, vsphere_name=None, search_in_dc=None, disconnect=False):
+    def get_ds_clusters(
+            self,
+            vsphere_name=None,
+            search_in_dc=None,
+            warn_if_empty=True,
+            disconnect=False,
+            detailled=False,
+        ):
         """Get all datastores clusters from vSphere as VsphereDsCluster objects."""
         LOG.debug(_("Trying to get all datastore clusters from vSphere ..."))
         self.ds_clusters = VsphereDsClusterDict()
@@ -542,7 +550,12 @@ class VsphereConnection(BaseVsphereHandler):
                     LOG.debug(_("Get all datastore clusters in DC {!r} ...").format(dc_name))
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)
                 for child in dc.datastoreFolder.childEntity:
-                    self._get_ds_clusters(child, vsphere_name=vsphere_name, dc_name=dc_name)
+                    self._get_ds_clusters(
+                        child,
+                        vsphere_name=vsphere_name,
+                        dc_name=dc_name,
+                        detailled=detailled,
+                    )
 
         finally:
             if disconnect:
@@ -558,7 +571,7 @@ class VsphereConnection(BaseVsphereHandler):
                     LOG.debug(
                         _("Found datastore clusters:") + "\n" + pp(list(self.ds_clusters.keys()))
                     )
-        else:
+        elif warn_if_empty:
             LOG.warning(_("No vSphere datastore clusters found."))
 
         for dsc_name, dsc in self.ds_clusters.items():
@@ -568,7 +581,13 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Datastore cluster mappings:") + "\n" + pp(self.ds_cluster_mapping))
 
     # -------------------------------------------------------------------------
-    def _get_ds_clusters(self, child, vsphere_name=None, dc_name=None, depth=1):
+    def _get_ds_clusters(self,
+            child,
+            vsphere_name=None,
+            dc_name=None,
+            depth=1,
+            detailled=False,
+        ):
 
         if self.verbose > 3:
             LOG.debug(_("Found a {} child.").format(child.__class__.__name__))
@@ -582,6 +601,7 @@ class VsphereConnection(BaseVsphereHandler):
                     vsphere_name=vsphere_name,
                     dc_name=dc_name,
                     depth=depth + 1,
+                    detailled=detailled,
                 )
 
         if isinstance(child, vim.StoragePod):
@@ -592,6 +612,7 @@ class VsphereConnection(BaseVsphereHandler):
                 appname=self.appname,
                 verbose=self.verbose,
                 base_dir=self.base_dir,
+                detailled=detailled,
             )
             self.ds_clusters.append(ds)
 

@@ -34,7 +34,7 @@ from .errors import VSphereNoDatastoreFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.1"
+__version__ = "1.8.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -890,6 +890,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
         reserve_space=True,
         compute_cluster=None,
         use_local=False,
+        use_random_select=False,
     ):
         """Find a datastore in dict with the given minimum free space and the given type."""
         st_type = storage_type.lower()
@@ -913,6 +914,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
                 storage_type=st_tp,
                 reserve_space=reserve_space,
                 compute_cluster=compute_cluster,
+                use_random_select=use_random_select,
             )
             if ds_name:
                 return ds_name
@@ -926,6 +928,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
         storage_type,
         reserve_space=True,
         compute_cluster=None,
+        use_random_select=False,
     ):
 
         LOG.debug(
@@ -936,6 +939,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
         LOG.debug(_("Given compute cluster: {!r}.").format(compute_cluster))
 
         avail_ds_names = []
+        spaces = {}
         for ds_name, ds in self.items():
             usable = True
             if ds.storage_type.lower() != storage_type.lower():
@@ -967,11 +971,21 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
 
             if usable:
                 avail_ds_names.append(ds_name)
+                spaces[ds_name] = ds.avail_space_gb
 
         if not avail_ds_names:
             return None
 
-        ds_name = random.choice(avail_ds_names)
+        if use_random_select:
+            ds_name = random.choice(avail_ds_names)
+        else:
+            ds_name = None
+            last_val = 0.0
+            for n in spaces.keys():
+                if spaces[n] > last_val:
+                    ds_name = n
+                    last_val = spaces[n]
+
         if reserve_space:
             ds = self[ds_name]
             ds.calculated_usage += needed_gb

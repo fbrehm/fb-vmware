@@ -30,7 +30,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -245,7 +245,9 @@ class SearchStorageApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def get_storages(self):
         """Retrieve all datastore clusters and storages in current vSphere and datacenter."""
-        LOG.info(_("Collect all atastore clusters and storages in current vSphere and datacenter."))
+        LOG.info(
+            _("Collect all atastore clusters and storages in current vSphere and datacenter.")
+        )
 
         self.get_datastore_clusters()
         len_ds_clusters = len(self.ds_clusters)
@@ -254,7 +256,7 @@ class SearchStorageApp(BaseVmwareApplication):
             msg = ngettext(
                 "Found total {one} datastore cluster in vSphere {vs}, datacenter {dc}.",
                 "Found total {nr} datastore clusters in vSphere {vs}, datacenter {dc}.",
-                len_ds_clusters
+                len_ds_clusters,
             )
             msg = msg.format(
                 one=self.colored(one, "CYAN"),
@@ -276,7 +278,7 @@ class SearchStorageApp(BaseVmwareApplication):
             msg = ngettext(
                 "Found total {one} datastore in vSphere {vs}, datacenter {dc}.",
                 "Found total {nr} datastores in vSphere {vs}, datacenter {dc}.",
-                len_datastores
+                len_datastores,
             )
             msg = msg.format(
                 one=self.colored(one, "CYAN"),
@@ -293,8 +295,12 @@ class SearchStorageApp(BaseVmwareApplication):
 
         if not len_ds_clusters and not len_datastores:
             msg = _(
-                "Found neither a datastore cluster nor a datastore in vSphere {vs}, datacenter {dc}."
-            ).format(vs=self.colored(self.vsphere_name, "CYAN"), dc=self.colored(self.dc, "CYAN"),)
+                "Found neither a datastore cluster nor a datastore in vSphere {vs}, "
+                "datacenter {dc}."
+            ).format(
+                vs=self.colored(self.vsphere_name, "CYAN"),
+                dc=self.colored(self.dc, "CYAN"),
+            )
             LOG.error(msg)
             self.exit(7)
 

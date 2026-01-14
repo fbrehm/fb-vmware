@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.11.0"
+__version__ = "2.11.1"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -519,13 +519,13 @@ class VsphereConnection(BaseVsphereHandler):
 
     # -------------------------------------------------------------------------
     def get_ds_clusters(
-            self,
-            vsphere_name=None,
-            search_in_dc=None,
-            warn_if_empty=True,
-            disconnect=False,
-            detailled=False,
-        ):
+        self,
+        vsphere_name=None,
+        search_in_dc=None,
+        warn_if_empty=True,
+        disconnect=False,
+        detailled=False,
+    ):
         """Get all datastores clusters from vSphere as VsphereDsCluster objects."""
         LOG.debug(_("Trying to get all datastore clusters from vSphere ..."))
         self.ds_clusters = VsphereDsClusterDict()
@@ -581,13 +581,14 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Datastore cluster mappings:") + "\n" + pp(self.ds_cluster_mapping))
 
     # -------------------------------------------------------------------------
-    def _get_ds_clusters(self,
-            child,
-            vsphere_name=None,
-            dc_name=None,
-            depth=1,
-            detailled=False,
-        ):
+    def _get_ds_clusters(
+        self,
+        child,
+        vsphere_name=None,
+        dc_name=None,
+        depth=1,
+        detailled=False,
+    ):
 
         if self.verbose > 3:
             LOG.debug(_("Found a {} child.").format(child.__class__.__name__))

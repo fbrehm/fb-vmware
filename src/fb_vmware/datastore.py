@@ -29,6 +29,7 @@ from pyVmomi import vim
 # Own modules
 from .errors import VSphereHandlerError
 from .errors import VSphereNameError
+from .errors import VSphereNoDatastoreFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
@@ -121,6 +122,9 @@ class VsphereDatastore(VsphereObject):
         self._storage_type = self.default_storage_type
 
         self._calculated_usage = 0.0
+
+        self.hosts = None
+        self.compute_clusters = None
 
         super(VsphereDatastore, self).__init__(
             name=name,
@@ -422,12 +426,25 @@ class VsphereDatastore(VsphereObject):
             self.hosts.add(host_name)
             if host_name not in hostlist:
                 parents = self.get_parents(host_data.key)
-                if self.verbose > 2:
+                if self.verbose > 0:
                     LOG.debug(f"Parents of host {host_name!r}:\n" + pp(parents))
-                hostlist[host_name] = (parents[1][1], parents[3][1])
+                dc = None
+                cr = None
+                for i in range(len(parents), 0, -1):
+                    (parent_type, parent_name) = parents[i - 1]
+                    if parent_type == "vim.Datacenter":
+                        dc = parent_name
+                    if parent_type in ("vim.ComputeResource", "vim.ClusterComputeResource"):
+                        cr = parent_name
+
+                # hostlist[host_name] = (parents[1][1], parents[3][1])
+                hostlist[host_name]  = {
+                    "dc": dc,
+                    "cr": cr,
+                }
 
         for host in hostlist:
-            compute_cluster = hostlist[host][1]
+            compute_cluster = hostlist[host]["cr"]
             self.compute_clusters.add(compute_cluster)
 
     # -------------------------------------------------------------------------
@@ -852,6 +869,102 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             if no_k8s and ds.for_k8s:
                 continue
             if ds.avail_space_gb >= needed_gb:
+                avail_ds_names.append(ds_name)
+
+        if not avail_ds_names:
+            return None
+
+        ds_name = random.choice(avail_ds_names)
+        if reserve_space:
+            ds = self[ds_name]
+            ds.calculated_usage += needed_gb
+
+        return ds_name
+
+    # -------------------------------------------------------------------------
+    def search_space(
+        self,
+        needed_gb,
+        storage_type="any",
+        reserve_space=True,
+        compute_cluster=None,
+        use_local=False,
+    ):
+        """Find a datastore in dict with the given minimum free space and the given type."""
+        st_type = storage_type.lower()
+        search_chains = {
+            "any": ("hdd", "ssd"),
+            "hdd": ("hdd",),
+            "ssd": ("ssd",),
+        }
+        if use_local:
+            search_chains["any"] = ("hdd", "ssd", "local")
+            search_chains["local"] = ("local",)
+
+        if st_type not in search_chains:
+            raise ValueError(
+                _("Could not handle storage type {}.").format(self.colored(storage_type, "RED"))
+            )
+
+        for st_tp in search_chains[st_type]:
+            ds_name = self._search_space(
+                needed_gb,
+                storage_type=st_tp,
+                reserve_space=reserve_space,
+                compute_cluster=compute_cluster,
+            )
+            if ds_name:
+                return ds_name
+
+        raise VSphereNoDatastoreFoundError(needed_gb)
+
+    # -------------------------------------------------------------------------
+    def _search_space(
+        self,
+        needed_gb,
+        storage_type,
+        reserve_space=True,
+        compute_cluster=None,
+    ):
+
+        LOG.debug(
+            _("Searching datastore for {c:d} GiB of type {t!r}.").format(
+                c=needed_gb, t=storage_type
+            )
+        )
+        LOG.debug(_("Given compute cluster: {!r}.").format(compute_cluster))
+
+        avail_ds_names = []
+        for ds_name, ds in self.items():
+            usable = True
+            if ds.storage_type.lower() != storage_type.lower():
+                # LOG.debug(f"Datastore {ds_name} has wrong storage type {ds.storage_type}.")
+                continue
+            if ds.avail_space_gb < needed_gb:
+                # LOG.debug(f"Datastore {ds_name} is too small with {ds.avail_space_gb:0f} GB.")
+                usable = False
+
+            if usable and compute_cluster:
+                if ds.compute_clusters is None:
+                    msg = _(
+                        "Cannot detect connection with compute cluster {cl!r}, datastore "
+                        "was not detailled discovered."
+                    ).format(ds_name)
+                    raise FbVMWareRuntimeError(msg)
+                found = False
+                for cc_name in ds.compute_clusters:
+                    # LOG.debug(f"Checking for CC {cc_name!r} == {compute_cluster!r}.")
+                    if cc_name == compute_cluster:
+                        found = True
+                        break
+                if not found:
+                    # LOG.debug(
+                    #     f"Datastore {ds_name} is connected with wrong computing clusters: "
+                    #     + pp(ds_cluster.compute_clusters)
+                    # )
+                    usable = False
+
+            if usable:
                 avail_ds_names.append(ds_name)
 
         if not avail_ds_names:

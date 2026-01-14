@@ -17,6 +17,7 @@ import sys
 
 # from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
+from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
 # Own modules
@@ -26,13 +27,16 @@ from ..argparse_actions import NonNegativeIntegerOptionAction
 from ..datastore import VsphereDatastoreDict
 from ..ds_cluster import VsphereDsCluster
 from ..ds_cluster import VsphereDsClusterDict
+from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
+npgettext = XLATOR.npgettext
+pgettext = XLATOR.pgettext
 
 
 # =============================================================================
@@ -69,9 +73,11 @@ class SearchStorageApp(BaseVmwareApplication):
         self.datastores = VsphereDatastoreDict()
         self.ds_clusters = VsphereDsClusterDict()
 
+        self.vsphere_name = None
         self.cur_vsphere = None
         self.dc = None
         self.cluster = None
+        self.cluster_type = None
 
         self.disk_size_gb = None
         self.storage_type = None
@@ -192,17 +198,21 @@ class SearchStorageApp(BaseVmwareApplication):
         self.do_vspheres = [vs_name]
 
         super(SearchStorageApp, self).pre_run()
+        self.vsphere_name = vs_name
         self.cur_vsphere = self.vsphere[vs_name]
 
         dc_name = self.select_datacenter(vs_name, self.dc)
         if dc_name is None:
             self.exit(1)
+        self.dc = dc_name
 
         (cluster_name, cluster_type) = self.select_computing_cluster(
             vs_name=vs_name, dc_name=dc_name, cluster_name=self.cluster
         )
         if cluster_name[0] is None:
             self.exit(1)
+        self.cluster = cluster_name[0]
+        self.cluster_type = cluster_name[1]
 
         LOG.info(
             _(
@@ -226,11 +236,136 @@ class SearchStorageApp(BaseVmwareApplication):
 
         ret = 0
         try:
-            LOG.info("And now - it starts ...")
+            self.get_storages()
         finally:
             self.cleaning_up()
 
         self.exit(ret)
+
+    # -------------------------------------------------------------------------
+    def get_storages(self):
+        """Retrieve all datastore clusters and storages in current vSphere and datacenter."""
+        LOG.info(_("Collect all atastore clusters and storages in current vSphere and datacenter."))
+
+        self.get_datastore_clusters()
+        len_ds_clusters = len(self.ds_clusters)
+        if len_ds_clusters:
+            one = pgettext("found_ds_cluster", "one")
+            msg = ngettext(
+                "Found total {one} datastore cluster in vSphere {vs}, datacenter {dc}.",
+                "Found total {nr} datastore clusters in vSphere {vs}, datacenter {dc}.",
+                len_ds_clusters
+            )
+            msg = msg.format(
+                one=self.colored(one, "CYAN"),
+                nr=self.colored(str(len_ds_clusters), "CYAN"),
+                vs=self.colored(self.vsphere_name, "CYAN"),
+                dc=self.colored(self.dc, "CYAN"),
+            )
+        else:
+            msg = _("Did not found a datastore cluster in vSphere {vs}, datacenter {dc}.").format(
+                vs=self.colored(self.vsphere_name, "CYAN"),
+                dc=self.colored(self.dc, "CYAN"),
+            )
+        LOG.info(msg)
+
+        self.get_datastores()
+        len_datastores = len(self.datastores)
+        if len_datastores:
+            one = pgettext("found_datastore", "one")
+            msg = ngettext(
+                "Found total {one} datastore in vSphere {vs}, datacenter {dc}.",
+                "Found total {nr} datastores in vSphere {vs}, datacenter {dc}.",
+                len_datastores
+            )
+            msg = msg.format(
+                one=self.colored(one, "CYAN"),
+                nr=self.colored(str(len_datastores), "CYAN"),
+                vs=self.colored(self.vsphere_name, "CYAN"),
+                dc=self.colored(self.dc, "CYAN"),
+            )
+        else:
+            msg = _("Did not found a datastore in vSphere {vs}, datacenter {dc}.").format(
+                vs=self.colored(self.vsphere_name, "CYAN"),
+                dc=self.colored(self.dc, "CYAN"),
+            )
+        LOG.info(msg)
+
+        if not len_ds_clusters and not len_datastores:
+            msg = _(
+                "Found neither a datastore cluster nor a datastore in vSphere {vs}, datacenter {dc}."
+            ).format(vs=self.colored(self.vsphere_name, "CYAN"), dc=self.colored(self.dc, "CYAN"),)
+            LOG.error(msg)
+            self.exit(7)
+
+    # -------------------------------------------------------------------------
+    def get_datastore_clusters(self):
+        """Retrieve all datastore clusters in current vSphere and datacenter."""
+        self.ds_clusters = VsphereDsClusterDict()
+
+        # ----------
+        def _get_datastore_clusters():
+            try:
+                self.cur_vsphere.get_ds_clusters(
+                    vsphere_name=self.vsphere_name,
+                    search_in_dc=self.dc,
+                    warn_if_empty=False,
+                    detailled=True,
+                )
+            except VSphereExpectedError as e:
+                LOG.error(str(e))
+                self.exit(6)
+
+            for cluster_name in self.cur_vsphere.ds_clusters:
+                self.ds_clusters.append(self.cur_vsphere.ds_clusters[cluster_name])
+
+        if self.verbose or self.quiet:
+            _get_datastore_clusters()
+        else:
+            spin_prompt = _("Getting all vSphere storage clusters ...")
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
+                _get_datastore_clusters()
+            sys.stdout.write(" " * len(spin_prompt))
+            sys.stdout.write("\r")
+            sys.stdout.flush()
+
+        if self.verbose > 2:
+            LOG.debug(_("Found datastore clusters:") + "\n" + pp(self.ds_clusters.as_list()))
+
+    # -------------------------------------------------------------------------
+    def get_datastores(self):
+        """Retrieve  datastores in current vSphere and datacenter."""
+        self.datastores = VsphereDatastoreDict()
+
+        # ----------
+        def _get_datastores():
+            try:
+                self.cur_vsphere.get_datastores(
+                    vsphere_name=self.vsphere_name,
+                    search_in_dc=self.dc,
+                    warn_if_empty=False,
+                )
+            except VSphereExpectedError as e:
+                LOG.error(str(e))
+                self.exit(6)
+
+            for ds_name in self.cur_vsphere.datastores:
+                self.datastores.append(self.cur_vsphere.datastores[ds_name])
+
+        if self.verbose or self.quiet:
+            _get_datastores()
+        else:
+            spin_prompt = _("Getting all vSphere datastores ...")
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
+                _get_datastores()
+            sys.stdout.write(" " * len(spin_prompt))
+            sys.stdout.write("\r")
+            sys.stdout.flush()
+
+        if self.verbose > 0:
+            LOG.debug(_("Found datastores:") + "\n" + pp(self.datastores.as_list()))
 
     # -------------------------------------------------------------------------
     def post_run(self):

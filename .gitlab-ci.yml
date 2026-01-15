@@ -15,6 +15,7 @@ variables:
     python3-fb-tools
     python3-pyvmomi
     python3-pyyaml
+    python3-rich
   PYTHON_INIT_FILE: 'src/fb_vmware/__init__.py'
   PYTHON_TEST_PATHS: 'src'
   SHELLSCRIPTS: >-

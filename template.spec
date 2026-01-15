@@ -25,6 +25,7 @@ BuildRequires:  python%{python3_pkgversion}-libs
 BuildRequires:  python%{python3_pkgversion}-pytz
 BuildRequires:  python%{python3_pkgversion}-pyvmomi
 BuildRequires:  python%{python3_pkgversion}-pyyaml
+BuildRequires:  python%{python3_pkgversion}-rich
 BuildRequires:  python%{python3_pkgversion}-semver
 BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  pyproject-rpm-macros

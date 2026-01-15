@@ -68,6 +68,7 @@ jobs:
         python3-fb-logging
         python3-fb-tools
         python3-pyvmomi
+        python3-rich
         python3-semver
         python3-yaml
       additional_rpm_build_packages: >-
@@ -75,6 +76,7 @@ jobs:
         python3-fb-tools
         python3-pyvmomi
         python3-pyyaml
+        python3-rich
       password_file: ${{ needs.prepare-image.outputs.password_file }}
       key_id: ${{ needs.prepare-image.outputs.key_id }}
       # do_help2man: true

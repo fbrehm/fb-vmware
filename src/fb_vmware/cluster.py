@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.5.0"
+__version__ = "1.7.0"
 LOG = logging.getLogger(__name__)
 
 
@@ -264,6 +264,35 @@ class VsphereCluster(VsphereObject):
     def standalone(self, value):
         self._standalone = to_bool(value)
 
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vim.ClusterComputeResource, True
+        )
+        for c in container.view:
+            if c.name == self.name:
+                obj = c
+                break
+
+        if obj is not None:
+            return obj
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vim.ComputeResource, True
+        )
+        for c in container.view:
+            if c.name == self.name:
+                obj = c
+                break
+        return obj
+
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
@@ -368,10 +397,10 @@ class VsphereCluster(VsphereObject):
             "hosts_total": data.summary.numHosts,
             "mem_mb_effective": data.summary.effectiveMemory,
             "mem_total": data.summary.totalMemory,
-            "standalone": False,
+            "standalone": True,
         }
-        if isinstance(data, vim.ComputeResource):
-            params["standalone"] = True
+        if isinstance(data, vim.ClusterComputeResource):
+            params["standalone"] = False
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))

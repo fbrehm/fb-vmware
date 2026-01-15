@@ -37,7 +37,7 @@ from .obj import DEFAULT_OBJ_STATUS, OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -310,6 +310,26 @@ class VsphereHostBiosInfo(FbBaseObject):
 class VsphereHost(VsphereObject):
     """Wrapper class for a vim.HostSystem, which is the represtation of a physical ESX host."""
 
+    power_state_label = {
+        "poweredOn": _("powered on"),
+        "poweredOff": _("powered off"),
+        "standBy": _("stand by"),
+        "unknown": _("unknown"),
+    }
+
+    connect_state_label = {
+        "connected": _("connected"),
+        "notResponding": _("not responding"),
+        "disconnected": _("disconnected"),
+    }
+
+    standby_mode_label = {
+        "entering": _("entering"),
+        "exiting": _("exiting"),
+        "in": _("in"),
+        "none": _("none"),
+    }
+
     # -------------------------------------------------------------------------
     def __init__(
         self,
@@ -522,6 +542,24 @@ class VsphereHost(VsphereObject):
             self._boot_time = None
         else:
             self._boot_time = v
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vim.HostSystem, True
+        )
+        for c in container.view:
+            if c.name == self.name:
+                obj = c
+                break
+
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

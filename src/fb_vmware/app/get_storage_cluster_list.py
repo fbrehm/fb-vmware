@@ -24,6 +24,10 @@ from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich import box
+from rich.table import Table
+from rich.text import Text
+
 # Own modules
 from . import BaseVmwareApplication
 from . import VmwareAppError
@@ -32,7 +36,7 @@ from ..ds_cluster import VsphereDsClusterDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.3.1"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -59,6 +63,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
         "usage_pc",
     )
     default_sort_keys = ["vsphere_name", "cluster_name"]
+
+    show_simulate_option = False
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -120,8 +126,6 @@ class GetStorageClusterListApp(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetStorageClusterListApp, self).init_arg_parser()
-
         output_options = self.arg_parser.add_argument_group(_("Output options"))
 
         output_options.add_argument(
@@ -147,6 +151,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 default=format_list(self.default_sort_keys, do_repr=True),
             ),
         )
+
+        super(GetStorageClusterListApp, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
@@ -243,6 +249,8 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 cluster["vsphere_name"] = vsphere_name
                 cluster["dc"] = cl.dc_name
 
+                cluster["storage_type"] = cl.storage_type
+
                 cluster["capacity"] = cl.capacity_gb
                 cluster["capacity_gb"] = format_decimal(cl.capacity_gb, format="#,##0")
                 total_capacity += cl.capacity_gb
@@ -260,104 +268,50 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                     cluster["usage_pc"] = usage_pc
                     cluster["usage_pc_out"] = format_decimal(usage_pc, format="0.0 %")
                 else:
+                    cluster["usage_pc"] = None
                     cluster["usage_pc_out"] = "- %"
 
                 cluster_list.append(cluster)
 
-        if self.print_total:
-            total_used = total_capacity - total_free
-            total_used_pc = None
-            total_used_pc_out = "- %"
-            if total_capacity:
-                total_used_pc = total_used / total_capacity
-                total_used_pc_out = format_decimal(total_used_pc, format="0.0 %")
+        total_used = total_capacity - total_free
+        total_used_pc = None
+        total_used_pc_out = "- %"
+        if total_capacity:
+            total_used_pc = total_used / total_capacity
+            total_used_pc_out = format_decimal(total_used_pc, format="0.0 %")
 
-            self.totals = {
-                "cluster_name": _("Total"),
-                "vsphere_name": "",
-                "dc": "",
-                "is_total": True,
-                "capacity_gb": format_decimal(total_capacity, format="#,##0"),
-                "free_space_gb": format_decimal(total_free, format="#,##0"),
-                "usage_gb": format_decimal(total_used, format="#,##0"),
-                "usage_pc_out": total_used_pc_out,
-            }
-            if not self.quiet:
-                self.totals["cluster_name"] += ":"
+        self.totals = {
+            "cluster_name": _("Total"),
+            "storage_type": "",
+            "vsphere_name": "",
+            "dc": "",
+            "is_total": True,
+            "capacity_gb": format_decimal(total_capacity, format="#,##0"),
+            "free_space_gb": format_decimal(total_free, format="#,##0"),
+            "usage_gb": format_decimal(total_used, format="#,##0"),
+            "usage_pc_out": total_used_pc_out,
+        }
+        if not self.quiet:
+            self.totals["cluster_name"] += ":"
 
         return cluster_list
 
     # -------------------------------------------------------------------------
-    def _get_cluster_fields_len(self, cluster_list, labels):
-
-        field_length = {}
-
-        for label in labels.keys():
-            field_length[label] = len(labels[label])
-
-        for cluster in cluster_list:
-            for label in labels.keys():
-                field = cluster[label]
-                if len(field) > field_length[label]:
-                    field_length[label] = len(field)
-
-        if self.totals:
-            for label in labels.keys():
-                field = self.totals[label]
-                if len(field) > field_length[label]:
-                    field_length[label] = len(field)
-
-        return field_length
-
-    # -------------------------------------------------------------------------
     def print_clusters(self, clusters):
         """Print on STDOUT all information about all datastore clusters."""
-        labels = {
-            "cluster_name": "Cluster",
-            "vsphere_name": "vSphere",
-            "dc": _("Data Center"),
-            "capacity_gb": _("Capacity in GB"),
-            "free_space_gb": _("Free space in GB"),
-            "usage_gb": _("Calculated usage in GB"),
-            "usage_pc_out": _("Usage in percent"),
-        }
+        show_footer = False
+        if self.print_total and not self.quiet:
+            show_footer = True
 
-        label_list = (
-            "cluster_name",
-            "vsphere_name",
-            "dc",
-            "capacity_gb",
-            "usage_gb",
-            "usage_pc_out",
-            "free_space_gb",
-        )
+        show_header = True
+        table_title = _("All datastore clusters") + "\n"
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            table_title = None
+            box_style = None
 
         cluster_list = self._get_cluster_list(clusters)
-        field_length = self._get_cluster_fields_len(cluster_list, labels)
-
-        max_len = 0
-        count = len(cluster_list)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += field_length[label]
-
-        if self.verbose > 2:
-            LOG.debug("Label length:\n" + pp(field_length))
-            LOG.debug("Max line length: {} chars".format(max_len))
-            LOG.debug("Datastore clusters:\n" + pp(cluster_list))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            if label in ("cluster_name", "vsphere_name", "dc"):
-                tpl += "{{{la}:<{le}}}".format(la=label, le=field_length[label])
-            else:
-                tpl += "{{{la}:>{le}}}".format(la=label, le=field_length[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
 
         if self.sort_keys:
             LOG.debug("Sorting keys: " + pp(self.sort_keys))
@@ -368,31 +322,70 @@ class GetStorageClusterListApp(BaseVmwareApplication):
                 else:
                     cluster_list.sort(key=itemgetter(key), reverse=True)
 
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
-
-        for cluster in cluster_list:
-            print(tpl.format(**cluster))
-
-        if self.totals:
-            if not self.quiet:
-                print("-" * max_len)
-            print(tpl.format(**self.totals))
-
-        if not self.quiet:
-            print()
+        if self.quiet:
+            caption = None
+        else:
+            count = len(cluster_list)
             if count:
-                msg = ngettext(
+                caption = "\n" + ngettext(
                     "Found one VMware storage cluster.",
                     "Found {} VMware storage clusters.",
                     count,
                 ).format(count)
             else:
-                msg = _("No VMware storage clusters found.")
+                caption = "\n" + _("No VMware storage clusters found.")
 
-            print(msg)
+        table = Table(
+            title=table_title,
+            title_style="bold cyan",
+            caption=caption,
+            caption_style="default on default",
+            caption_justify="left",
+            box=box_style,
+            show_header=show_header,
+            show_footer=show_footer,
+        )
+
+        table.add_column(header="Cluster", footer=_("Total"))
+        table.add_column(header=_("Type"), justify="center", footer="")
+        table.add_column(header=_("vSphere"), footer="")
+        table.add_column(header=_("Data Center"), footer="")
+        table.add_column(
+            header=_("Capacity in GB"), footer=self.totals["capacity_gb"], justify="right"
+        )
+        table.add_column(
+            header=_("Calculated usage in GB"), footer=self.totals["usage_gb"], justify="right"
+        )
+        table.add_column(
+            header=_("Usage in percent"), footer=self.totals["usage_pc_out"], justify="right"
+        )
+        table.add_column(
+            header=_("Free space in GB"), footer=self.totals["free_space_gb"], justify="right"
+        )
+
+        for cluster in cluster_list:
+            used_pc_out = Text(cluster["usage_pc_out"])
+            if cluster["usage_pc"] is None:
+                used_pc_out.stylize("bold magenta")
+            elif cluster["usage_pc"] >= 0.9:
+                used_pc_out.stylize("bold red")
+            elif cluster["usage_pc"] >= 0.8:
+                used_pc_out.stylize("bold yellow")
+
+            table.add_row(
+                cluster["cluster_name"],
+                cluster["storage_type"],
+                cluster["vsphere_name"],
+                cluster["dc"],
+                cluster["capacity_gb"],
+                cluster["usage_gb"],
+                used_pc_out,
+                cluster["free_space_gb"],
+            )
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
             print()
 
 

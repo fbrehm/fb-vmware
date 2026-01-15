@@ -20,6 +20,10 @@ from operator import itemgetter
 from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 
+from rich import box
+from rich.table import Table
+from rich.text import Text
+
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
@@ -28,7 +32,7 @@ from ..network import GeneralNetworksDict
 from ..network import VsphereNetwork
 from ..xlate import XLATOR
 
-__version__ = "1.7.0"
+__version__ = "1.8.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -201,9 +205,14 @@ class GetNetworkListApp(BaseVmwareApplication):
         all_dvs = []
 
         print()
+        show_header = True
         title = _("Distributed Virtual Switches")
-        print(self.colored(title, "cyan"))
-        print(self.colored("=" * len(title), "cyan"))
+        title += "\n" + ("=" * len(title))
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            title = None
+            box_style = None
 
         # -----------------------------
         def get_contact(dvs):
@@ -247,96 +256,123 @@ class GetNetworkListApp(BaseVmwareApplication):
                 }
                 all_dvs.append(dvs)
 
-        if len(all_dvs):
-            self._print_virtual_switches(all_dvs)
+        if not len(all_dvs):
+            c_title = Text(title, style="bold cyan")
+            self.rich_console.print(c_title)
+            print()
+            print(_("No Distributed Virtual Switches found."))
             return
 
-        print()
-        print(_("No Distributed Virtual Switches found."))
-
-    # -------------------------------------------------------------------------
-    def _print_virtual_switches(self, all_dvs):
-
-        labels = {
-            "vsphere": "vSphere",
-            "dc": _("Data Center"),
-            "name": _("Name"),
-            "contact": _("Contact"),
-            "create_time": _("Creation time"),
-            "description": _("Description"),
-            "hosts": _("Hosts"),
-            "ports": _("Ports"),
-            "standalone_ports": _("Standalone Ports"),
-            "ratio_reservation": _("Ratio reservation"),
-        }
-        label_list = (
-            "name",
-            "vsphere",
-            "dc",
-            "create_time",
-            "hosts",
-            "ports",
-            "standalone_ports",
-            "ratio_reservation",
-            "contact",
-            "description",
+        table = Table(
+            title=title,
+            title_style="bold cyan",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
         )
 
-        str_lengths = {}
-        for label in labels:
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for dvs in all_dvs:
-            for label in labels.keys():
-                val = dvs[label]
-                if val is None:
-                    val = "-"
-                    dvs[label] = val
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
-        if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            if label in ("hosts", "ports", "standalone_ports", "ratio_reservation"):
-                tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
-            else:
-                tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
+        table.add_column(header=_("Name"))
+        table.add_column(header=_("vSphere"))
+        table.add_column(header=_("Data Center"))
+        table.add_column(header=_("Creation time"))
+        table.add_column(header=_("Hosts"), justify="right")
+        table.add_column(header=_("Ports"), justify="right")
+        table.add_column(header=_("Standalone Ports"), justify="right")
+        table.add_column(header=_("Ratio reservation"), justify="right")
+        table.add_column(header=_("Contact"))
+        table.add_column(header=_("Description"))
 
         sort_keys = ["vsphere", "name"]
         all_dvs.sort(key=itemgetter(*sort_keys))
+
         for dvs in all_dvs:
-            count += 1
-            print(tpl.format(**dvs))
+            table.add_row(
+                dvs["name"],
+                dvs["vsphere"],
+                dvs["dc"],
+                dvs["create_time"],
+                dvs["hosts"],
+                dvs["ports"],
+                dvs["standalone_ports"],
+                dvs["ratio_reservation"],
+                dvs["description"],
+            )
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
+            print()
 
     # -------------------------------------------------------------------------
     def print_dv_portgroups(self):
         """Print on STDOUT all information about Distributed Virtual Port Groups."""
-        all_dvpgs = []
-
         print()
+
+        show_header = True
         title = _("Distributed Virtual Port Groups")
-        print(self.colored(title, "cyan"))
-        print(self.colored("=" * len(title), "cyan"))
+        title += "\n" + ("=" * len(title))
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            title = None
+            box_style = None
+
+        all_dvpgs = self._perform_dv_portgroups()
+
+        sort_keys = ["vsphere", "name"]
+        all_dvpgs.sort(key=itemgetter(*sort_keys))
+
+        if not len(all_dvpgs):
+            c_title = Text(title, style="bold cyan")
+            self.rich_console.print(c_title)
+            print()
+            print(_("No Distributed Virtual Port Groups found."))
+            return
+
+        table = Table(
+            title=title,
+            title_style="bold cyan",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
+        )
+
+        table.add_column(header=_("Name"))
+        table.add_column(header=_("vSphere"))
+        table.add_column(header=_("Data Center"))
+        table.add_column(header="DV Switch")
+        table.add_column(header="VLAN ID", justify="right")
+        table.add_column(header=_("Network"))
+        table.add_column(header=_("Accessible"), justify="center")
+        table.add_column(header=_("Type"))
+        table.add_column(header=_("Ports"), justify="right")
+        table.add_column(header=_("Uplink"), justify="center")
+        table.add_column(header=_("Description"))
+
+        for dvpg in all_dvpgs:
+            table.add_row(
+                dvpg["name"],
+                dvpg["vsphere"],
+                dvpg["dc"],
+                dvpg["dvs"],
+                dvpg["vlan_id"],
+                dvpg["network"],
+                dvpg["accessible"],
+                dvpg["type"],
+                dvpg["num_ports"],
+                dvpg["uplink"],
+                dvpg["description"],
+            )
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
+            print()
+
+    # -------------------------------------------------------------------------
+    def _perform_dv_portgroups(self):
+
+        all_dvpgs = []
 
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].dv_portgroups.keys():
@@ -351,9 +387,12 @@ class GetNetworkListApp(BaseVmwareApplication):
                 uplink = _("No")
                 if this_dvpg.uplink:
                     uplink = _("Yes")
+
                 accessible = "No"
                 if this_dvpg.accessible:
-                    accessible = _("Yes")
+                    accessible = Text(_("Yes"), style="bold green")
+                else:
+                    accessible = Text(_("No"), style="bold red")
 
                 dc_name = "~"
                 if this_dvpg.dc_name:
@@ -378,96 +417,66 @@ class GetNetworkListApp(BaseVmwareApplication):
                 }
                 all_dvpgs.append(dvpg)
 
-        if len(all_dvpgs):
-            self._print_dv_portgroups(all_dvpgs)
-            return
-
-        print()
-        print(_("No Distributed Virtual Port Groups found."))
-
-    # -------------------------------------------------------------------------
-    def _print_dv_portgroups(self, all_dvpgs):
-
-        labels = {
-            "vsphere": "vSphere",
-            "dc": "DC",
-            "name": _("Name"),
-            "dvs": "DV Switch",
-            "vlan_id": "VLAN ID",
-            "network": _("Network"),
-            "accessible": _("Accessible"),
-            "num_ports": _("Ports"),
-            "type": _("Type"),
-            "uplink": _("Uplink"),
-            "description": _("Description"),
-        }
-        label_list = (
-            "name",
-            "vsphere",
-            "dc",
-            "dvs",
-            "vlan_id",
-            "network",
-            "accessible",
-            "type",
-            "num_ports",
-            "uplink",
-            "description",
-        )
-
-        str_lengths = {}
-        for label in labels:
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for dvpg in all_dvpgs:
-            for label in labels.keys():
-                val = dvpg[label]
-                if val is None:
-                    val = "-"
-                    dvpg[label] = val
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
-        if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            if label in ("num_ports", "vlan_id"):
-                tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
-            else:
-                tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
-
-        for dvpg in all_dvpgs:
-            count += 1
-            print(tpl.format(**dvpg))
+        return all_dvpgs
 
     # -------------------------------------------------------------------------
     def print_networks(self):
         """Print on STDOUT all information about Virtual Networks."""
-        all_networks = []
-
         print()
+
+        show_header = True
         title = _("Virtual Networks")
-        print(self.colored(title, "cyan"))
-        print(self.colored("=" * len(title), "cyan"))
+        title += "\n" + ("=" * len(title))
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            title = None
+            box_style = None
+
+        all_networks = self._perform_networks()
+
+        if not len(all_networks):
+            c_title = Text(title, style="bold cyan")
+            self.rich_console.print(c_title)
+            print()
+            print(_("No Virtual Networks found."))
+            return
+
+        sort_keys = ["vsphere", "name"]
+        all_networks.sort(key=itemgetter(*sort_keys))
+
+        table = Table(
+            title=title,
+            title_style="bold cyan",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
+        )
+
+        table.add_column(header=_("Name"))
+        table.add_column(header=_("vSphere"))
+        table.add_column(header=_("Data Center"))
+        table.add_column(header=_("Network"))
+        table.add_column(header=_("Accessible"), justify="center")
+
+        for network in all_networks:
+            table.add_row(
+                network["name"],
+                network["vsphere"],
+                network["dc"],
+                network["network"],
+                network["accessible"],
+            )
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
+            print()
+
+    # -------------------------------------------------------------------------
+    def _perform_networks(self):
+
+        all_networks = []
 
         for vsphere_name in self.vsphere:
             for name in self.vsphere[vsphere_name].networks.keys():
@@ -475,9 +484,12 @@ class GetNetworkListApp(BaseVmwareApplication):
                 network = "~"
                 if this_network.network:
                     network = str(this_network.network)
+
                 accessible = "No"
                 if this_network.accessible:
-                    accessible = _("Yes")
+                    accessible = Text(_("Yes"), style="bold green")
+                else:
+                    accessible = Text(_("No"), style="bold red")
 
                 dc_name = "~"
                 if this_network.dc_name:
@@ -492,65 +504,7 @@ class GetNetworkListApp(BaseVmwareApplication):
                 }
                 all_networks.append(net)
 
-        if len(all_networks):
-            self._print_networks(all_networks)
-            return
-
-        print()
-        print(_("No Virtual Networks found."))
-
-    # -------------------------------------------------------------------------
-    def _print_networks(self, all_networks):
-
-        labels = {
-            "vsphere": "vSphere",
-            "dc": _("Data Center"),
-            "name": _("Name"),
-            "network": _("Network"),
-            "accessible": _("Accessible"),
-        }
-        label_list = ("name", "vsphere", "dc", "network", "accessible")
-
-        str_lengths = {}
-        for label in labels:
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for net in all_networks:
-            for label in labels.keys():
-                val = net[label]
-                if val is None:
-                    val = "-"
-                    net[label] = val
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
-        if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
-
-        for net in all_networks:
-            count += 1
-            print(tpl.format(**net))
+        return all_networks
 
 
 # =============================================================================
@@ -567,7 +521,11 @@ def main():
     if app.verbose > 2:
         print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
 
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        print("\n" + app.colored(_("User interrupt."), "YELLOW"))
+        sys.exit(5)
 
     sys.exit(0)
 

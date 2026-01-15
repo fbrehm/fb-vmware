@@ -18,18 +18,25 @@ import sys
 from operator import itemgetter
 
 # Third party modules
+from babel.numbers import format_decimal
+
 from fb_tools.argparse_actions import RegexOptionAction
 from fb_tools.common import pp
 from fb_tools.spinner import Spinner
 from fb_tools.xlate import format_list
 
+from rich import box
+from rich.table import Table
+from rich.text import Text
+
 # Own modules
 from . import BaseVmwareApplication, VmwareAppError
 from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
+from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.4.0"
+__version__ = "1.5.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -269,6 +276,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         summary["online"] = host.online
         summary["no_portgroups"] = str(len(host.portgroups))
         summary["power_state"] = host.power_state
+        summary["standby"] = host.standby
         summary["os_name"] = host.product.name
         summary["os_version"] = host.product.os_version
         summary["quarantaine"] = host.quarantaine
@@ -278,107 +286,112 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def print_hosts(self, hosts):
         """Print on STDOUT all information about all hosts in a human readable format."""
-        labels = {
-            "vsphere": "vSphere",
-            "dc": "DC",
-            "cluster": "Cluster",
-            "name": "Host",
-            "connection_state": _("Connect state"),
-            "cpus": _("CPU cores/threads"),
-            "memory_gb": _("Memory in GiB"),
-            "vendor": _("Vendor"),
-            "model": _("Model"),
-            "maintenance": _("Maintenance"),
-            "online": _("Online"),
-            # 'no_portgroups': _('Portgroups'),
-            "power_state": _("Power State"),
-            "os_name": _("OS Name"),
-            "os_version": _("OS Version"),
-            # 'quarantaine': _('Quarantaine'),
-        }
-
-        label_list = (
-            "name",
-            "dc",
-            "vsphere",
-            "cluster",
-            "vendor",
-            "model",
-            "os_name",
-            "os_version",
-            "cpus",
-            "memory_gb",
-            "power_state",
-            "connection_state",
-            "online",
-            "maintenance",
-        )
-
-        str_lengths = {}
-        for label in labels:
-            str_lengths[label] = len(labels[label])
-
-        max_len = 0
-        count = 0
-        for host in hosts:
-            for label in labels.keys():
-                val = host[label]
-                if val is None:
-                    val = "-"
-                    host[label] = val
-                else:
-                    if label == "memory_gb":
-                        val = "{:7.1f}".format(val)
-                        host[label] = val
-                    elif label in ("connection_state", "maintenance", "online", "quarantaine"):
-                        if val:
-                            val = _("Yes")
-                        else:
-                            val = _("No")
-                        host[label] = val
-                if len(val) > str_lengths[label]:
-                    str_lengths[label] = len(val)
-
-        for label in labels.keys():
-            if max_len:
-                max_len += 2
-            max_len += str_lengths[label]
-
-        if self.verbose > 1:
-            LOG.debug("Label length:\n" + pp(str_lengths))
-            LOG.debug("Max line length: {} chars".format(max_len))
-
-        tpl = ""
-        for label in label_list:
-            if tpl != "":
-                tpl += "  "
-            if label in ("memory_gb", "cpus", "no_portgroups"):
-                tpl += "{{{la}:>{le}}}".format(la=label, le=str_lengths[label])
-            else:
-                tpl += "{{{la}:<{le}}}".format(la=label, le=str_lengths[label])
-        if self.verbose > 1:
-            LOG.debug(_("Line template: {}").format(tpl))
-
-        if not self.quiet:
-            print()
-            print(tpl.format(**labels))
-            print("-" * max_len)
-
         hosts.sort(key=itemgetter(*self.sort_keys))
 
+        show_header = True
+        table_title = _("All physical hosts") + "\n"
+        box_style = box.ROUNDED
+        if self.quiet:
+            show_header = False
+            table_title = None
+            box_style = None
+
+        if self.quiet:
+            caption = None
+        else:
+            count = len(hosts)
+            if count:
+                caption = "\n" + ngettext(
+                    "Found one VMware host.",
+                    "Found {} VMware hosts.",
+                    count,
+                ).format(count)
+            else:
+                caption = "\n" + _("Found no VMware hosts.")
+
+        table = Table(
+            title=table_title,
+            title_style="bold cyan",
+            caption=caption,
+            caption_style="default on default",
+            caption_justify="left",
+            box=box_style,
+            show_header=show_header,
+            show_footer=False,
+        )
+
+        table.add_column(header=_("Host"))
+        table.add_column(header=_("vSphere"))
+        table.add_column(header=_("Data Center"))
+        table.add_column(header=_("Cluster"))
+        table.add_column(header=_("Vendor"))
+        table.add_column(header=_("Model"))
+        table.add_column(header=_("OS Name"))
+        table.add_column(header=_("OS Version"))
+        table.add_column(header=_("CPU cores/threads"), justify="right")
+        table.add_column(header=_("Memory in GiB"), justify="right")
+        table.add_column(header=_("Power State"))
+        table.add_column(header=_("Connect state"))
+        table.add_column(header=_("StandBy state"), justify="center")
+        table.add_column(header=_("Maintenance"), justify="center")
+
         for host in hosts:
-            count += 1
-            print(tpl.format(**host))
+            row = []
+
+            row.append(host["name"])
+            row.append(host["vsphere"])
+            row.append(host["dc"])
+            row.append(host["cluster"])
+            row.append(host["vendor"])
+            row.append(host["model"])
+            row.append(host["os_name"])
+            row.append(host["os_version"])
+            row.append(host["cpus"])
+            row.append(format_decimal(host["memory_gb"], format="#,##0"))
+
+            power_state = host["power_state"]
+            if power_state in VsphereHost.power_state_label:
+                power_state = VsphereHost.power_state_label[power_state]
+            p_state = Text(power_state)
+            if host["power_state"].lower() == "poweredon":
+                p_state.stylize("bold green")
+            elif host["power_state"].lower() == "poweredoff":
+                p_state.stylize("bold red")
+            elif host["power_state"].lower() == "standby":
+                p_state.stylize("bold blue")
+            else:
+                p_state.stylize("bold magenta")
+            row.append(p_state)
+
+            connection_state = host["connection_state"]
+            if connection_state in VsphereHost.connect_state_label:
+                connection_state = VsphereHost.connect_state_label[connection_state]
+            c_state = Text(connection_state)
+            if host["connection_state"].lower() == "connected":
+                c_state.stylize("bold green")
+            elif host["connection_state"].lower() == "disconnected":
+                c_state.stylize("bold red")
+            else:
+                c_state.stylize("bold magenta")
+            row.append(c_state)
+
+            standby = host["standby"]
+            if standby == "none":
+                standby = "~"
+            if standby in VsphereHost.standby_mode_label:
+                standby = VsphereHost.standby_mode_label[standby]
+            row.append(standby)
+
+            m_state = Text(_("No"), style="bold green")
+            if host["maintenance"]:
+                m_state = Text(_("Yes"), style="bold yellow")
+            row.append(m_state)
+
+            table.add_row(*row)
+
+        self.rich_console.print(table)
 
         if not self.quiet:
-            print()
-            if count == 0:
-                msg = _("Found no VMware hosts.")
-            else:
-                msg = ngettext("Found one VMware host.", "Found {} VMware hosts.", count).format(
-                    count
-                )
-            print(msg)
             print()
 
     # -------------------------------------------------------------------------
@@ -416,7 +429,11 @@ def main():
     if app.verbose > 2:
         print(_("{c}-Object:\n{a}").format(c=app.__class__.__name__, a=app), file=sys.stderr)
 
-    app()
+    try:
+        app()
+    except KeyboardInterrupt:
+        print("\n" + app.colored(_("User interrupt."), "YELLOW"))
+        sys.exit(5)
 
     sys.exit(0)
 

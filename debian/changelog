@@ -1,3 +1,10 @@
+fb-vmware (1.8.0) all; urgency=medium
+
+  * Refactoring datastore classes and implemented better search for them
+  * See CHANGELOG.md for all changes
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 15 Jan 2026 15:32:43 +0100
+
 fb-vmware (1.7.1) all; urgency=medium
 
   * Removing pointless data/.gitkeep.

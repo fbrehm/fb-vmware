@@ -29,7 +29,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "0.5.0"
+__version__ = "1.1.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -298,6 +298,24 @@ class VsphereDVS(VsphereObject):
             raise VSphereHandlerError(msg)
 
         self._vsphere = val
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vim.DistributedVirtualSwitch, True
+        )
+        for c in container.view:
+            if c.name == self.name:
+                obj = c
+                break
+
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
@@ -706,6 +724,24 @@ class VsphereDvPortGroup(VsphereNetwork):
             self._uplink = None
             return
         self._uplink = to_bool(value)
+
+    # -----------------------------------------------------------
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        obj = None
+        if not self.name:
+            return None
+
+        content = service_instance.RetrieveContent()
+        container = content.viewManager.CreateContainerView(
+            content.rootFolder, vim.dvs.DistributedVirtualPortgroup, True
+        )
+        for c in container.view:
+            if c.name == self.name:
+                obj = c
+                break
+
+        return obj
 
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):

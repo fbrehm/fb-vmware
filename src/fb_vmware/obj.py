@@ -13,17 +13,20 @@ from __future__ import absolute_import
 import copy
 import logging
 import re
+from abc import ABCMeta, abstractmethod
 
 # Third party modules
 from fb_tools.common import RE_TF_NAME
 from fb_tools.common import pp
 from fb_tools.obj import FbBaseObject
 
+from six import add_metaclass
+
 # Own modules
 from .errors import VSphereNameError
 from .xlate import XLATOR
 
-__version__ = "1.3.5"
+__version__ = "1.5.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -33,6 +36,7 @@ OBJ_STATUS_GREEN = "green"
 
 
 # =============================================================================
+@add_metaclass(ABCMeta)
 class VsphereObject(FbBaseObject):
     """
     A base class for some other vSphere classes.
@@ -216,6 +220,16 @@ class VsphereObject(FbBaseObject):
         """Return the name of the variable used in terraform definitions."""
         return self.obj_type + "_" + RE_TF_NAME.sub("_", self.name.lower())
 
+    # -----------------------------------------------------------
+    @abstractmethod
+    def get_pyvmomi_obj(self, service_instance):
+        """Return the appropriate PyVMomi object for the current object."""
+        raise RuntimeError(
+            "The method get_pyvmomi_obj() has to be redefined for class {}.".format(
+                self.__class__.__name__
+            )
+        )
+
     # -------------------------------------------------------------------------
     def as_dict(self, short=True):
         """
@@ -318,6 +332,21 @@ class VsphereObject(FbBaseObject):
             return True
 
         return self.qual_name > other.qual_name
+
+    # -------------------------------------------------------------------------
+    def get_parents(self, managed_object):
+        """Get the parents of a managed object as an array."""
+        parents = []
+        if hasattr(managed_object, "parent") and managed_object.parent is not None:
+            parent = managed_object.parent
+            grand_parents = self.get_parents(parent)
+            if grand_parents:
+                parents = grand_parents
+            parents += [(parent.__class__.__name__, parent.name)]
+
+            return parents
+
+        return None
 
 
 # =============================================================================

@@ -58,7 +58,13 @@ class TestVMWareObject(FbVMWareTestcase):
         obj_type = "testobject"
         obj_name = "Test-Object"
 
-        gen_obj = VsphereObject(
+        class TestVsphereObject(VsphereObject):
+            """Only for tests."""
+
+            def get_pyvmomi_obj(self, service_instance):
+                pass
+
+        gen_obj = TestVsphereObject(
             name=obj_name,
             obj_type=obj_type,
             appname=self.appname,

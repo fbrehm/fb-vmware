@@ -33,6 +33,7 @@ dependencies = [
     "pyvmomi",
     "PyYAML",
     "requests",
+    "rich",
     "semver",
     "six",
 ]
@@ -49,10 +50,12 @@ directory = "data"
 [project.scripts]
 get-vsphere-host-list = "fb_vmware.app.get_host_list:main"
 get-vsphere-network-list = "fb_vmware.app.get_network_list:main"
+get-vsphere-storage-cluster-info =  "fb_vmware.app.get_storage_cluster_info:main"
 get-vsphere-storage-cluster-list = "fb_vmware.app.get_storage_cluster_list:main"
 get-vsphere-storage-list = "fb_vmware.app.get_storage_list:main"
 get-vsphere-vm-info = "fb_vmware.app.get_vm_info:main"
 get-vsphere-vm-list = "fb_vmware.app.get_vm_list:main"
+search-vsphere-storage = "fb_vmware.app.search_storage:main"
 
 [project.optional-dependencies]
 development = [

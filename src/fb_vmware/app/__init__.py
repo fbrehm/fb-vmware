@@ -42,7 +42,7 @@ from ..xlate import __lib_dir__ as __xlate_lib_dir__
 from ..xlate import __mo_file__ as __xlate_mo_file__
 from ..xlate import __module_dir__ as __xlate_module_dir__
 
-__version__ = "1.7.1"
+__version__ = "1.7.2"
 LOG = logging.getLogger(__name__)
 TZ = pytz.timezone("Europe/Berlin")
 
@@ -416,7 +416,7 @@ class BaseVmwareApplication(FbConfigApplication):
         vsphere = self.vsphere[vs_name]
 
         if not dc_name:
-            raise VmwareAppError(_("No virtual databenter name given."))
+            raise VmwareAppError(_("No virtual datacenter name given."))
         vsphere.get_datacenters()
         if dc_name not in vsphere.datacenters:
             msg = _("Datacenter {dc} not found in vSphere {vs}.").format(
@@ -468,7 +468,7 @@ class BaseVmwareApplication(FbConfigApplication):
             return (cluster_name, cluster_type[cluster_name])
 
         cluster_name = Prompt.ask(
-            _("Select a computing resource, which should be conneted with the storage location"),
+            _("Select a computing resource, which should be connected with the storage location"),
             choices=sorted(cluster_list, key=str.lower),
             show_choices=True,
             console=self.rich_console,

@@ -32,7 +32,7 @@ from ..errors import VSphereNoDatastoreFoundError
 from ..errors import VSphereNoDsClusterFoundError
 from ..xlate import XLATOR
 
-__version__ = "0.6.1"
+__version__ = "0.6.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -249,7 +249,7 @@ class SearchStorageApp(BaseVmwareApplication):
     def get_storages(self):
         """Retrieve all datastore clusters and storages in current vSphere and datacenter."""
         LOG.info(
-            _("Collect all atastore clusters and storages in current vSphere and datacenter.")
+            _("Collect all datastore clusters and storages in current vSphere and datacenter.")
         )
 
         self.get_datastore_clusters()

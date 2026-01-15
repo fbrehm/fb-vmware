@@ -859,7 +859,7 @@ msgid ""
 "{cl_type} {cl} for a disk of {sz} of type {st_type}."
 msgstr ""
 "Suche Speicherort in vSphere {vs}, virtuelles Rechenzentrum {dc}, verbunden mit dem {cl_type} "
-"{cl}  für eine Platte vom Typ {st_type}."
+"{cl} für eine Platte vom Typ {st_type}."
 
 #: src/fb_vmware/app/search_storage.py:252
 msgid "Collect all datastore clusters and storages in current vSphere and datacenter."

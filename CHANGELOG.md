@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-01-15
+
+### Added
+
+* Adding methods `get_all_objects()` and `get_parents()` to class BaseVsphereHandler.
+* Adding method `get_vm_direct()` to class VsphereConnection.
+* Adding method `get_pyvmomi_obj()` to different classes.
+* Adding script `get-vsphere-storage-cluster-info`
+* Adding method `search_space` to classes VsphereDatastoreDict and VsphereDsClusterDict.
+* Adding script `search-vsphere-storage`.
+
+### Changed
+
+* Implementingmethod `get_vm_list()` to class VsphereConnection and using it in scripts
+  `get-vsphere-vm-list` and `get-vsphere-vm-info`.
+* Changing command line arguments for `get-vsphere-vm-list`.
+* Collect connected hosts to a datastore.
+* Refactoring all info scripts to use Python-Rich tables.
+* Applying black to all Python scripts.
+
 ## [1.7.1] - 2025-11-28
 
 ### Fixed

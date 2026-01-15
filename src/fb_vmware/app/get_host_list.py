@@ -36,7 +36,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.3"
+__version__ = "1.5.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -74,7 +74,7 @@ class GetHostsListApplication(BaseVmwareApplication):
     ):
         """Initialize a GetHostsListApplication object."""
         desc = _(
-            "Tries to get a list of all physical hosts in " "VMware vSphere and print it out."
+            "Tries to get a list of all physical hosts in VMware vSphere and print it out."
         )
 
         self._host_pattern = self.default_host_pattern

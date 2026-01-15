@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.7.0"
+__version__ = "1.8.0"
 LOG = logging.getLogger(__name__)
 
 
@@ -34,6 +34,8 @@ _ = XLATOR.gettext
 # =============================================================================
 class VsphereCluster(VsphereObject):
     """An object for encapsulating a vSphere calculation cluster object."""
+
+    default_resource_pool_name = "Resources"
 
     # -------------------------------------------------------------------------
     def __init__(
@@ -46,6 +48,7 @@ class VsphereCluster(VsphereObject):
         dc_name=None,
         name=None,
         status=DEFAULT_OBJ_STATUS,
+        resource_pool_name=None,
         cpu_cores=0,
         cpu_threads=0,
         config_status=DEFAULT_OBJ_STATUS,
@@ -81,6 +84,7 @@ class VsphereCluster(VsphereObject):
         self._mem_total = None
         self._standalone = False
         self._dc_name = None
+        self._resource_pool_name = self.default_resource_pool_name
         self.networks = []
         self.datastores = []
         self.resource_pool = None
@@ -106,6 +110,9 @@ class VsphereCluster(VsphereObject):
         self.mem_total = mem_total
         self.standalone = standalone
 
+        if resource_pool_name is not None and str(resource_pool_name).strip() != "":
+            self._resource_pool_name = str(resource_pool_name).strip() != ""
+
         if initialized is not None:
             self.initialized = initialized
 
@@ -130,9 +137,15 @@ class VsphereCluster(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def base_resource_pool_name(self):
+        """Return the base name of the default resource pool of this cluster."""
+        return self._resource_pool_name
+
+    # -----------------------------------------------------------
+    @property
     def resource_pool_name(self):
         """Return the name of the default resource pool of this cluster."""
-        return self.name + "/Resources"
+        return self.name + "/" + self.base_resource_pool_name
 
     # -----------------------------------------------------------
     @property
@@ -307,6 +320,7 @@ class VsphereCluster(VsphereObject):
         res = super(VsphereCluster, self).as_dict(short=short)
 
         res["dc_name"] = self.dc_name
+        res["base_resource_pool_name"] = self.base_resource_pool_name
         res["resource_pool_name"] = self.resource_pool_name
         res["resource_pool_var"] = self.resource_pool_var
         res["cpu_cores"] = self.cpu_cores
@@ -340,6 +354,7 @@ class VsphereCluster(VsphereObject):
             initialized=self.initialized,
             name=self.name,
             dc_name=self.dc_name,
+            resource_pool_name=self.base_resource_pool_name,
             standalone=self.standalone,
             status=self.status,
             cpu_cores=self.cpu_cores,
@@ -388,6 +403,7 @@ class VsphereCluster(VsphereObject):
             "base_dir": base_dir,
             "initialized": True,
             "dc_name": dc_name,
+            "resource_pool_name": self.default_resource_pool_name,
             "name": data.name,
             "status": data.overallStatus,
             "config_status": data.configStatus,
@@ -401,6 +417,9 @@ class VsphereCluster(VsphereObject):
         }
         if isinstance(data, vim.ClusterComputeResource):
             params["standalone"] = False
+
+        if hasattr(data, "resourcePool"):
+            params["resource_pool_name"] = data.resourcePool.summary.name
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))

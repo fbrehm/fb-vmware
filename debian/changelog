@@ -1,4 +1,4 @@
-fb-vmware (1.8.0) UNRELEASED; urgency=medium
+fb-vmware (1.8.0) all; urgency=medium
 
   * Refactoring datastore classes and implemented better search for them
   * See CHANGELOG.md for all changes

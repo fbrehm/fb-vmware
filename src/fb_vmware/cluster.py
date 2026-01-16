@@ -19,12 +19,13 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
 from .errors import VSphereNameError
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.9.1"
+__version__ = "1.9.2"
 LOG = logging.getLogger(__name__)
 
 

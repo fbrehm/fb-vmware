@@ -394,7 +394,7 @@ class VsphereHost(VsphereObject):
     # -----------------------------------------------------------
     @property
     def vsphere(self):
-        """Return the name of the vSphere from configuration, of thr host."""
+        """Return the name of the vSphere from configuration of the host."""
         return self._vsphere
 
     @vsphere.setter

@@ -15,7 +15,7 @@ import logging
 import pathlib
 import re
 import sys
-from operator import itemgetter
+from operator import attrgetter
 
 # Third party modules
 from babel.numbers import format_decimal
@@ -36,7 +36,7 @@ from ..cluster import VsphereCluster
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -143,8 +143,56 @@ class GetResPoolListApplication(BaseVmwareApplication):
         ret = 0
         all_rpools = []
 
+        if self.verbose:
+            for vsphere_name in self.vsphere:
+                all_rpools += self.get_resource_pools(vsphere_name)
+        elif not self.quiet:
+            spin_prompt = _("Getting all vSphere hosts ...") + " "
+            spinner_name = self.get_random_spinner_name()
+            with Spinner(spin_prompt, spinner_name):
+                for vsphere_name in self.vsphere:
+                    all_rpools += self.get_resource_pools(vsphere_name)
+            sys.stdout.write(" " * len(spin_prompt))
+            sys.stdout.write("\r")
+            sys.stdout.flush()
+
+        all_rpools.sort(key=attrgetter(*self.sort_keys))
+
+        if len(all_rpools):
+            out_list = []
+            out = ""
+            if self.verbose == 2:
+                LOG.debug(_("First computing resource:") + "\n" + pp(all_rpools[0].as_dict()))
+                for rpool in all_rpools:
+                    out_list.append(
+                        f" * Vsphere {rpool.vsphere:<10} - DC {rpool.dc_name:<12} - {rpool.name}")
+                out = "\n".join(out_list)
+            elif self.verbose > 2:
+                for rpool in all_rpools:
+                    out_list.append(rpool.as_dict())
+                out = pp(out_list)
+            if self.verbose >= 2:
+                LOG.debug("All computing resources:\n{}".format(out))
+        else:
+            LOG.error(_("Did not found any resource pools od cluster resource pools."))
+            ret = 3
+
 
         return ret
+
+    # -------------------------------------------------------------------------
+    def get_resource_pools(self, vsphere_name):
+        """Get all host of all (cluster) computing resources in a VMware vSphere."""
+        clusters = []
+
+        vsphere = self.vsphere[vsphere_name]
+
+        vsphere.get_clusters(vsphere_name=vsphere_name)
+
+        for cluster in sorted(vsphere.clusters):
+            clusters.append(cluster)
+
+        return clusters
 
 # =============================================================================
 def main():

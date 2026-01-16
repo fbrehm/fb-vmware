@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## {Unreleased] - 2026-01-16
+
+### Added
+
+* Adding script `get-vsphere-cluster-list`.
+
+### Changed
+
+* Trying to get name of the resource pool of a computing cluster from UI.
+* Some minor fixes.
+
 ## [1.8.0] - 2026-01-15
 
 ### Added

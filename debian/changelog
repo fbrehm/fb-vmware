@@ -1,3 +1,9 @@
+fb-vmware (1.8.1) UNRELEASED; urgency=medium
+
+  * Adding script get-vsphere-cluster-list.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Fri, 16 Jan 2026 16:38:38 +0100
+
 fb-vmware (1.8.0) all; urgency=medium
 
   * Refactoring datastore classes and implemented better search for them

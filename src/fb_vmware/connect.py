@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.11.1"
+__version__ = "2.11.3"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -279,11 +279,14 @@ class VsphereConnection(BaseVsphereHandler):
         return
 
     # -------------------------------------------------------------------------
-    def get_clusters(self, search_in_dc=None, disconnect=False):
+    def get_clusters(self, vsphere_name=None, search_in_dc=None, disconnect=False):
         """Get all computing clusters from vSphere as VsphereCluster objects."""
         LOG.debug(_("Trying to get all clusters from vSphere ..."))
 
         self.clusters = []
+
+        if vsphere_name is None:
+            vsphere_name = self.name
 
         try:
 
@@ -302,7 +305,7 @@ class VsphereConnection(BaseVsphereHandler):
                 dc = self.get_obj(content, [vim.Datacenter], dc_name)
 
                 for child in dc.hostFolder.childEntity:
-                    self._get_clusters(child, dc_name=dc_name)
+                    self._get_clusters(child, vsphere_name=vsphere_name, dc_name=dc_name)
 
         finally:
             if disconnect:
@@ -320,13 +323,21 @@ class VsphereConnection(BaseVsphereHandler):
             LOG.debug(_("Found clusters:") + "\n" + pp(out))
 
     # -------------------------------------------------------------------------
-    def _get_clusters(self, child, dc_name=None, depth=1):
+    def _get_clusters(self, child, vsphere_name=None, dc_name=None, depth=1):
+
+        if vsphere_name is None:
+            vsphere_name = self.name
 
         if hasattr(child, "childEntity"):
             if depth > self.max_search_depth:
                 return
             for sub_child in child.childEntity:
-                self._get_clusters(sub_child, dc_name, depth + 1)
+                self._get_clusters(
+                    sub_child,
+                    vsphere_name=vsphere_name,
+                    dc_name=dc_name,
+                    depth=(depth + 1),
+                )
             return
 
         if isinstance(child, (vim.ClusterComputeResource, vim.ComputeResource)):
@@ -335,6 +346,7 @@ class VsphereConnection(BaseVsphereHandler):
                 appname=self.appname,
                 verbose=self.verbose,
                 base_dir=self.base_dir,
+                vsphere=vsphere_name,
                 dc_name=dc_name,
             )
             if self.verbose > 1:
@@ -891,6 +903,7 @@ class VsphereConnection(BaseVsphereHandler):
         if isinstance(child, (vim.ClusterComputeResource, vim.ComputeResource)):
             cluster = VsphereCluster.from_summary(
                 child,
+                vsphere=vsphere_name,
                 dc_name=dc_name,
                 appname=self.appname,
                 verbose=self.verbose,

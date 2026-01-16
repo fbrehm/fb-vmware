@@ -102,7 +102,9 @@ class TestVMCluster(FbVMWareTestcase):
         data.datastore = []
         data.datastore.append(ds1)
         data.datastore.append(ds2)
-        data.resourcePool = None
+        data.resourcePool = SimpleTestObject()
+        data.resourcePool.summary = SimpleTestObject()
+        data.resourcePool.summary.name = 'Resources'
 
         data.summary.numCpuCores = 144
         data.summary.numCpuThreads = 288

@@ -19,12 +19,13 @@ from fb_tools.xlate import format_list
 from pyVmomi import vim
 
 # Own modules
+from .errors import VSphereHandlerError
 from .errors import VSphereNameError
 from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.7.0"
+__version__ = "1.9.2"
 LOG = logging.getLogger(__name__)
 
 
@@ -35,6 +36,8 @@ _ = XLATOR.gettext
 class VsphereCluster(VsphereObject):
     """An object for encapsulating a vSphere calculation cluster object."""
 
+    default_resource_pool_name = "Resources"
+
     # -------------------------------------------------------------------------
     def __init__(
         self,
@@ -43,9 +46,11 @@ class VsphereCluster(VsphereObject):
         version=__version__,
         base_dir=None,
         initialized=None,
+        vsphere=None,
         dc_name=None,
         name=None,
         status=DEFAULT_OBJ_STATUS,
+        resource_pool_name=None,
         cpu_cores=0,
         cpu_threads=0,
         config_status=DEFAULT_OBJ_STATUS,
@@ -80,7 +85,9 @@ class VsphereCluster(VsphereObject):
         self._mem_mb_effective = None
         self._mem_total = None
         self._standalone = False
+        self._vsphere = None
         self._dc_name = None
+        self._resource_pool_name = self.default_resource_pool_name
         self.networks = []
         self.datastores = []
         self.resource_pool = None
@@ -98,6 +105,8 @@ class VsphereCluster(VsphereObject):
         )
 
         self.dc_name = dc_name
+        if vsphere is not None:
+            self.vsphere = vsphere
         self.cpu_cores = cpu_cores
         self.cpu_threads = cpu_threads
         self.hosts_effective = hosts_effective
@@ -106,8 +115,30 @@ class VsphereCluster(VsphereObject):
         self.mem_total = mem_total
         self.standalone = standalone
 
+        if resource_pool_name is not None and str(resource_pool_name).strip() != "":
+            self._resource_pool_name = str(resource_pool_name).strip()
+
         if initialized is not None:
             self.initialized = initialized
+
+    # -----------------------------------------------------------
+    @property
+    def vsphere(self):
+        """Return the name of the vSphere from configuration of the cluster."""
+        return self._vsphere
+
+    @vsphere.setter
+    def vsphere(self, value):
+        if value is None:
+            self._vsphere = None
+            return
+
+        val = str(value).strip()
+        if val == "":
+            msg = _("The name of the vSphere may not be empty.")
+            raise VSphereHandlerError(msg)
+
+        self._vsphere = val
 
     # -----------------------------------------------------------
     @property
@@ -130,9 +161,15 @@ class VsphereCluster(VsphereObject):
 
     # -----------------------------------------------------------
     @property
+    def base_resource_pool_name(self):
+        """Return the base name of the default resource pool of this cluster."""
+        return self._resource_pool_name
+
+    # -----------------------------------------------------------
+    @property
     def resource_pool_name(self):
         """Return the name of the default resource pool of this cluster."""
-        return self.name + "/Resources"
+        return f"{self.name}/{self.base_resource_pool_name}"
 
     # -----------------------------------------------------------
     @property
@@ -306,7 +343,9 @@ class VsphereCluster(VsphereObject):
         """
         res = super(VsphereCluster, self).as_dict(short=short)
 
+        res["vsphere"] = self.vsphere
         res["dc_name"] = self.dc_name
+        res["base_resource_pool_name"] = self.base_resource_pool_name
         res["resource_pool_name"] = self.resource_pool_name
         res["resource_pool_var"] = self.resource_pool_var
         res["cpu_cores"] = self.cpu_cores
@@ -339,7 +378,9 @@ class VsphereCluster(VsphereObject):
             base_dir=self.base_dir,
             initialized=self.initialized,
             name=self.name,
+            vsphere=self.vsphere,
             dc_name=self.dc_name,
+            resource_pool_name=self.base_resource_pool_name,
             standalone=self.standalone,
             status=self.status,
             cpu_cores=self.cpu_cores,
@@ -359,9 +400,10 @@ class VsphereCluster(VsphereObject):
         if not isinstance(other, VsphereCluster):
             return False
 
+        if self.vsphere != other.vsphere:
+            return False
         if self.dc_name != other.dc_name:
             return False
-
         if self.name != other.name:
             return False
 
@@ -370,7 +412,14 @@ class VsphereCluster(VsphereObject):
     # -------------------------------------------------------------------------
     @classmethod
     def from_summary(
-        cls, data, dc_name=None, appname=None, verbose=0, base_dir=None, test_mode=False
+        cls,
+        data,
+        vsphere=None,
+        dc_name=None,
+        appname=None,
+        verbose=0,
+        base_dir=None,
+        test_mode=False,
     ):
         """Create a new VsphereCluster object based on the appropriate data from pyvomi."""
         if test_mode:
@@ -387,7 +436,9 @@ class VsphereCluster(VsphereObject):
             "verbose": verbose,
             "base_dir": base_dir,
             "initialized": True,
+            "vsphere": vsphere,
             "dc_name": dc_name,
+            "resource_pool_name": cls.default_resource_pool_name,
             "name": data.name,
             "status": data.overallStatus,
             "config_status": data.configStatus,
@@ -401,6 +452,18 @@ class VsphereCluster(VsphereObject):
         }
         if isinstance(data, vim.ClusterComputeResource):
             params["standalone"] = False
+
+        if hasattr(data, "resourcePool"):
+            rname = data.resourcePool.summary.name
+            if verbose > 0:
+                LOG.debug(f"Name of resource pool of {data.name!r}: {rname!r}")
+            params["resource_pool_name"] = rname
+        else:
+            msg = _(
+                "Could not access to resource pool of compute resource {cc!r} in vSphere {vs!r}, "
+                "datacenter {dc!r}."
+            ).format(cc=data.name, vs=vsphere, dc=dc_name)
+            LOG.warn(msg)
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))

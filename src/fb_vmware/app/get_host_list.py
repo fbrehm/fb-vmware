@@ -36,7 +36,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.3"
+__version__ = "1.5.6"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -73,9 +73,7 @@ class GetHostsListApplication(BaseVmwareApplication):
         env_prefix=None,
     ):
         """Initialize a GetHostsListApplication object."""
-        desc = _(
-            "Tries to get a list of all physical hosts in " "VMware vSphere and print it out."
-        )
+        desc = _("Tries to get a list of all physical hosts in VMware vSphere and print it out.")
 
         self._host_pattern = self.default_host_pattern
         self.sort_keys = self.default_sort_keys
@@ -119,8 +117,6 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetHostsListApplication, self).init_arg_parser()
-
         filter_group = self.arg_parser.add_argument_group(_("Filter options"))
 
         filter_group.add_argument(
@@ -172,6 +168,8 @@ class GetHostsListApplication(BaseVmwareApplication):
             ),
         )
 
+        super(GetHostsListApplication, self).init_arg_parser()
+
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):
         """Evaluate command line parameters."""
@@ -213,10 +211,10 @@ class GetHostsListApplication(BaseVmwareApplication):
         ret = 0
         all_hosts = []
 
-        if self.verbose:
+        if self.verbose or self.quiet:
             for vsphere_name in self.vsphere:
                 all_hosts += self.get_hosts(vsphere_name)
-        elif not self.quiet:
+        else:
             spin_prompt = _("Getting all vSphere hosts ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):

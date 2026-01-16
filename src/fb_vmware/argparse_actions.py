@@ -11,6 +11,7 @@ from __future__ import absolute_import
 # Standard modules
 import argparse
 import logging
+
 # import os
 # from pathlib import Path
 
@@ -20,7 +21,7 @@ import logging
 # Own modules
 from .xlate import XLATOR
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -40,7 +41,9 @@ class NonNegativeIntegerOptionAction(argparse.Action):
         self.may_zero = bool(may_zero)
 
         super(NonNegativeIntegerOptionAction, self).__init__(
-            *args, **kwargs, option_strings=option_strings,
+            *args,
+            **kwargs,
+            option_strings=option_strings,
         )
 
     # -------------------------------------------------------------------------

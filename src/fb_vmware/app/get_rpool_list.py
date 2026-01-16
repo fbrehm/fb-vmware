@@ -33,11 +33,12 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
 ngettext = XLATOR.ngettext
+
 
 # =============================================================================
 class GetResPoolAppError(VmwareAppError):
@@ -161,7 +162,8 @@ class GetResPoolListApplication(BaseVmwareApplication):
                 LOG.debug(_("First computing resource:") + "\n" + pp(all_rpools[0].as_dict()))
                 for rpool in all_rpools:
                     out_list.append(
-                        f" * Vsphere {rpool.vsphere:<10} - DC {rpool.dc_name:<12} - {rpool.name}")
+                        f" * Vsphere {rpool.vsphere:<10} - DC {rpool.dc_name:<12} - {rpool.name}"
+                    )
                 out = "\n".join(out_list)
             elif self.verbose > 2:
                 for rpool in all_rpools:
@@ -241,7 +243,7 @@ class GetResPoolListApplication(BaseVmwareApplication):
         table.add_column(
             header=_("Hosts total"),
             justify="right",
-            footer=self._prepare_number(totals["hosts_total"], warn_on_value1=True)
+            footer=self._prepare_number(totals["hosts_total"], warn_on_value1=True),
         )
         table.add_column(
             header=_("Hosts available"),
@@ -255,7 +257,7 @@ class GetResPoolListApplication(BaseVmwareApplication):
         table.add_column(
             header=_("CPU cores"),
             justify="right",
-            footer=self._prepare_number(totals["cpu_cores"])
+            footer=self._prepare_number(totals["cpu_cores"]),
         )
         table.add_column(
             header=_("CPU threads"),
@@ -286,7 +288,8 @@ class GetResPoolListApplication(BaseVmwareApplication):
             row.append(is_cluster)
             row.append(rpool.base_resource_pool_name)
             row.append(self._prepare_number(rpool.hosts_total, warn_on_value1=True))
-            row.append(self._prepare_number(
+            row.append(
+                self._prepare_number(
                     rpool.hosts_effective,
                     warn_on_value1=True,
                     compare_val=rpool.hosts_total,
@@ -295,7 +298,9 @@ class GetResPoolListApplication(BaseVmwareApplication):
             row.append(self._prepare_number(rpool.cpu_cores))
             row.append(self._prepare_number(rpool.cpu_threads))
             row.append(self._prepare_number(rpool.mem_mb_total))
-            row.append(self._prepare_number(rpool.mem_mb_effective, compare_val=rpool.mem_mb_total))
+            row.append(
+                self._prepare_number(rpool.mem_mb_effective, compare_val=rpool.mem_mb_total)
+            )
 
             table.add_row(*row)
 

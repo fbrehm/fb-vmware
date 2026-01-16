@@ -36,7 +36,7 @@ from ..cluster import VsphereCluster
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -173,10 +173,13 @@ class GetResPoolListApplication(BaseVmwareApplication):
                 out = pp(out_list)
             if self.verbose >= 2:
                 LOG.debug("All computing resources:\n{}".format(out))
-        else:
-            LOG.error(_("Did not found any resource pools od cluster resource pools."))
-            ret = 3
 
+            self.print_rpools(all_rpools)
+        else:
+            LOG.error(_("Did not found any resource pools or cluster resource pools."))
+            if not self.quiet:
+                print()
+            ret = 3
 
         return ret
 
@@ -193,6 +196,160 @@ class GetResPoolListApplication(BaseVmwareApplication):
             clusters.append(cluster)
 
         return clusters
+
+    # -------------------------------------------------------------------------
+    def print_rpools(self, rpools):
+        """Print on STDOUT all information about cluster) computing resources."""
+        show_header = True
+        show_footer = True
+        table_title = _("All compute resources and cluster compute resources") + "\n"
+        box_style = box.ROUNDED
+
+        if self.quiet:
+            show_header = False
+            show_footer = False
+            table_title = None
+            box_style = None
+
+        if self.quiet:
+            caption = None
+        else:
+            count = len(rpools)
+            if count:
+                caption = "\n" + ngettext(
+                    "Found one compute resource.",
+                    "Found {} compute resources.",
+                    count,
+                ).format(count)
+            else:
+                caption = "\n" + _("Found no compute resources.")
+
+        totals = {
+            "hosts_total": 0,
+            "hosts_avail": 0,
+            "cpu_cores": 0,
+            "cpu_threads": 0,
+            "mem_total": 0,
+            "mem_avail": 0,
+        }
+
+        for rpool in rpools:
+            totals["hosts_total"] += rpool.hosts_total
+            totals["hosts_avail"] += rpool.hosts_effective
+            totals["cpu_cores"] += rpool.cpu_cores
+            totals["cpu_threads"] += rpool.cpu_threads
+            totals["mem_total"] += rpool.mem_mb_total
+            totals["mem_avail"] += rpool.mem_mb_effective
+
+        table = Table(
+            title=table_title,
+            title_style="bold cyan",
+            caption=caption,
+            caption_style="default on default",
+            caption_justify="left",
+            box=box_style,
+            show_header=show_header,
+            show_footer=show_footer,
+        )
+
+        table.add_column(header=_("vSphere"), footer=_("Total:"))
+        table.add_column(header=_("Data Center"), footer="")
+        table.add_column(header=_("Name"), footer="")
+        table.add_column(header=_("Cluster"), footer="")
+        table.add_column(header=_("Pool name"), footer="")
+
+        hosts_total = format_decimal(totals["hosts_total"], format="#,##0")
+        if totals["hosts_total"] == 0:
+            hosts_total = Text(hosts_total, style="bold red")
+        elif totals["hosts_total"] == 1:
+            hosts_total = Text(hosts_total, style="bold yellow")
+        table.add_column(header=_("Hosts total"), justify="right", footer=hosts_total)
+
+        hosts_avail = format_decimal(totals["hosts_avail"], format="#,##0")
+        if totals["hosts_avail"] == 0:
+            hosts_avail = Text(hosts_avail, style="bold red")
+        elif totals["hosts_avail"] == 1 or totals["hosts_avail"] < totals["hosts_avail"]:
+            hosts_avail = Text(hosts_avail, style="bold yellow")
+        table.add_column(header=_("Hosts available"), justify="right", footer=hosts_avail)
+
+        cpu_cores = format_decimal(totals["cpu_cores"], format="#,##0")
+        if totals["cpu_cores"] == 0:
+            cpu_cores = Text(cpu_cores, style="bold red")
+        table.add_column(header=_("CPU cores"), justify="right", footer=cpu_cores)
+
+        cpu_threads = format_decimal(totals["cpu_threads"], format="#,##0")
+        if totals["cpu_threads"] == 0:
+            cpu_threads = Text(cpu_threads, style="bold red")
+        table.add_column(header=_("CPU threads"), justify="right", footer=cpu_threads)
+
+        mem_total = format_decimal(totals["mem_total"], format="#,##0")
+        if totals["mem_total"] == 0:
+            mem_total = Text(mem_total, style="bold red")
+        table.add_column(header=_("Memory total"), justify="right", footer=mem_total)
+
+        mem_avail = format_decimal(totals["mem_avail"], format="#,##0")
+        if totals["mem_avail"] == 0:
+            mem_avail = Text(mem_avail, style="bold red")
+        elif totals["mem_avail"] < totals["mem_avail"]:
+            mem_avail = Text(mem_avail, style="bold yellow")
+        table.add_column(header=_("Memory available"), justify="right", footer=mem_avail)
+
+        for rpool in rpools:
+            row = []
+            row.append(rpool.vsphere)
+            row.append(rpool.dc_name)
+            row.append(rpool.name)
+
+            is_cluster = Text(_("Yes"), style="bold green")
+            if rpool.standalone:
+                is_cluster = Text(_("No"), style="green")
+            row.append(is_cluster)
+
+            row.append(rpool.base_resource_pool_name)
+
+            hosts_total = format_decimal(rpool.hosts_total, format="#,##0")
+            if rpool.hosts_total == 0:
+                hosts_total = Text(hosts_total, style="bold red")
+            elif rpool.hosts_total == 1:
+                hosts_total = Text(hosts_total, style="bold yellow")
+            row.append(hosts_total)
+
+            hosts_avail = format_decimal(rpool.hosts_effective, format="#,##0")
+            if rpool.hosts_effective == 0:
+                hosts_avail = Text(hosts_avail, style="bold red")
+            elif rpool.hosts_effective == 1 or rpool.hosts_effective < rpool.hosts_total:
+                hosts_avail = Text(hosts_avail, style="bold yellow")
+            row.append(hosts_avail)
+
+            cpu_cores = format_decimal(rpool.cpu_cores, format="#,##0")
+            if rpool.cpu_cores == 0:
+                cpu_cores = Text(cpu_cores, style="bold red")
+            row.append(cpu_cores)
+
+            cpu_threads = format_decimal(rpool.cpu_threads, format="#,##0")
+            if rpool.cpu_threads == 0:
+                cpu_threads = Text(cpu_threads, style="bold red")
+            row.append(cpu_threads)
+
+            mem_total = format_decimal(rpool.mem_mb_total, format="#,##0")
+            if rpool.mem_mb_total == 0:
+                mem_total = Text(mem_total, style="bold red")
+            row.append(mem_total)
+
+            mem_avail = format_decimal(rpool.mem_mb_effective, format="#,##0")
+            if rpool.hosts_effective == 0:
+                mem_avail = Text(mem_avail, style="bold red")
+            elif rpool.mem_mb_effective < rpool.mem_mb_total:
+                mem_avail = Text(mem_avail, style="bold yellow")
+            row.append(mem_avail)
+
+            table.add_row(*row)
+
+        self.rich_console.print(table)
+
+        if not self.quiet:
+            print()
+
 
 # =============================================================================
 def main():

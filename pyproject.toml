@@ -48,6 +48,7 @@ name = "fb_vmware"
 directory = "data"
 
 [project.scripts]
+get-vsphere-cluster-list = "fb_vmware.app.get_rpool_list:main"
 get-vsphere-host-list = "fb_vmware.app.get_host_list:main"
 get-vsphere-network-list = "fb_vmware.app.get_network_list:main"
 get-vsphere-storage-cluster-info =  "fb_vmware.app.get_storage_cluster_info:main"

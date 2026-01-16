@@ -119,8 +119,6 @@ class GetHostsListApplication(BaseVmwareApplication):
     # -------------------------------------------------------------------------
     def init_arg_parser(self):
         """Public available method to initiate the argument parser."""
-        super(GetHostsListApplication, self).init_arg_parser()
-
         filter_group = self.arg_parser.add_argument_group(_("Filter options"))
 
         filter_group.add_argument(
@@ -171,6 +169,8 @@ class GetHostsListApplication(BaseVmwareApplication):
                 default=format_list(self.default_sort_keys, do_repr=True),
             ),
         )
+
+        super(GetHostsListApplication, self).init_arg_parser()
 
     # -------------------------------------------------------------------------
     def perform_arg_parser(self):

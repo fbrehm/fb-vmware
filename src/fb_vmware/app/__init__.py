@@ -163,7 +163,7 @@ class BaseVmwareApplication(FbConfigApplication):
     # -------------------------------------------------------------------------
     def __del__(self):
         """Clean up in emergency case."""
-        if self.vsphere.keys():
+        if hasattr(self, "vsphere") and self.vsphere.keys():
             self.cleaning_up()
 
     # -------------------------------------------------------------------------

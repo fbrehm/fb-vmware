@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.11.2"
+__version__ = "2.11.3"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -903,7 +903,7 @@ class VsphereConnection(BaseVsphereHandler):
         if isinstance(child, (vim.ClusterComputeResource, vim.ComputeResource)):
             cluster = VsphereCluster.from_summary(
                 child,
-                vsphere_name=vsphere_name,
+                vsphere=vsphere_name,
                 dc_name=dc_name,
                 appname=self.appname,
                 verbose=self.verbose,

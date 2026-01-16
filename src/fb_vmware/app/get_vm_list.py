@@ -37,7 +37,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.12.0"
+__version__ = "1.12.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -386,10 +386,10 @@ class GetVmListApplication(BaseVmwareApplication):
 
         re_name = re.compile(self.vm_pattern, re.IGNORECASE)
 
-        if self.verbose:
+        if self.verbose or self.quiet:
             for vsphere_name in self.vsphere:
                 all_vms += self.get_vms(vsphere_name, re_name)
-        elif not self.quiet:
+        else:
             spin_prompt = _("Getting all vSphere VMs ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):

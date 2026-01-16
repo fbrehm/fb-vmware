@@ -24,7 +24,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.9.0"
+__version__ = "1.9.1"
 LOG = logging.getLogger(__name__)
 
 
@@ -457,6 +457,12 @@ class VsphereCluster(VsphereObject):
             if verbose > 0:
                 LOG.debug(f"Name of resource pool of {data.name!r}: {rname!r}")
             params["resource_pool_name"] = rname
+        else:
+            msg = _(
+                "Could not access to resource pool of compute resource {cc!r} in vSphere {vs!r}, "
+                "datacenter {dc!r}."
+            ).format(cc=data.name, vs=vsphere, dc=dc_name)
+            LOG.warn(msg)
 
         if verbose > 2:
             LOG.debug(_("Creating {} object from:").format(cls.__name__) + "\n" + pp(params))

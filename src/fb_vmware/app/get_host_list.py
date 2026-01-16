@@ -36,7 +36,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.4"
+__version__ = "1.5.5"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -213,10 +213,10 @@ class GetHostsListApplication(BaseVmwareApplication):
         ret = 0
         all_hosts = []
 
-        if self.verbose:
+        if self.verbose or self.quiet:
             for vsphere_name in self.vsphere:
                 all_hosts += self.get_hosts(vsphere_name)
-        elif not self.quiet:
+        else:
             spin_prompt = _("Getting all vSphere hosts ...") + " "
             spinner_name = self.get_random_spinner_name()
             with Spinner(spin_prompt, spinner_name):

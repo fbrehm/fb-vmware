@@ -1,4 +1,4 @@
-fb-vmware (1.8.1) UNRELEASED; urgency=medium
+fb-vmware (1.8.1) all; urgency=medium
 
   * Adding script get-vsphere-cluster-list.
 

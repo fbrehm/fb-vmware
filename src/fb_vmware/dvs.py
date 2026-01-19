@@ -29,7 +29,7 @@ from .obj import DEFAULT_OBJ_STATUS
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -308,7 +308,7 @@ class VsphereDVS(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.DistributedVirtualSwitch, True
+            content.rootFolder, [vim.DistributedVirtualSwitch], True
         )
         for c in container.view:
             if c.name == self.name:
@@ -734,7 +734,7 @@ class VsphereDvPortGroup(VsphereNetwork):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.dvs.DistributedVirtualPortgroup, True
+            content.rootFolder, [vim.dvs.DistributedVirtualPortgroup], True
         )
         for c in container.view:
             if c.name == self.name:

@@ -1,3 +1,9 @@
+fb-vmware (1.8.2) all; urgency=medium
+
+  * Different fixes, see CHANGELOG.md
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Mon, 19 Jan 2026 12:32:55 +0100
+
 fb-vmware (1.8.1) all; urgency=medium
 
   * Adding script get-vsphere-cluster-list.

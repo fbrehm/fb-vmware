@@ -55,7 +55,7 @@ from .network import VsphereNetwork, VsphereNetworkDict
 from .vm import VsphereVm, VsphereVmList
 from .xlate import XLATOR
 
-__version__ = "2.11.3"
+__version__ = "2.11.4"
 LOG = logging.getLogger(__name__)
 
 DEFAULT_OS_VERSION = "rhel9_64Guest"
@@ -1013,6 +1013,7 @@ class VsphereConnection(BaseVsphereHandler):
         no_error=False,
         disconnect=False,
         name_only=False,
+        as_pyvmomi_obj=False,
     ):
         """Get a virtual machine from vSphere as VsphereVm object straight by its name."""
         if vsphere_name is None:
@@ -1039,6 +1040,9 @@ class VsphereConnection(BaseVsphereHandler):
                             vm=self.colored(vm_name, "CYAN"), vs=self.colored(vsphere_name, "CYAN")
                         )
                     )
+                if as_pyvmomi_obj:
+                    return vm_obj
+
                 parents = self.get_parents(vm_obj)
                 if self.verbose > 3:
                     LOG.debug("Parents of VM {vm!r}:\n{p}".format(vm=vm_obj.name, p=pp(parents)))

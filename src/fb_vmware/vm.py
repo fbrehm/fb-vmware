@@ -38,7 +38,7 @@ from .obj import OBJ_STATUS_GREEN
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -422,7 +422,7 @@ class VsphereVm(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.VirtualMachine, True
+            content.rootFolder, [vim.VirtualMachine], True
         )
         for c in container.view:
             if c.name == self.name:

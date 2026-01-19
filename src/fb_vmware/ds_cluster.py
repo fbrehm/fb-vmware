@@ -35,7 +35,7 @@ from .errors import VSphereNoDsClusterFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.2"
+__version__ = "1.8.3"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -340,7 +340,7 @@ class VsphereDsCluster(VsphereObject):
 
         content = service_instance.RetrieveContent()
         container = content.viewManager.CreateContainerView(
-            content.rootFolder, vim.StoragePod, True
+            content.rootFolder, [vim.StoragePod], True
         )
         for c in container.view:
             if c.name == self.name:

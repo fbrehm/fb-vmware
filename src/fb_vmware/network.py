@@ -31,7 +31,7 @@ from .obj import VsphereObject
 from .typed_dict import TypedDict
 from .xlate import XLATOR
 
-__version__ = "1.10.1"
+__version__ = "1.10.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -246,7 +246,7 @@ class VsphereNetwork(VsphereObject):
             return None
 
         content = service_instance.RetrieveContent()
-        container = content.viewManager.CreateContainerView(content.rootFolder, vim.Network, True)
+        container = content.viewManager.CreateContainerView(content.rootFolder, [vim.Network], True)
         for c in container.view:
             if c.name == self.name:
                 obj = c

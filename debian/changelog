@@ -1,3 +1,10 @@
+fb-vmware (1.8.3) UNRELEASED; urgency=medium
+
+  * Fixed debug output errors in classes VsphereDatastoreDict and
+    VsphereDsClusterDict.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 22 Jan 2026 17:38:46 +0100
+
 fb-vmware (1.8.2) all; urgency=medium
 
   * Different fixes, see CHANGELOG.md

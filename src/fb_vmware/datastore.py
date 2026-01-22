@@ -34,7 +34,7 @@ from .errors import VSphereNoDatastoreFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.3"
+__version__ = "1.8.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -932,7 +932,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     ):
 
         LOG.debug(
-            _("Searching datastore for {c:d} GiB of type {t!r}.").format(
+            _("Searching datastore for {c:0.1f} GiB of type {t!r}.").format(
                 c=needed_gb, t=storage_type
             )
         )
@@ -952,7 +952,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
             if usable and compute_cluster:
                 if ds.compute_clusters is None:
                     msg = _(
-                        "Cannot detect connection with compute cluster {cl!r}, datastore "
+                        "Cannot detect connection with compute cluster {!r}, datastore "
                         "was not detailled discovered."
                     ).format(ds_name)
                     raise FbVMWareRuntimeError(msg)

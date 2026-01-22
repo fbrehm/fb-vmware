@@ -1,4 +1,4 @@
-fb-vmware (1.8.3) UNRELEASED; urgency=medium
+fb-vmware (1.8.3) all; urgency=medium
 
   * Fixed debug output errors in classes VsphereDatastoreDict and
     VsphereDsClusterDict.

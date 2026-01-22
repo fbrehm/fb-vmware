@@ -688,6 +688,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
                 use_random_select=use_random_select,
             )
             if ds_cluster_name:
+                LOG.debug(_("Found usable datastore cluster {!r}.").format(ds_cluster_name))
                 return ds_cluster_name
 
         raise VSphereNoDsClusterFoundError(needed_gb)

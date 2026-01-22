@@ -917,6 +917,7 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
                 use_random_select=use_random_select,
             )
             if ds_name:
+                LOG.debug(_("Found usable datastore {!r}.").format(ds_name))
                 return ds_name
 
         raise VSphereNoDatastoreFoundError(needed_gb)

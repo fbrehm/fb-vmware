@@ -35,7 +35,7 @@ from .errors import VSphereNoDsClusterFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.3"
+__version__ = "1.8.4"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -688,6 +688,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
                 use_random_select=use_random_select,
             )
             if ds_cluster_name:
+                LOG.debug(_("Found usable datastore cluster {!r}.").format(ds_cluster_name))
                 return ds_cluster_name
 
         raise VSphereNoDsClusterFoundError(needed_gb)
@@ -703,7 +704,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     ):
 
         LOG.debug(
-            _("Searching datastore cluster for {c:d} GiB of type {t!r}.").format(
+            _("Searching datastore cluster for {c:0.1f} GiB of type {t!r}.").format(
                 c=needed_gb, t=storage_type
             )
         )
@@ -723,7 +724,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
             if usable and compute_cluster:
                 if dsc.compute_clusters is None:
                     msg = _(
-                        "Cannot detect connection with compute cluster {cl!r}, datastore cluster "
+                        "Cannot detect connection with compute cluster {!r}, datastore cluster "
                         "was not detailled discovered."
                     ).format(dsc_name)
                     raise FbVMWareRuntimeError(msg)

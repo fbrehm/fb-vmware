@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Updated CHANGELOG.md.
 
+## [1.8.4] - 2026-02-06
+
+### Changed
+
+* Non change release for triggering build pipelines.
+
 ## [1.8.3] - 2026-01-22
 
 ### Fixed
@@ -301,7 +307,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Initial release.
 
 
-[Unreleased]: https://github.com/fbrehm/fb-vmware/compare/1.8.3...develop
+[Unreleased]: https://github.com/fbrehm/fb-vmware/compare/1.8.4...develop
+[1.8.4]: https://github.com/fbrehm/fb-vmware/compare/1.8.3...1.8.4
 [1.8.3]: https://github.com/fbrehm/fb-vmware/compare/1.8.2...1.8.3
 [1.8.2]: https://github.com/fbrehm/fb-vmware/compare/1.8.1...1.8.2
 [1.8.1]: https://github.com/fbrehm/fb-vmware/compare/1.8.0...1.8.1

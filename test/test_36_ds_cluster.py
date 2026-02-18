@@ -19,6 +19,8 @@ try:
 except ImportError:
     import unittest
 
+from fb_tools.common import pp
+
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
@@ -97,6 +99,30 @@ class TestVDataStoreCluster(FbVMWareTestcase):
         self.assertEqual(dsc.vsphere, vsphere)
         self.assertEqual(dsc.dc_name, dc)
 
+    # -------------------------------------------------------------------------
+    def test_valid_search_chains(self):
+        """Test valid search chains of a VsphereDsClusterDict."""
+        LOG.info(self.get_method_doc())
+
+        expected_chains = ("any", "hdd", "hdd-first", "ssd", "ssd-first")
+        expected_chains_w_local = (
+            "any",
+            "hdd",
+            "hdd-first",
+            "local",
+            "local-first",
+            "ssd",
+            "ssd-first",
+        )
+
+        from fb_vmware import VsphereDsClusterDict
+
+        LOG.debug("Expected search chains: " + pp(expected_chains))
+
+        got_chains = VsphereDsClusterDict.valid_search_chains()
+        LOG.debug("Got search chains: " + pp(got_chains))
+        self.assertEqual(got_chains, expected_chains)
+
 
 # =============================================================================
 if __name__ == "__main__":
@@ -113,6 +139,7 @@ if __name__ == "__main__":
     suite.addTest(TestVDataStoreCluster("test_import", verbose))
     suite.addTest(TestVDataStoreCluster("test_init_object", verbose))
     # suite.addTest(TestVDataStoreCluster('test_init_from_summary', verbose))
+    suite.addTest(TestVDataStoreCluster("test_valid_search_chains", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

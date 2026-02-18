@@ -1,3 +1,9 @@
+fb-vmware (1.8.5) all; urgency=medium
+
+  * Different fixes, see CHANGELOG.md
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Wed, 18 Feb 2026 13:39:53 +0100
+
 fb-vmware (1.8.4) all; urgency=medium
 
   * Non change release for triggering build pipelines.

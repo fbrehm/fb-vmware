@@ -19,6 +19,8 @@ try:
 except ImportError:
     import unittest
 
+from fb_tools.common import pp
+
 libdir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, libdir)
 
@@ -98,6 +100,37 @@ class TestVDataStore(FbVMWareTestcase):
         self.assertEqual(ds.dc_name, dc)
         self.assertEqual(ds.cluster, cluster)
 
+    # -------------------------------------------------------------------------
+    def test_valid_search_chains(self):
+        """Test valid search chains of a VsphereDatastoreDict."""
+        LOG.info(self.get_method_doc())
+
+        expected_chains = ("any", "hdd", "hdd-first", "ssd", "ssd-first")
+        expected_chains_w_local = (
+            "any",
+            "hdd",
+            "hdd-first",
+            "local",
+            "local-first",
+            "ssd",
+            "ssd-first",
+        )
+
+        from fb_vmware import VsphereDatastoreDict
+
+        LOG.debug("Expected search chains w/o storage type 'local': " + pp(expected_chains))
+        LOG.debug(
+            "Expected search chains with storage type 'local': " + pp(expected_chains_w_local)
+        )
+
+        got_chains = VsphereDatastoreDict.valid_search_chains()
+        LOG.debug("Got search chains w/o storage type 'local': " + pp(got_chains))
+        self.assertEqual(got_chains, expected_chains)
+
+        got_chains = VsphereDatastoreDict.valid_search_chains(use_local=True)
+        LOG.debug("Got search chains with storage type 'local': " + pp(got_chains))
+        self.assertEqual(got_chains, expected_chains_w_local)
+
 
 # =============================================================================
 if __name__ == "__main__":
@@ -114,6 +147,7 @@ if __name__ == "__main__":
     suite.addTest(TestVDataStore("test_import", verbose))
     suite.addTest(TestVDataStore("test_init_object", verbose))
     # suite.addTest(TestVDataStore('test_init_from_summary', verbose))
+    suite.addTest(TestVDataStore("test_valid_search_chains", verbose))
 
     runner = unittest.TextTestRunner(verbosity=verbose)
 

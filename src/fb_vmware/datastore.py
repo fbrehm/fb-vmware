@@ -10,6 +10,7 @@
 from __future__ import absolute_import
 
 # Standard modules
+import copy
 import logging
 import random
 import re
@@ -34,10 +35,28 @@ from .errors import VSphereNoDatastoreFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.4"
+__version__ = "1.9.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
+SEARCH_CHAINS = {
+    "any": ("hdd", "ssd"),
+    "hdd": ("hdd",),
+    "hdd-first": ("hdd", "ssd"),
+    "ssd": ("ssd",),
+    "ssd-first": ("ssd", "hdd"),
+}
+
+SEARCH_CHAINS_WITH_LOCAL = {
+    "any": ("hdd", "ssd", "local"),
+    "hdd": ("hdd",),
+    "hdd-first": ("hdd", "ssd", "local"),
+    "ssd": ("ssd",),
+    "ssd-first": ("ssd", "hdd", "local"),
+    "local": ("local",),
+    "local-first": ("local", "hdd", "ssd"),
+}
 
 
 # =============================================================================
@@ -601,6 +620,17 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     msg_no_ds_dict = _("Object {{!r}} is not a {} object.").format("VsphereDatastoreDict")
 
     # -------------------------------------------------------------------------
+    @classmethod
+    def valid_search_chains(cls, use_local=False):
+        """Return all valid search chains as a tuple."""
+        if use_local:
+            search_chains = SEARCH_CHAINS_WITH_LOCAL
+        else:
+            search_chains = SEARCH_CHAINS
+
+        return tuple(sorted(search_chains.keys(), key=str.lower))
+
+    # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
         """Initialize a VsphereDatastoreDict object."""
         self._map = {}
@@ -894,14 +924,10 @@ class VsphereDatastoreDict(MutableMapping, FbGenericBaseObject):
     ):
         """Find a datastore in dict with the given minimum free space and the given type."""
         st_type = storage_type.lower()
-        search_chains = {
-            "any": ("hdd", "ssd"),
-            "hdd": ("hdd",),
-            "ssd": ("ssd",),
-        }
         if use_local:
-            search_chains["any"] = ("hdd", "ssd", "local")
-            search_chains["local"] = ("local",)
+            search_chains = copy.copy(SEARCH_CHAINS_WITH_LOCAL)
+        else:
+            search_chains = copy.copy(SEARCH_CHAINS)
 
         if st_type not in search_chains:
             raise ValueError(

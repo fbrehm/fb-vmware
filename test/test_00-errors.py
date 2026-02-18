@@ -34,7 +34,7 @@ class TestVMWareErrors(FbVMWareTestcase):
 
     # -------------------------------------------------------------------------
     def test_import(self):
-        """Test importing module fb_tools.errors."""
+        """Test importing module fb_vmware.errors."""
         LOG.info(self.get_method_doc())
 
         import fb_vmware.errors

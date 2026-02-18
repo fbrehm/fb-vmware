@@ -35,10 +35,18 @@ from .errors import VSphereNoDsClusterFoundError
 from .obj import VsphereObject
 from .xlate import XLATOR
 
-__version__ = "1.8.4"
+__version__ = "1.9.0"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
+
+SEARCH_CHAINS = {
+    "any": ("hdd", "ssd"),
+    "hdd": ("hdd",),
+    "hdd-first": ("hdd", "ssd"),
+    "ssd": ("ssd",),
+    "ssd-first": ("ssd", "hdd"),
+}
 
 
 # =============================================================================
@@ -428,6 +436,12 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     msg_no_cluster_dict = _("Object {{!r}} is not a {} object.").format("VsphereDsClusterDict.")
 
     # -------------------------------------------------------------------------
+    @classmethod
+    def valid_search_chains(cls):
+        """Return all valid search chains as a tuple."""
+        return tuple(sorted(SEARCH_CHAINS.keys(), key=str.lower))
+
+    # -------------------------------------------------------------------------
     def __init__(self, *args, **kwargs):
         """Initialize a VsphereDsClusterDict object."""
         self._map = {}
@@ -668,11 +682,7 @@ class VsphereDsClusterDict(MutableMapping, FbGenericBaseObject):
     ):
         """Find a datastore cluster with the given minimum free space and the given type."""
         st_type = storage_type.lower()
-        search_chains = {
-            "any": ("hdd", "ssd"),
-            "hdd": ("hdd",),
-            "ssd": ("ssd",),
-        }
+        search_chains = SEARCH_CHAINS
 
         if st_type not in search_chains:
             raise ValueError(

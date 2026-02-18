@@ -106,12 +106,22 @@ class TestVDataStore(FbVMWareTestcase):
         LOG.info(self.get_method_doc())
 
         expected_chains = ("any", "hdd", "hdd-first", "ssd", "ssd-first")
-        expected_chains_w_local = ("any", "hdd", "hdd-first", "local", "local-first", "ssd", "ssd-first")
+        expected_chains_w_local = (
+            "any",
+            "hdd",
+            "hdd-first",
+            "local",
+            "local-first",
+            "ssd",
+            "ssd-first",
+        )
 
         from fb_vmware import VsphereDatastoreDict
 
         LOG.debug("Expected search chains w/o storage type 'local': " + pp(expected_chains))
-        LOG.debug("Expected search chains with storage type 'local': " + pp(expected_chains_w_local))
+        LOG.debug(
+            "Expected search chains with storage type 'local': " + pp(expected_chains_w_local)
+        )
 
         got_chains = VsphereDatastoreDict.valid_search_chains()
         LOG.debug("Got search chains w/o storage type 'local': " + pp(got_chains))

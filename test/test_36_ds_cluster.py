@@ -105,7 +105,15 @@ class TestVDataStoreCluster(FbVMWareTestcase):
         LOG.info(self.get_method_doc())
 
         expected_chains = ("any", "hdd", "hdd-first", "ssd", "ssd-first")
-        expected_chains_w_local = ("any", "hdd", "hdd-first", "local", "local-first", "ssd", "ssd-first")
+        expected_chains_w_local = (
+            "any",
+            "hdd",
+            "hdd-first",
+            "local",
+            "local-first",
+            "ssd",
+            "ssd-first",
+        )
 
         from fb_vmware import VsphereDsClusterDict
 

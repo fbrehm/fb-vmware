@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 * Updated CHANGELOG.md.
+* Extending valid search chains of classes VsphereDatastoreDict and VsphereDsClusterDict.
+* Added classmethod `valid_search_chains()` to classes VsphereDatastoreDict
+  and VsphereDsClusterDict.
 
 ## [1.8.4] - 2026-02-06
 

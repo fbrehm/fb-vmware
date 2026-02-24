@@ -1,3 +1,9 @@
+fb-vmware (1.8.6) all; urgency=medium
+
+  * Renaming directory test => tests.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Tue, 24 Feb 2026 09:57:32 +0100
+
 fb-vmware (1.8.5) all; urgency=medium
 
   * Different fixes, see CHANGELOG.md

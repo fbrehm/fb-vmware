@@ -27,7 +27,7 @@ from ..errors import VSphereExpectedError
 from ..ether import VsphereEthernetcard
 from ..xlate import XLATOR
 
-__version__ = "1.10.0"
+__version__ = "1.10.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -384,7 +384,7 @@ class GetVmApplication(BaseVmwareApplication):
 # =============================================================================
 def main():
     """Entrypoint for get-vsphere-vm-info."""
-    my_path = pathlib.Path(__file__)
+    my_path = pathlib.Path(sys.argv[0])
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")

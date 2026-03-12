@@ -36,7 +36,7 @@ from ..errors import VSphereExpectedError
 from ..host import VsphereHost
 from ..xlate import XLATOR
 
-__version__ = "1.5.6"
+__version__ = "1.5.7"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -416,7 +416,7 @@ class GetHostsListApplication(BaseVmwareApplication):
 # =============================================================================
 def main():
     """Entrypoint for get-vsphere-host-list."""
-    my_path = pathlib.Path(__file__)
+    my_path = pathlib.Path(sys.argv[0])
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")

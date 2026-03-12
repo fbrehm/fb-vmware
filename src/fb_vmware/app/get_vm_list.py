@@ -37,7 +37,7 @@ from ..errors import VSphereExpectedError
 from ..vm import VsphereVm
 from ..xlate import XLATOR
 
-__version__ = "1.12.1"
+__version__ = "1.12.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -666,7 +666,7 @@ class GetVmListApplication(BaseVmwareApplication):
 # =============================================================================
 def main():
     """Entrypoint for get-vsphere-vm-list."""
-    my_path = pathlib.Path(__file__)
+    my_path = pathlib.Path(sys.argv[0])
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")

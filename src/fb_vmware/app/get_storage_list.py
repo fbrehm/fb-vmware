@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2025 by Frank Brehm, Berlin
+@copyright: © 2022 - 2026 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import, print_function
 
@@ -36,7 +36,7 @@ from ..datastore import VsphereDatastoreDict
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -456,7 +456,7 @@ class GetStorageListApp(BaseVmwareApplication):
 # =============================================================================
 def main():
     """Entrypoint for get-vsphere-storage-list."""
-    my_path = pathlib.Path(__file__)
+    my_path = pathlib.Path(sys.argv[0])
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")

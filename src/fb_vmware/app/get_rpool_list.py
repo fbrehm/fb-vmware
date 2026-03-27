@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2026 by Frank Brehm, Berlin
+@copyright: © 2022 - 2026 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import, print_function
 
@@ -33,7 +33,7 @@ from .. import __version__ as GLOBAL_VERSION
 from ..errors import VSphereExpectedError
 from ..xlate import XLATOR
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 LOG = logging.getLogger(__name__)
 
 _ = XLATOR.gettext
@@ -356,7 +356,7 @@ class GetResPoolListApplication(BaseVmwareApplication):
 # =============================================================================
 def main():
     """Entrypoint for get-vsphere-cluster-list."""
-    my_path = pathlib.Path(__file__)
+    my_path = pathlib.Path(sys.argv[0])
     appname = my_path.name
 
     locale.setlocale(locale.LC_ALL, "")

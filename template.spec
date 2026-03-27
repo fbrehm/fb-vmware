@@ -17,10 +17,9 @@ Source0:        fb-vmware.%{version}.tar.gz
 BuildRequires:  gettext
 BuildRequires:  python%{python3_pkgversion}
 BuildRequires:  python%{python3_pkgversion}-babel
-BuildRequires:  python%{python3_pkgversion}-chardet
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-fb-logging >= 1.0.0
-BuildRequires:  python%{python3_pkgversion}-fb-tools >= 2.6.2
+BuildRequires:  python%{python3_pkgversion}-fb-logging >= 1.4.0
+BuildRequires:  python%{python3_pkgversion}-fb-tools >= 3.0.0
 BuildRequires:  python%{python3_pkgversion}-libs
 BuildRequires:  python%{python3_pkgversion}-pytz
 BuildRequires:  python%{python3_pkgversion}-pyvmomi
@@ -31,14 +30,12 @@ BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  pyproject-rpm-macros
 Requires:       python%{python3_pkgversion}
 Requires:       python%{python3_pkgversion}-babel
-Requires:       python%{python3_pkgversion}-chardet
-Requires:       python%{python3_pkgversion}-fb-logging >= 1.0.0
-Requires:       python%{python3_pkgversion}-fb-tools >= 2.6.2
+Requires:       python%{python3_pkgversion}-fb-logging >= 1.4.0
+Requires:       python%{python3_pkgversion}-fb-tools >= 3.0.0
 Requires:       python%{python3_pkgversion}-libs
 Requires:       python%{python3_pkgversion}-pytz
 Requires:       python%{python3_pkgversion}-pyvmomi
 Requires:       python%{python3_pkgversion}-pyyaml
-Requires:       python%{python3_pkgversion}-requests
 Requires:       python%{python3_pkgversion}-rich
 Requires:       python%{python3_pkgversion}-semver
 Requires:       python%{python3_pkgversion}-six
@@ -50,11 +47,15 @@ Python wrapper module around the pyvmomi module to simplify work and handling.
 This is the Python@@@py_version_nodot@@@ version.
 
 In this package are contained the following scripts:
+ * get-vsphere-cluster-list
  * get-vsphere-host-list
  * get-vsphere-network-list
+ * get-vsphere-storage-cluster-info
  * get-vsphere-storage-cluster-list
+ * get-vsphere-storage-list
  * get-vsphere-vm-info
  * get-vsphere-vm-list
+ * search-vsphere-storage
 
 %prep
 echo "Preparing '${builddir}-' ..."

@@ -5,7 +5,7 @@
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2025 by Frank Brehm, Berlin
+@copyright: © 2022 - 2026 by Frank Brehm, Berlin
 """
 # flake8: noqa
 from __future__ import absolute_import
@@ -56,7 +56,7 @@ from .vm import VsphereVmList
 from .xlate import XLATOR
 
 
-__version__ = "1.8.6"
+__version__ = "1.9.0"
 
 LOG = logging.getLogger(__name__)
 

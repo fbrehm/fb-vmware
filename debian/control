@@ -2,17 +2,15 @@ Source: fb-vmware
 Section: python
 Priority: extra
 Maintainer: Frank Brehm <frank@brehm-online.com>
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 13),
                gettext,
                dh-python,
                help2man,
                python3-all,
                python3-babel,
-               python3-chardet,
-               python3-fb-logging (>=1.0.0),
-               python3-fb-tools (>=2.6.2),
+               python3-fb-logging (>=1.4.0),
+               python3-fb-tools (>=3.0.0),
                python3-pip,
-               python3-pyvmomi,
                python3-semver,
                python3-six,
                python3-yaml,
@@ -21,18 +19,36 @@ Standards-Version: 3.9.6
 Homepage: https://github.com/fbrehm/fb-vmware
 Vcs-Browser: https://github.com/fbrehm/fb-vmware
 Vcs-Git: https://github.com/fbrehm/fb-vmware.git
-X-Python3-Version: >= 3.6
+X-Python3-Version: >= 3.8
+
+Package: fb-vmware
+Architecture: all
+Pre-Depends: ${misc:Pre-Depends}
+Depends: python3-fb-vmware (= ${binary:Version}),
+         ${misc:Depends},
+         ${python3:Depends}
+Description: A Python wrapper module around the pyvmomi module to simplify work and handling.
+ .
+ This package includes the following executable binaries:
+ - get-vsphere-cluster-list
+ - get-vsphere-host-list
+ - get-vsphere-network-list
+ - get-vsphere-storage-cluster-info
+ - get-vsphere-storage-cluster-list
+ - get-vsphere-storage-list
+ - get-vsphere-vm-info
+ - get-vsphere-vm-list
+ - search-vsphere-storage
 
 Package: python3-fb-vmware
 Architecture: all
-Depends: python3-six,
-         python3-babel,
-         python3-chardet,
-         python3-fb-logging (>=1.0.0),
-         python3-fb-tools (>=2.6.2),
+Depends: python3-babel,
+         python3-fb-logging (>=1.4.0),
+         python3-fb-tools (>=3.0.0),
          python3-pyvmomi,
          python3-rich,
          python3-semver,
+         python3-six,
          python3-yaml,
          python3-tz,
          ${misc:Depends},

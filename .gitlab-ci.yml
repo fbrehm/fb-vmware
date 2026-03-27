@@ -10,7 +10,7 @@ variables:
   EXPIRE_ARTIFACTS_IN: '1 week'
   PKG_NAME: 'fb-vmware'
   PYTHON_ADDITIONAL_PACKAGES: >-
-    python3-chardet
+    python3-babel
     python3-fb-logging
     python3-fb-tools
     python3-pyvmomi

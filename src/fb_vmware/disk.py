@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-@summary: Mdule for capsulating a vSphere disk object, which can be assigned to a VM.
+@summary: Module for capsulating a vSphere disk object, which can be assigned to a VM.
 
 @author: Frank Brehm
 @contact: frank@brehm-online.com
-@copyright: © 2025 by Frank Brehm, Berlin
+@copyright: © 2022 - 2026 by Frank Brehm, Berlin
 """
 from __future__ import absolute_import
 

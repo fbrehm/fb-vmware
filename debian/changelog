@@ -1,3 +1,9 @@
+fb-vmware (1.9.0) all; urgency=medium
+
+  * Changing build environment to create two Debian packages.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Fri, 27 Mar 2026 16:46:48 +0100
+
 fb-vmware (1.8.6) all; urgency=medium
 
   * Renaming directory test => tests.

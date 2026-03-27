@@ -56,7 +56,7 @@ from .vm import VsphereVmList
 from .xlate import XLATOR
 
 
-__version__ = "1.8.6"
+__version__ = "1.9.0"
 
 LOG = logging.getLogger(__name__)
 

@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.9.1] - 2026-06-11
 
-### Chhanged
+### Changed
 
 * Splitting RPM specfile into two different binary packages.
 
-## 81.9.0] - 2026-03-27
+## [1.9.0] - 2026-03-27
 
 ### Changed
 
@@ -273,7 +273,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.7] - 2023-01-02
 
-## Fixed
+### Fixed
 
 * Fixing `.gitlab-ci.yml`.
 

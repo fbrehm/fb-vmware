@@ -28,6 +28,7 @@ BuildRequires:  python%{python3_pkgversion}-rich
 BuildRequires:  python%{python3_pkgversion}-semver
 BuildRequires:  python%{python3_pkgversion}-six
 BuildRequires:  pyproject-rpm-macros
+
 Requires:       python%{python3_pkgversion}
 Requires:       python%{python3_pkgversion}-babel
 Requires:       python%{python3_pkgversion}-fb-logging >= 1.4.0
@@ -44,18 +45,7 @@ BuildArch:      noarch
 %description
 Python wrapper module around the pyvmomi module to simplify work and handling.
 
-This is the Python@@@py_version_nodot@@@ version.
-
-In this package are contained the following scripts:
- * get-vsphere-cluster-list
- * get-vsphere-host-list
- * get-vsphere-network-list
- * get-vsphere-storage-cluster-info
- * get-vsphere-storage-cluster-list
- * get-vsphere-storage-list
- * get-vsphere-vm-info
- * get-vsphere-vm-list
- * search-vsphere-storage
+This is the Python%{python3_pkgversion} version.
 
 %prep
 echo "Preparing '${builddir}-' ..."
@@ -70,19 +60,39 @@ echo "Pwd: $( pwd )"
 
 %install
 %pyproject_install
-%pyproject_save_files fb_vmware
 
-echo "Whats in '%{builddir}':"
-ls -lA '%{builddir}'
-
-echo "Whats in '%{buildroot}':"
-ls -lA '%{buildroot}'
-
-%files -f %{pyproject_files}
+%files
 %defattr(-,root,root,-)
 %license LICENSE
-%doc CHANGELOG.md LICENSE README.md pyproject.toml debian/changelog
+%doc CHANGELOG.md README.md pyproject.toml debian/changelog
+%{python3_sitelib}/*
+%{_datadir}/locale/*
+
+%package -n fb-vmware
+
+Summary:  Python wrapper module around the pyvmomi module to simplify work and handling.
+Group:    Applications/System
+
+Requires: python%{python3_pkgversion}-fb-vmware = %{version}
+
+%description -n fb-vmware
+Python wrapper module around the pyvmomi module to simplify work and handling.
+
+In this package are contained the following scripts:
+ * get-vsphere-cluster-list
+ * get-vsphere-host-list
+ * get-vsphere-network-list
+ * get-vsphere-storage-cluster-info
+ * get-vsphere-storage-cluster-list
+ * get-vsphere-storage-list
+ * get-vsphere-vm-info
+ * get-vsphere-vm-list
+ * search-vsphere-storage
+
+This is the Python%{python3_pkgversion} version.
+
+%files -n fb-vmware
 %{_bindir}/*
-%{_datadir}/*
+%{_mandir}/*
 
 %changelog

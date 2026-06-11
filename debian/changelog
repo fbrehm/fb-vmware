@@ -1,3 +1,9 @@
+fb-vmware (1.9.1) all; urgency=medium
+
+  * Splitting RPM specfile into two different binary packages.
+
+ -- Frank Brehm <frank.brehm@pixelpark.com>  Thu, 11 Jun 2026 13:51:20 +0200
+
 fb-vmware (1.9.0) all; urgency=medium
 
   * Changing build environment to create two Debian packages.
